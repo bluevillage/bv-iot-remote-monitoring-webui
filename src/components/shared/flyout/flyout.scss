@@ -1,0 +1,24 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+@import 'src/styles/themes';
+@import 'src/styles/mixins';
+
+.flyout-container {
+  position: fixed;
+  width: 500px;
+  bottom: 0;
+  right: 0;
+  animation: 0.2s ease 0s 1 slideInFromRight;
+  box-shadow: -3px 3px 14px rgba(0, 0, 0, 0.6);
+  @include rem-fallback(top, 48px);
+
+  @include themify($themes) {
+    background-color: themed('colorFlyoutBackground');
+    border-top: 1px solid #383b3e;
+  }
+}
+
+@keyframes slideInFromRight {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}

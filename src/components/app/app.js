@@ -8,6 +8,7 @@ import Header from './header/header';
 import Navigation from './navigation/navigation';
 import Main from './main/main';
 import PageContent from './pageContent/pageContent';
+import { Flyout } from 'components/shared';
 
 // Page Components
 import  {
@@ -55,6 +56,7 @@ class App extends Component {
             </Switch>
           </PageContent>
         </Main>
+        <Flyout />
       </div>
     );
   }
