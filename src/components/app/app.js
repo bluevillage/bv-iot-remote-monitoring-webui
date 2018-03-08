@@ -50,7 +50,7 @@ class App extends Component {
               <Route exact path={dashboardTab.to} component={DashboardPage} />
               <Route exact path={devicesTab.to} component={DevicesPage} />
               <Route exact path={rulesTab.to} component={RulesPage} />
-              <Route exact path={maintenanceTab.to} component={MaintenancePage} />
+              <Route path={maintenanceTab.to} component={MaintenancePage} />
               <Route component={PageNotFound} />
             </Switch>
           </PageContent>
