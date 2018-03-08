@@ -7,4 +7,4 @@ export * from './indicator/indicator';
 export * from './forms';
 export * from './pcsGrid/pcsGrid';
 export * from './refreshBar/refreshBar';
-export * from './flyout/flyout';
+export * from './flyout';
