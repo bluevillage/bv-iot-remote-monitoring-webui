@@ -16,31 +16,11 @@
     .grid-cell { min-height: 400px; }
   }
 
-  .widget-container {
-    flex-grow: 1;
-    display: flex;
-    flex-flow: column nowrap;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    .widget-header { padding: 10px; }
-
-    .widget-content {
-      flex-grow: 1;
-      padding: 10px;
-      overflow: auto;
-    }
-  }
-
   @include themify($themes) {
     color: themed('colorContentText');
-
-    .widget-header { background-color: themed('colorLowestThird'); }
-    .widget-content { background-color: themed('colorLowestSecond') }
   }
+}
+
+@media (max-width: 1200px) {
+  .dashboard-container { height: auto; }
 }
