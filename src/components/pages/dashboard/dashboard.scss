@@ -4,8 +4,8 @@
 @import 'src/styles/themes';
 
 .dashboard-container {
-  text-align: center;
   padding: 20px;
+  height: 100%;
   @include rem-font-size(20px);
 
   @include themify($themes) {
