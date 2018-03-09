@@ -4,11 +4,40 @@
 @import 'src/styles/themes';
 
 .dashboard-container {
-  padding: 20px;
   height: 100%;
-  @include rem-font-size(20px);
+  display: flex;
+  flex-grow: 1;
+  flex-flow: column nowrap;
+  align-items: stretch;
+
+  .grid-container {
+    padding: 10px;
+
+    .grid-cell { min-height: 400px; }
+  }
+
+  .widget-container {
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column wrap;
+
+    .widget-header {
+      padding: 10px;
+      background: red;
+    }
+
+    .widget-content {
+      flex-grow: 1;
+      padding: 10px;
+      background: green;
+      overflow: auto;
+    }
+  }
 
   @include themify($themes) {
     color: themed('colorContentText');
+
+    .widget-header { background-color: themed('colorLowestThird'); }
+    .widget-content { background-color: themed('colorLowestSecond') }
   }
 }
