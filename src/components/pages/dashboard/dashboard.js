@@ -52,7 +52,9 @@ export class Dashboard extends Component {
           <Cell className="col-6">
             <Widget>
               <WidgetHeader>Header</WidgetHeader>
-              <WidgetContent>Content</WidgetContent>
+              <WidgetContent>
+                <pre>{ JSON.stringify(testJson, null, 2) }</pre>
+              </WidgetContent>
             </Widget>
           </Cell>
           <Cell className="col-4">
@@ -66,13 +68,17 @@ export class Dashboard extends Component {
           <Cell className="col-6">
             <Widget>
               <WidgetHeader>Header</WidgetHeader>
-              <WidgetContent>Content</WidgetContent>
+              <WidgetContent>
+                <pre>{ JSON.stringify(testJson, null, 2) }</pre>
+              </WidgetContent>
             </Widget>
           </Cell>
           <Cell className="col-4">
             <Widget>
               <WidgetHeader>Header</WidgetHeader>
-              <WidgetContent>Content</WidgetContent>
+              <WidgetContent>
+                <pre>{ JSON.stringify(testJson, null, 2) }</pre>
+              </WidgetContent>
             </Widget>
           </Cell>
         </Grid>

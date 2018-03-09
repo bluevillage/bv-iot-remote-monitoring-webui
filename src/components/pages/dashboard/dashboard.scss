@@ -19,17 +19,20 @@
   .widget-container {
     flex-grow: 1;
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 
-    .widget-header {
-      padding: 10px;
-      background: red;
-    }
+    .widget-header { padding: 10px; }
 
     .widget-content {
       flex-grow: 1;
       padding: 10px;
-      background: green;
       overflow: auto;
     }
   }
