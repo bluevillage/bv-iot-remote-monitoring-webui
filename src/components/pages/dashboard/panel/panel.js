@@ -2,10 +2,12 @@
 
 import React from 'react';
 
+import { joinClasses } from 'utilities';
+
 import './panel.css';
 
-export const Panel = ({ children }) => (
-  <div className="panel-container">
+export const Panel = ({ className, children }) => (
+  <div className={joinClasses('panel-container', className)}>
     { children }
   </div>
 );

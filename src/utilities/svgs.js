@@ -6,6 +6,7 @@ import ColonIconPath from 'assets/icons/colon.svg';
 import ContosoIconPath from 'assets/icons/contoso.svg';
 import CriticalIconPath from 'assets/icons/critical.svg';
 import DisabledIconPath from 'assets/icons/disabled.svg';
+import ElipsisIconPath from 'assets/icons/elipsis.svg';
 import ErrorIconPath from 'assets/icons/errorAsterisk.svg';
 import HamburgerIconPath from 'assets/icons/hamburger.svg';
 import InfoBubbleIconPath from 'assets/icons/infoBubble.svg';
@@ -42,6 +43,7 @@ export const svgs = {
   contoso: ContosoIconPath,
   critical: CriticalIconPath,
   disabled: DisabledIconPath,
+  elipsis: ElipsisIconPath,
   error: ErrorIconPath,
   hamburger: HamburgerIconPath,
   info: InfoIconPath,

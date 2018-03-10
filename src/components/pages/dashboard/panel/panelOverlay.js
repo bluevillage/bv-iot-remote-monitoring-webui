@@ -2,6 +2,8 @@
 
 import React from 'react';
 
-export const PanelOverlay = ({ children }) => (
-  <div className="overlay-container">{ children }</div>
+import { joinClasses } from 'utilities';
+
+export const PanelOverlay = ({ children, className }) => (
+  <div className={joinClasses('overlay-container', className)}>{ children }</div>
 );

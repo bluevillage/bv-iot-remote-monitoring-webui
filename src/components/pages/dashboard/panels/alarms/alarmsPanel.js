@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React, { Component } from 'react';
+import { NavLink } from 'react-router-dom';
+
+import { Svg } from 'components/shared';
+import { svgs } from 'utilities';
 
 import {
   Panel,
@@ -11,6 +15,8 @@ import {
 import { RulesGrid, rulesColumnDefs } from 'components/pages/rules/rulesGrid';
 import { translateColumnDefs } from 'utilities';
 
+import './alarmsPanel.css';
+
 export class AlarmsPanel extends Component {
 
   constructor(props) {
@@ -20,8 +26,16 @@ export class AlarmsPanel extends Component {
       rulesColumnDefs.ruleName,
       rulesColumnDefs.severity,
       {
-        headerName: 'Open',
+        headerName: 'rules.grid.count',
         field: 'count'
+      },
+      {
+        headerName: 'Explore',
+        field: 'ruleId',
+        cellRendererFramework: ({ value }) =>
+          <NavLink to={`/maintenance/rule/${value}`} className="alarms-explore-link">
+            <Svg path={svgs.elipsis} />
+          </NavLink>
       }
     ];
   }
@@ -40,7 +54,7 @@ export class AlarmsPanel extends Component {
       t
     };
     return (
-      <Panel>
+      <Panel className="alarms-panel-container">
         <PanelHeader>System alarms</PanelHeader>
         <PanelContent>
           <RulesGrid {...gridProps} />

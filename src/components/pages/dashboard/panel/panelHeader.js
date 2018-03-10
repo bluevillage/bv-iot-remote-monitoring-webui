@@ -2,6 +2,8 @@
 
 import React from 'react';
 
-export const PanelHeader = ({ children }) => (
-  <div className="panel-header">{ children }</div>
+import { joinClasses } from 'utilities';
+
+export const PanelHeader = ({ children, className }) => (
+  <div className={joinClasses('panel-header', className)}>{ children }</div>
 );
