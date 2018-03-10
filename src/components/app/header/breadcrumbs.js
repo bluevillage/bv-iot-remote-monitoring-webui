@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import { Route, Switch, NavLink } from 'react-router-dom';
 
 import { Svg } from 'components/shared';
 import { svgs } from 'utilities';
