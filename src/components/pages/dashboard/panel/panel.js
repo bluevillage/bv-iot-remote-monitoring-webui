@@ -2,10 +2,10 @@
 
 import React from 'react';
 
-import './widget.css';
+import './panel.css';
 
-export const Widget = ({ children }) => (
-  <div className="widget-container">
+export const Panel = ({ children }) => (
+  <div className="panel-container">
     { children }
   </div>
 );

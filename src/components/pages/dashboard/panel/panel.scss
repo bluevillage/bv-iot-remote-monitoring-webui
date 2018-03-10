@@ -3,7 +3,7 @@
 @import 'src/styles/mixins';
 @import 'src/styles/themes';
 
-.widget-container {
+.panel-container {
   flex-grow: 1;
   display: flex;
   flex-flow: column nowrap;
@@ -15,9 +15,9 @@
   left: 0;
   right: 0;
 
-  .widget-header { padding: 10px; }
+  .panel-header { padding: 10px; }
 
-  .widget-content {
+  .panel-content {
     flex-grow: 1;
     padding: 10px;
     overflow: auto;
@@ -37,7 +37,7 @@
   }
 
   @include themify($themes) {
-    .widget-header { background-color: themed('colorLowestThird'); }
-    .widget-content { background-color: themed('colorLowestSecond') }
+    .panel-header { background-color: themed('colorLowestThird'); }
+    .panel-content { background-color: themed('colorLowestSecond') }
   }
 }
