@@ -34,7 +34,6 @@ export const epics = createEpicScenario({
         to: 'NOW',
         devices: ''
       })
-      .do(response => console.log(response))
       .map(toActionCreator(redux.actions.updateAlarms, fromAction))
       .catch(handleError(fromAction))
   },

@@ -33,7 +33,7 @@ export class AlarmsPanel extends Component {
         field: 'ruleId',
         cellRendererFramework: ({ value }) =>
           <NavLink to={`/maintenance/rule/${value}`} className="alarms-explore-link">
-            <Svg path={svgs.elipsis} />
+            <Svg path={svgs.ellipsis} />
           </NavLink>
       }
     ];
@@ -46,7 +46,6 @@ export class AlarmsPanel extends Component {
 
   render() {
     const { t, alarms, isPending } = this.props;
-    console.log('alarms', alarms);
     const gridProps = {
       columnDefs: translateColumnDefs(t, this.columnDefs),
       rowData: !isPending ? alarms : undefined,
