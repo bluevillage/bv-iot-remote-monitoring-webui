@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { Observable } from 'rxjs';
 
+import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
@@ -39,7 +40,7 @@ export class TelemetryPanel extends Component {
         <PanelContent>
           Contents
         </PanelContent>
-        { this.state.isPending && <PanelOverlay /> }
+        { this.state.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }

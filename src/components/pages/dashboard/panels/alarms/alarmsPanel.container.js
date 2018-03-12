@@ -3,7 +3,11 @@
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next';
 import { AlarmsPanel } from './alarmsPanel';
-import { epics as rulesEpics, getRulesPendingStatus, getRulesLastUpdated } from 'store/reducers/rulesReducer';
+import {
+  epics as rulesEpics,
+  getRulesPendingStatus,
+  getRulesLastUpdated
+} from 'store/reducers/rulesReducer';
 import {
   epics as alarmEpics,
   getAlarmsWithRuleName,
