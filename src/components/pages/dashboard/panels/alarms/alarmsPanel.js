@@ -9,8 +9,7 @@ import { svgs } from 'utilities';
 import {
   Panel,
   PanelHeader,
-  PanelContent,
-  PanelOverlay
+  PanelContent
 } from 'components/pages/dashboard/panel';
 import { RulesGrid, rulesColumnDefs } from 'components/pages/rules/rulesGrid';
 import { translateColumnDefs } from 'utilities';
