@@ -4,11 +4,16 @@
 @import 'src/styles/themes';
 
 .telemetry-panel-container {
+  text{
+    fill: white;
+  }
+  .tsi-dark{
+    background: transparent
+  }
   .options-container {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
-
     .radio-container {
       margin: 0 5px;
       height: 2em;

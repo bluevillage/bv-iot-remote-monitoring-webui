@@ -20,18 +20,17 @@ import './telemetryPanel.css';
 const telemetryChartId = 'device-telemetry-chart';
 
 const chartColors = [
-  '#E81123',
-  '#F2C80F',
-  '#FFEE91',
-  '#FD625E',
-  '#3599B8',
-  '#3599B8',
-  '#26FFDE',
   '#01B8AA',
-  '#FF4EC2',
-  '#FDA954',
   '#33669A',
-  '#E0E7EE'
+  '#26FFDE',
+  '#3599B8',
+  '#E81123',
+  '#E0E7EE',
+  '#F2C80F',
+  '#FDA954',
+  '#FD625E',
+  '#FF4EC2',
+  '#FFEE91'
 ];
 
 export class TelemetryPanel extends LinkedComponent {
@@ -50,13 +49,10 @@ export class TelemetryPanel extends LinkedComponent {
 
     // Initialize chart client
     this.tsiClient = new window.TsiClient();
-    // Create line chart
-    this.lineChart = new this.tsiClient.ux.LineChart(telemetryChartId);
   }
 
   componentDidMount() {
     TelemetryService.getTelemetryByDeviceIdP1M()
-      .do(response => console.log('response', response))
       .flatMap(({ items }) => items)
       .flatMap(({ data, deviceId, time }) =>
         Observable.from(Object.keys(data))
@@ -74,7 +70,6 @@ export class TelemetryPanel extends LinkedComponent {
         }
       }), {})
       .subscribe(telemetry => {
-        console.log('telemetry', telemetry);
         const telemetryKeys = Object.keys(telemetry).sort();
         this.setState({
           telemetry,
@@ -83,6 +78,8 @@ export class TelemetryPanel extends LinkedComponent {
           isPending: false
         })
       });
+      // Create line chart
+      this.lineChart = new this.tsiClient.ux.LineChart(document.getElementById(telemetryChartId));
   }
 
   componentWillUnmount() {
@@ -92,7 +89,13 @@ export class TelemetryPanel extends LinkedComponent {
   componentWillUpdate(_, newState) {
     if (newState.telemetry && newState.telemetryKey && newState.telemetry[newState.telemetryKey]) {
       const datum = [{ [newState.telemetryKey]: newState.telemetry[newState.telemetryKey] }];
-      this.lineChart.render(datum, { legend: 'compact', grid: true, tooltip: true, grid: false }, chartColors.map(color => ({ color })));
+      var idsObject = datum[0][Object.keys(datum[0])[0]];
+      var newDatum = Object.keys(idsObject).reduce((p, id) => {
+        var ae = {[id]: {'': idsObject[id]}};
+        p.push(ae);
+        return p;
+      },[]);
+      this.lineChart.render(newDatum, { legend: 'compact', grid: true, tooltip: true, grid: false, yAxisState: 'shared', noAnimate: true }, chartColors.map(color => ({ color })));
     }
   }
 
