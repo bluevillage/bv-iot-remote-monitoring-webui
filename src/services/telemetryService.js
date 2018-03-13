@@ -27,4 +27,9 @@ export class TelemetryService {
     return HttpClient.get(`${ENDPOINT}alarmsbyrule/${id}?${stringify(params)}`)
       .map(toAlarmsForRuleModel);
   }
+
+  /** Returns a list of telemetry messages for the given devices */ // NOW-P2D
+  static getTelemetryByDeviceIdP1M(deviceIds = '') {
+    return HttpClient.get(`${ENDPOINT}messages?from=NOW-PT15M&to=NOW&order=desc&devices=${encodeURIComponent(deviceIds)}`);
+  }
 }
