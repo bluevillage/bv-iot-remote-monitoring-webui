@@ -30,6 +30,10 @@ export class TelemetryService {
 
   /** Returns a list of telemetry messages for the given devices */ // NOW-P2D
   static getTelemetryByDeviceIdP1M(deviceIds = '') {
+    return HttpClient.get(`${ENDPOINT}messages?from=NOW-PT1M&to=NOW&order=desc&devices=${encodeURIComponent(deviceIds)}`);
+  }
+
+  static getTelemetryByDeviceIdP15M(deviceIds = '') {
     return HttpClient.get(`${ENDPOINT}messages?from=NOW-PT15M&to=NOW&order=desc&devices=${encodeURIComponent(deviceIds)}`);
   }
 }

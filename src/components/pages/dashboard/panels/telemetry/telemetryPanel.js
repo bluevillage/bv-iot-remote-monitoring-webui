@@ -13,7 +13,7 @@ import {
   PanelContent,
   PanelOverlay
 } from 'components/pages/dashboard/panel';
-import { LinkedComponent, Validator } from 'utilities';
+import { LinkedComponent, Validator, joinClasses } from 'utilities';
 
 import './telemetryPanel.css';
 
@@ -21,12 +21,12 @@ const telemetryChartId = 'device-telemetry-chart';
 
 const chartColors = [
   '#01B8AA',
+  '#F2C80F',
+  '#E81123',
+  '#3599B8',
   '#33669A',
   '#26FFDE',
-  '#3599B8',
-  '#E81123',
   '#E0E7EE',
-  '#F2C80F',
   '#FDA954',
   '#FD625E',
   '#FF4EC2',
@@ -52,72 +52,102 @@ export class TelemetryPanel extends LinkedComponent {
   }
 
   componentDidMount() {
-    TelemetryService.getTelemetryByDeviceIdP1M()
-      .flatMap(({ items }) => items)
-      .flatMap(({ data, deviceId, time }) =>
-        Observable.from(Object.keys(data))
-          .filter(key => key.indexOf('Unit') < 0)
-          .map(key => ({ key, deviceId, time, data: data[key] }))
-      )
-      .reduce((acc, { key, deviceId, time, data }) => ({
-        ...acc,
-        [key]: {
-          ...acc[key],
-          [deviceId]: {
-            ...(acc[key] && acc[key][deviceId] ? acc[key][deviceId] : {}),
-            [time]: { val: data }
-          }
-        }
-      }), {})
-      .subscribe(telemetry => {
-        const telemetryKeys = Object.keys(telemetry).sort();
-        this.setState({
-          telemetry,
-          telemetryKeys,
-          telemetryKey: telemetryKeys[0],
-          isPending: false
-        })
-      });
-      // Create line chart
-      this.lineChart = new this.tsiClient.ux.LineChart(document.getElementById(telemetryChartId));
+    this.getData();
+
+    // Create line chart
+    this.lineChart = new this.tsiClient.ux.LineChart(document.getElementById(telemetryChartId));
   }
 
   componentWillUnmount() {
     if (this.subscription) this.subscription.unsubscribe();
   }
 
-  componentWillUpdate(_, newState) {
-    if (newState.telemetry && newState.telemetryKey && newState.telemetry[newState.telemetryKey]) {
-      const datum = [{ [newState.telemetryKey]: newState.telemetry[newState.telemetryKey] }];
-      var idsObject = datum[0][Object.keys(datum[0])[0]];
-      var newDatum = Object.keys(idsObject).reduce((p, id) => {
-        var ae = {[id]: {'': idsObject[id]}};
-        p.push(ae);
-        return p;
-      },[]);
-      this.lineChart.render(newDatum, { legend: 'compact', grid: true, tooltip: true, grid: false, yAxisState: 'shared', noAnimate: true }, chartColors.map(color => ({ color })));
+  componentWillUpdate(_, { telemetry, telemetryKey}) {
+    if (telemetry && telemetryKey && telemetry[telemetryKey]) {
+      const datum = Object.keys(telemetry[telemetryKey]).map(deviceId => ({
+        [deviceId]: telemetry[telemetryKey][deviceId]
+      }));
+      const noAnimate = telemetryKey === this.state.telemetryKey;
+      // Set a timeout to allow the panel height to be calculated before updating the graph
+      setTimeout(() => {
+        this.lineChart.render(
+          datum,
+          {
+            grid: false,
+            legend: 'compact',
+            noAnimate, // If the telemetryKey changes, animate
+            tooltip: true,
+            yAxisState: 'shared' // Default to all values being on the same axis
+          },
+          chartColors.map(color => ({ color }))
+        );
+      }, 10);
     }
   }
 
+  getData() {
+    TelemetryService.getTelemetryByDeviceIdP15M()
+      .flatMap(response =>
+        Observable.interval(2000)
+          .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M())
+          .startWith(response)
+      )
+      .flatMap(({ items }) =>
+        Observable.from(items)
+          .flatMap(({ data, deviceId, time }) =>
+            Observable.from(Object.keys(data))
+              .filter(key => key.indexOf('Unit') < 0)
+              .map(key => ({ key, deviceId, time, data: data[key] }))
+          )
+          .reduce((acc, { key, deviceId, time, data }) => ({
+            ...acc,
+            [key]: {
+              ...(acc[key] ? acc[key] : {}),
+              [deviceId]: {
+                ...(acc[key] && acc[key][deviceId] ? acc[key][deviceId] : {}),
+                '': {
+                  ...(acc[key] && acc[key][deviceId] && acc[key][deviceId][''] ? acc[key][deviceId][''] : {}),
+                  [time]: { val: data }
+                }
+              }
+            }
+          }), this.state.telemetry)
+      )
+      .subscribe(telemetry => {
+        const telemetryKeys = Object.keys(telemetry).sort();
+        this.setState({
+          telemetry,
+          telemetryKeys,
+          telemetryKey: this.state.telemetryKey || telemetryKeys[0],
+          isPending: false
+        });
+      }
+    );
+  }
+
+  setTelemetryKey = telemetryKey => () => this.setState({ telemetryKey });
+
   render() {
-    const { telemetryKeys, telemetry } = this.state;
+    const { telemetryKeys, telemetry, telemetryKey } = this.state;
     return (
       <Panel>
         <PanelHeader>Telemetry</PanelHeader>
         <PanelContent className="telemetry-panel-container">
-          <div className="chart-container" id={telemetryChartId}></div>
           <div className="options-container">
             {
               telemetryKeys.map((key, index) => {
                 const count = Object.keys(telemetry[key]).length;
                 return (
-                  <Radio link={this.telemetryKeyRadio} value={key} key={index}>
+                  <button key={index}
+                       onClick={this.setTelemetryKey(key)}
+                       className={joinClasses('telemetry-option', telemetryKey === key ? 'active' : '')}>
                     {`${key} [${count}]`}
-                  </Radio>
+                  </button>
                 );
               })
             }
           </div>
+          <div className="chart-container" id={telemetryChartId} />
         </PanelContent>
         { this.state.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
