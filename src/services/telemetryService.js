@@ -56,4 +56,8 @@ export class TelemetryService {
     });
   }
 
+  static getAllAlarms(params = {} ) {
+    return HttpClient.get(`${ENDPOINT}alarms?${stringify(params)}`)
+      .map(toAlarmsForRuleModel);
+  }
 }
