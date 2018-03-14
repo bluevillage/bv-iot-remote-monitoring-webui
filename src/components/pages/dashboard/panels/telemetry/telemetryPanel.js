@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-import React from 'react';
+import React, { Component } from 'react';
 import { Observable } from 'rxjs';
 // import update from 'immutability-helper';
 import 'tsiclient';
 
 import { TelemetryService } from 'services';
-import { Indicator, Radio } from 'components/shared';
+import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
   PanelContent,
   PanelOverlay
 } from 'components/pages/dashboard/panel';
-import { LinkedComponent, Validator, joinClasses } from 'utilities';
+import { joinClasses } from 'utilities';
 
 import './telemetryPanel.css';
 
@@ -33,7 +33,7 @@ const chartColors = [
   '#FFEE91'
 ];
 
-export class TelemetryPanel extends LinkedComponent {
+export class TelemetryPanel extends Component {
   constructor(props) {
     super(props);
 
@@ -43,9 +43,6 @@ export class TelemetryPanel extends LinkedComponent {
       telemetryKeys: [],
       telemetryKey: ''
     };
-
-    // Create validators
-    this.telemetryKeyRadio = this.linkTo('telemetryKey');
 
     // Initialize chart client
     this.tsiClient = new window.TsiClient();
@@ -86,7 +83,7 @@ export class TelemetryPanel extends LinkedComponent {
   }
 
   getData() {
-    TelemetryService.getTelemetryByDeviceIdP15M()
+    this.subscription = TelemetryService.getTelemetryByDeviceIdP15M()
       .flatMap(response =>
         Observable.interval(2000)
           .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M())
