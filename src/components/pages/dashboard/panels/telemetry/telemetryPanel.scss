@@ -7,10 +7,6 @@
   display: flex;
   flex-flow: column nowrap;
 
-  // Overrides of the TSIChart Lib - START
-  .tsi-dark { background: transparent; }
-  // Overrides of the TSIChart Lib - END
-
   .chart-container { flex-grow: 1; }
 
   .options-container {
@@ -33,6 +29,8 @@
   @include themify($themes) {
     // Overrides of the TSIChart Lib
     text { fill: themed('colorContentText'); }
+
+    .linechart { background: transparent; }
 
     .options-container .telemetry-option {
       color: themed('colorContentTextDim');

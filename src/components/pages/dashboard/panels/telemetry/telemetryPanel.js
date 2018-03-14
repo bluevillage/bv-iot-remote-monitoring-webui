@@ -16,6 +16,8 @@ import {
 import { joinClasses } from 'utilities';
 
 import './telemetryPanel.css';
+// TODO: find a way to import without the relative path
+import '../../../../../../node_modules/tsiclient/tsiclient.css';
 
 const telemetryChartId = 'device-telemetry-chart';
 
