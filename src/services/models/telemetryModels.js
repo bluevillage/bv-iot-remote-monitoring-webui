@@ -40,3 +40,10 @@ export const toAlarmsForRuleModel = (response = {}) => (response.items || [])
     'status': 'status',
     'rule.id': 'ruleId'
   }));
+
+export const toMessagesModel = (response = {}) => (response.items || [])
+  .map((message = {}) => reshape(message, {
+    'data': 'data',
+    'deviceId': 'deviceId',
+    'time': 'time'
+  }));

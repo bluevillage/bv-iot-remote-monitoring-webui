@@ -3,7 +3,12 @@
 import { stringify } from 'query-string';
 import Config from 'app.config';
 import { HttpClient } from './httpClient';
-import { toRulesModel, toAlarmsModel, toAlarmsForRuleModel } from './models';
+import {
+  toAlarmsForRuleModel,
+  toAlarmsModel,
+  toMessagesModel,
+  toRulesModel,
+} from './models';
 
 const ENDPOINT = Config.serviceUrls.telemetry;
 
@@ -28,12 +33,27 @@ export class TelemetryService {
       .map(toAlarmsForRuleModel);
   }
 
-  /** Returns a list of telemetry messages for the given devices */ // NOW-P2D
+  static getTelemetryByMessages(params = {}) {
+    return HttpClient.get(`${ENDPOINT}messages?${stringify(params)}`)
+      .map(toMessagesModel);
+  }
+
   static getTelemetryByDeviceIdP1M(deviceIds = '') {
-    return HttpClient.get(`${ENDPOINT}messages?from=NOW-PT1M&to=NOW&order=desc&devices=${encodeURIComponent(deviceIds)}`);
+    return TelemetryService.getTelemetryByMessages({
+      from: 'NOW-PT1M',
+      to: 'NOW',
+      order: 'desc',
+      devices: encodeURIComponent(deviceIds)
+    });
   }
 
   static getTelemetryByDeviceIdP15M(deviceIds = '') {
-    return HttpClient.get(`${ENDPOINT}messages?from=NOW-PT15M&to=NOW&order=desc&devices=${encodeURIComponent(deviceIds)}`);
+    return TelemetryService.getTelemetryByMessages({
+      from: 'NOW-PT15M',
+      to: 'NOW',
+      order: 'desc',
+      devices: encodeURIComponent(deviceIds)
+    });
   }
+
 }

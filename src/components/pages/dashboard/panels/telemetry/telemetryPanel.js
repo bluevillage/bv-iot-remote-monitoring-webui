@@ -91,7 +91,7 @@ export class TelemetryPanel extends Component {
           .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M())
           .startWith(response)
       )
-      .flatMap(({ items }) =>
+      .flatMap(items =>
         Observable.from(items)
           .flatMap(({ data, deviceId, time }) =>
             Observable.from(Object.keys(data))
