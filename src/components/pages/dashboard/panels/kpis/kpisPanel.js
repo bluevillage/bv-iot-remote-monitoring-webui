@@ -54,30 +54,33 @@ export class KpisPanel extends Component {
     const currentFrom = 'NOW-PT1H';
     const previousFrom = 'NOW-PT2H';
 
-    this.subscription = Observable.forkJoin(
-      //missing device ids
-      TelemetryService.getActiveAlarms({ from: currentFrom, to: 'NOW' }), // Get current
-      TelemetryService.getActiveAlarms({ from: previousFrom, to: currentFrom }), // Get previous
+    const currentParams = { from: currentFrom, to: 'NOW' };
+    const previousParams = { from: previousFrom, to: currentFrom };
 
-      TelemetryService.getAlarms({ order: 'desc', from: currentFrom, to: 'NOW' }),
-      TelemetryService.getAlarms({ order: 'desc', from: previousFrom, to: currentFrom })
+    this.subscription = Observable.forkJoin(
+      // TODO: Add device ids to params
+      TelemetryService.getActiveAlarms(currentParams), // Get current
+      TelemetryService.getActiveAlarms(previousParams), // Get previous
+
+      TelemetryService.getAlarms(currentParams),
+      TelemetryService.getAlarms(previousParams)
     ).subscribe(([
-      alarmsByRule,
-      previousAlarmsByRule,
-      alarmsList,
-      previousAlarmsList
+      currentActiveAlarms,
+      previousActiveAlarms,
+      currentAlarms,
+      previousAlarms
     ]) => {
       this.setState({
-        alarmsByRule,
-        alarmsList,
+        currentActiveAlarms,
+        currentAlarms,
         isPending: false
       }, () => {
         // Compute top 5 kpis
-        const time = '2017-04-19T13:00:00Z';
-        const topFiveAlarms = this.state.alarmsByRule
+        const time = '2017-04-19T13:00:00Z'; // TODO: Remove hard coded time, needed by the charts
+        const topFiveAlarms = this.state.currentActiveAlarms
           .sort(compareByProperty('count'))
           .slice(0, 5);
-        const previousAlarms = previousAlarmsByRule.reduce(
+        const previousAlarms = previousActiveAlarms.reduce(
           (acc, alarm) =>
             (alarm.ruleId in acc)
               ? { ...acc, [alarm.ruleId]: alarm.count }
