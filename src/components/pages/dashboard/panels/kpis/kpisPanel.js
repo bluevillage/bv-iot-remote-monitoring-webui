@@ -56,11 +56,11 @@ export class KpisPanel extends Component {
 
     this.subscription = Observable.forkJoin(
       //missing device ids
-      TelemetryService.getAlarms({ from: currentFrom, to: 'NOW' }), // Get current
-      TelemetryService.getAlarms({ from: previousFrom, to: currentFrom }), // Get previous
+      TelemetryService.getActiveAlarms({ from: currentFrom, to: 'NOW' }), // Get current
+      TelemetryService.getActiveAlarms({ from: previousFrom, to: currentFrom }), // Get previous
 
-      TelemetryService.getAllAlarms({ order: 'desc', from: currentFrom, to: 'NOW' }),
-      TelemetryService.getAllAlarms({ order: 'desc', from: previousFrom, to: currentFrom })
+      TelemetryService.getAlarms({ order: 'desc', from: currentFrom, to: 'NOW' }),
+      TelemetryService.getAlarms({ order: 'desc', from: previousFrom, to: currentFrom })
     ).subscribe(([
       alarmsByRule,
       previousAlarmsByRule,

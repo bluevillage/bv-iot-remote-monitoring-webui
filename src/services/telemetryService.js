@@ -40,6 +40,7 @@ export class TelemetryService {
       .map(toAlarmsForRuleModel);
   }
 
+  /** Returns a telemetry events */
   static getTelemetryByMessages(params = {}) {
     return HttpClient.get(`${ENDPOINT}messages?${stringify(params)}`)
       .map(toMessagesModel);
@@ -63,8 +64,4 @@ export class TelemetryService {
     });
   }
 
-  static getAllAlarms(params = {} ) {
-    return HttpClient.get(`${ENDPOINT}alarms?${stringify(params)}`)
-      .map(toAlarmsForRuleModel);
-  }
 }
