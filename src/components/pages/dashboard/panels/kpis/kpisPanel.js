@@ -71,7 +71,6 @@ export class KpisPanel extends Component {
   render() {
     const { isPending, criticalAlarmsChange } = this.props;
     const showOverlay = isPending && !criticalAlarmsChange;
-    console.log('criticalAlarmsChange', criticalAlarmsChange);
     return (
       <Panel>
         <PanelHeader>{ isPending ? 'Loading...' : 'System KPIs' }</PanelHeader>
