@@ -1,11 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React, { Component } from 'react';
-import { Observable } from 'rxjs';
-// import update from 'immutability-helper';
 import 'tsiclient';
 
-import { TelemetryService } from 'services';
 import { Indicator } from 'components/shared';
 import {
   Panel,
@@ -40,10 +37,10 @@ export class TelemetryPanel extends Component {
     super(props);
 
     this.state = {
-      isPending: true,
       telemetry: {},
       telemetryKeys: [],
-      telemetryKey: ''
+      telemetryKey: '',
+      isPending: true
     };
 
     // Initialize chart client
@@ -53,24 +50,29 @@ export class TelemetryPanel extends Component {
   componentDidMount() {
     // Create line chart
     this.lineChart = new this.tsiClient.ux.LineChart(document.getElementById(chartId));
-
-    this.getData();
   }
 
-  componentWillUnmount() {
-    if (this.subscription) this.subscription.unsubscribe();
+  componentWillReceiveProps({ telemetry, isPending }) {
+    const telemetryKeys = Object.keys(telemetry).sort();
+    const currentKey = this.state.telemetryKey;
+    this.setState({
+      telemetry,
+      telemetryKeys,
+      telemetryKey: currentKey in telemetry ? currentKey : telemetryKeys[0],
+      isPending
+    });
   }
 
   componentWillUpdate(_, { telemetry, telemetryKey}) {
-    if (telemetry && telemetryKey && telemetry[telemetryKey]) {
-      const datum = Object.keys(telemetry[telemetryKey]).map(deviceId => ({
+    if (Object.keys(telemetry).length && telemetryKey && telemetry[telemetryKey]) {
+      const chartData = Object.keys(telemetry[telemetryKey]).map(deviceId => ({
         [deviceId]: telemetry[telemetryKey][deviceId]
       }));
       const noAnimate = telemetryKey === this.state.telemetryKey;
       // Set a timeout to allow the panel height to be calculated before updating the graph
       setTimeout(() => {
         this.lineChart.render(
-          datum,
+          chartData,
           {
             grid: false,
             legend: 'compact',
@@ -82,46 +84,6 @@ export class TelemetryPanel extends Component {
         );
       }, 10);
     }
-  }
-
-  getData() {
-    this.subscription = TelemetryService.getTelemetryByDeviceIdP15M()
-      .flatMap(response =>
-        Observable.interval(2000)
-          .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M())
-          .startWith(response)
-      )
-      .flatMap(items =>
-        Observable.from(items)
-          .flatMap(({ data, deviceId, time }) =>
-            Observable.from(Object.keys(data))
-              .filter(key => key.indexOf('Unit') < 0)
-              .map(key => ({ key, deviceId, time, data: data[key] }))
-          )
-          .reduce((acc, { key, deviceId, time, data }) => ({
-            ...acc,
-            [key]: {
-              ...(acc[key] ? acc[key] : {}),
-              [deviceId]: {
-                ...(acc[key] && acc[key][deviceId] ? acc[key][deviceId] : {}),
-                '': {
-                  ...(acc[key] && acc[key][deviceId] && acc[key][deviceId][''] ? acc[key][deviceId][''] : {}),
-                  [time]: { val: data }
-                }
-              }
-            }
-          }), this.state.telemetry)
-      )
-      .subscribe(telemetry => {
-        const telemetryKeys = Object.keys(telemetry).sort();
-        this.setState({
-          telemetry,
-          telemetryKeys,
-          telemetryKey: this.state.telemetryKey || telemetryKeys[0],
-          isPending: false
-        });
-      }
-    );
   }
 
   setTelemetryKey = telemetryKey => () => this.setState({ telemetryKey });
