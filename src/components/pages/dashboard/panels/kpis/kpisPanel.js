@@ -69,9 +69,12 @@ export class KpisPanel extends Component {
   }
 
   render() {
+    const { isPending, criticalAlarmsChange } = this.props;
+    const showOverlay = isPending && !criticalAlarmsChange;
+    console.log('criticalAlarmsChange', criticalAlarmsChange);
     return (
       <Panel>
-        <PanelHeader>System KPIs</PanelHeader>
+        <PanelHeader>{ isPending ? 'Loading...' : 'System KPIs' }</PanelHeader>
         <PanelContent className="kpis-panel-container">
           <div className="kpi-cell full-width">
             <div className="kpi-header">Top rules triggered</div>
@@ -84,14 +87,17 @@ export class KpisPanel extends Component {
           <div className="kpi-cell">
             <div className="kpi-header">Critical alarms</div>
             <div className="critical-alarms">
-              <div className="kpi-percentage-container">
-                <div className="kpi-value">{ this.props.criticalAlarmsChange }</div>
-                <div className="kpi-percentage-sign">%</div>
-              </div>
+              {
+                criticalAlarmsChange !== 0 &&
+                  <div className="kpi-percentage-container">
+                    <div className="kpi-value">{ criticalAlarmsChange }</div>
+                    <div className="kpi-percentage-sign">%</div>
+                  </div>
+              }
             </div>
           </div>
         </PanelContent>
-        { this.props.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
+        { showOverlay && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }

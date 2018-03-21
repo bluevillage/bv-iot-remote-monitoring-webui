@@ -71,11 +71,12 @@ export class TelemetryPanel extends Component {
   setTelemetryKey = telemetryKey => () => this.setState({ telemetryKey });
 
   render() {
-    const { telemetry } = this.props;
+    const { isPending, telemetry } = this.props;
     const { telemetryKeys, telemetryKey } = this.state;
+    const showOverlay = isPending && !Object.keys(telemetry).length;
     return (
       <Panel>
-        <PanelHeader>Telemetry</PanelHeader>
+        <PanelHeader>{ isPending ? 'Loading...' : 'Telemetry' }</PanelHeader>
         <PanelContent className="telemetry-panel-container">
           <div className="options-container">
             {
@@ -93,7 +94,7 @@ export class TelemetryPanel extends Component {
           </div>
           <div className="chart-container" id={chartId} />
         </PanelContent>
-        { this.props.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
+        { showOverlay && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }

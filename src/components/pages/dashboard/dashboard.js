@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React, { Component } from 'react';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
+import Config from 'app.config';
 import { TelemetryService } from 'services';
 import { compareByProperty } from 'utilities';
 import { Grid, Cell } from './grid';
@@ -49,20 +50,26 @@ export class Dashboard extends Component {
       alarmsPerDeviceId: {},
       criticalAlarmsChange: 0,
       kpisIsPending: true,
-      kpisError: null
+      kpisError: null,
+
+      // Map data
+      openWarningCount: 0,
+      openCriticalCount: 0
     };
 
     this.subscriptions = [];
+    this.telemetryRefresh$ = new Subject();
+    this.panelsRefresh$ = new Subject();
   }
 
   componentDidMount() {
     // Telemetry stream - START
     const telemetry$ = TelemetryService.getTelemetryByDeviceIdP15M()
-      .flatMap(response =>
-        Observable.interval(2000)
+      .merge(
+        this.telemetryRefresh$
+          .delay(Config.telemetryRefreshInterval)
           .do(_ => this.setState({ telemetryIsPending: true }))
           .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M())
-          .startWith(response)
       )
       .flatMap(items =>
         Observable.from(items)
@@ -96,7 +103,8 @@ export class Dashboard extends Component {
       const previousParams = { from: previousFrom, to: currentFrom };
 
       // TODO: Add device ids to params - START
-      const kpis$ = Observable.interval(15000)
+      const kpis$ = this.panelsRefresh$
+        .delay(Config.dashboardRefreshInterval)
         .startWith(0)
         .do(_ => this.setState({ kpisIsPending: true }))
         .flatMap(_ =>
@@ -176,21 +184,21 @@ export class Dashboard extends Component {
 
             // Map data
             openWarningCount: currentAlarmsStats.openWarningCount,
-            openCriticalCount: currentAlarmsStats.openCriticalCount,
+            openCriticalCount: currentAlarmsStats.openCriticalCount
           });
         });
       // KPI stream - END
 
       this.subscriptions.push(
         telemetry$.subscribe(
-          telemetryState => this.setState(telemetryState),
+          telemetryState => this.setState(telemetryState, () => this.telemetryRefresh$.next('r')),
           telemetryError => this.setState({ telemetryError, telemetryIsPending: false })
         )
       );
 
       this.subscriptions.push(
         kpis$.subscribe(
-          kpiState => this.setState(kpiState),
+          kpiState => this.setState(kpiState, () => this.panelsRefresh$.next('r')),
           kpisError => this.setState({ kpisError, kpisIsPending: false })
         )
       );
@@ -206,17 +214,25 @@ export class Dashboard extends Component {
 
       telemetry,
       telemetryIsPending,
+      telemetryError,
 
       topAlarms,
       alarmsPerDeviceId,
       criticalAlarmsChange,
-      kpisIsPending
+      kpisIsPending,
+      kpisError,
+
+      openWarningCount,
+      openCriticalCount
     } = this.state;
     return (
       <div className="dashboard-container">
         <Grid>
           <Cell className="col-6">
-            <MapPanel isPending={kpisIsPending} />
+            <MapPanel
+              openWarningCount={openWarningCount}
+              openCriticalCount={openCriticalCount}
+              isPending={kpisIsPending} />
           </Cell>
           <Cell className="col-4">
             <AlarmsPanelContainer />
@@ -225,6 +241,7 @@ export class Dashboard extends Component {
             <TelemetryPanel
               telemetry={telemetry}
               isPending={telemetryIsPending}
+              error={telemetryError}
               colors={chartColors} />
           </Cell>
           <Cell className="col-4">
@@ -233,6 +250,7 @@ export class Dashboard extends Component {
               alarmsPerDeviceId={alarmsPerDeviceId}
               criticalAlarmsChange={criticalAlarmsChange}
               isPending={kpisIsPending}
+              error={kpisError}
               colors={chartColors} />
           </Cell>
         </Grid>

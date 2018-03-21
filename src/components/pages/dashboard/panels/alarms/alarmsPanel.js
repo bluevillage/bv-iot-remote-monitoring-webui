@@ -2,10 +2,12 @@
 
 import React, { Component } from 'react';
 
+import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
-  PanelContent
+  PanelContent,
+  PanelOverlay
 } from 'components/pages/dashboard/panel';
 import { RulesGrid, rulesColumnDefs } from 'components/pages/rules/rulesGrid';
 import { translateColumnDefs } from 'utilities';
@@ -35,15 +37,17 @@ export class AlarmsPanel extends Component {
     const { t, alarms, isPending } = this.props;
     const gridProps = {
       columnDefs: translateColumnDefs(t, this.columnDefs),
-      rowData: !isPending ? alarms : undefined,
+      rowData: alarms,
       t
     };
+    const showOverlay = isPending && !alarms.length;
     return (
       <Panel className="alarms-panel-container">
-        <PanelHeader>System alarms</PanelHeader>
+        <PanelHeader>{ isPending ? 'Loading...' : 'System alarms' }</PanelHeader>
         <PanelContent>
           <RulesGrid {...gridProps} />
         </PanelContent>
+        { showOverlay && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }

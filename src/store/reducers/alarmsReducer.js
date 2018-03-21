@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import moment from 'moment';
 import update from 'immutability-helper';
 import { createSelector } from 'reselect';
+
+import Config from 'app.config';
 import { TelemetryService } from 'services';
 import { getEntities as getRuleEntities } from './rulesReducer';
 import {
@@ -35,7 +37,14 @@ export const epics = createEpicScenario({
         devices: ''
       })
       .map(toActionCreator(redux.actions.updateAlarms, fromAction))
+      .flatMap(action => [action, epics.actions.pollAlarms()])
       .catch(handleError(fromAction))
+  },
+
+  pollAlarms: {
+    type: 'POLL_ALARMS',
+    epic: fromAction => Observable.of(epics.actions.fetchAlarms())
+      .delay(Config.dashboardRefreshInterval)
   },
 });
 // ========================= Epics - END

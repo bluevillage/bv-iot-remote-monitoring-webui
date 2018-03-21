@@ -34,13 +34,15 @@ export class MapPanel extends Component {
   }
 
   render() {
+    const { isPending } = this.props;
+    const showOverlay = isPending;
     return (
       <Panel>
-        <PanelHeader>Device locations</PanelHeader>
+        <PanelHeader>{ isPending ? 'Loading...' : 'Device locations' }</PanelHeader>
         <PanelContent>
           Contents
         </PanelContent>
-        { this.props.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
+        { showOverlay && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }
