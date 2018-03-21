@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Observable } from 'rxjs';
 
 import { TelemetryService } from 'services';
+import { compareByProperty } from 'utilities';
 import { Grid, Cell } from './grid';
 import {
   MapPanel,
@@ -16,16 +17,19 @@ import './dashboard.css';
 
 const maxTopAlarms = 5; // TODO: Move to config
 
-const countCriticalAlarms = alarms => alarms.reduce(
-  (count, { severity }) => severity === 'critical' ? count + 1 : count,
-  0
-);
-
-const compareByProperty = (property) => (a, b) => {
-  if (b[property] > a[property]) return 1;
-  if (b[property] < a[property]) return -1;
-  return 0;
-};
+const chartColors = [
+  '#01B8AA',
+  '#F2C80F',
+  '#E81123',
+  '#3599B8',
+  '#33669A',
+  '#26FFDE',
+  '#E0E7EE',
+  '#FDA954',
+  '#FD625E',
+  '#FF4EC2',
+  '#FFEE91'
+];
 
 export class Dashboard extends Component {
 
@@ -33,22 +37,19 @@ export class Dashboard extends Component {
     super(props);
 
     this.state = {
+      chartColors,
+
       // Telemetry data
       telemetry: {},
       telemetryIsPending: true,
       telemetryError: null,
 
       // Kpis data
-      currentTopAlarms: [],
-      previousTopAlarms: {},
-
-      currentActiveAlarms: [],
-      previousActiveAlarms: [],
-      currentAlarms: [],
-      previousAlarms: [],
+      topAlarms: [],
+      alarmsPerDeviceId: {},
       criticalAlarmsChange: 0,
       kpisIsPending: true,
-      kpisError: null,
+      kpisError: null
     };
 
     this.subscriptions = [];
@@ -83,7 +84,8 @@ export class Dashboard extends Component {
               }
             }
           }), this.state.telemetry)
-      );
+      )
+      .map(telemetry => ({ telemetry, telemetryIsPending: false }));
       // Telemetry stream - END
 
       // KPI stream - START
@@ -94,33 +96,52 @@ export class Dashboard extends Component {
       const previousParams = { from: previousFrom, to: currentFrom };
 
       // TODO: Add device ids to params - START
-      const kpis$ = Observable.forkJoin(
-        TelemetryService.getActiveAlarms(currentParams), // Get current
-        TelemetryService.getActiveAlarms(previousParams), // Get previous
+      const kpis$ = Observable.interval(15000)
+        .startWith(0)
+        .do(_ => this.setState({ kpisIsPending: true }))
+        .flatMap(_ =>
+          Observable.forkJoin(
+            TelemetryService.getActiveAlarms(currentParams), // Get current
+            TelemetryService.getActiveAlarms(previousParams), // Get previous
 
-        TelemetryService.getAlarms(currentParams),
-        TelemetryService.getAlarms(previousParams)
-      );
-      // KPI stream - END
-
-      this.subscriptions.push(
-        telemetry$.subscribe(
-          telemetry => this.setState({ telemetry, telemetryIsPending: false }),
-          telemetryError => this.setState({ telemetryError, telemetryIsPending: false })
-        )
-      );
-
-      this.subscriptions.push(
-        kpis$.subscribe(([
+            TelemetryService.getAlarms(currentParams),
+            TelemetryService.getAlarms(previousParams)
+          )
+        ).map(([
           currentActiveAlarms,
           previousActiveAlarms,
 
           currentAlarms,
           previousAlarms
         ]) => {
+          // Process all the data out of the currentAlarms list
+          const currentAlarmsStats = currentAlarms.reduce((acc, alarm) => {
+              const isOpen = alarm.status === 'open';
+              const isWarning = alarm.severity === 'warning';
+              const isCritical = alarm.severity === 'critical';
+              let updatedAlarmsPerDeviceId = acc.alarmsPerDeviceId;
+              if (alarm.deviceId) {
+                const deviceType = (this.props.devices[alarm.deviceId] || {}).type || 'Other'; // TODO: Translate
+                updatedAlarmsPerDeviceId = {
+                  ...updatedAlarmsPerDeviceId,
+                  [deviceType]: (updatedAlarmsPerDeviceId[deviceType] || 0) + 1
+                };
+              }
+              return {
+                openWarningCount: (acc.openWarningCount || 0) + (isWarning && isOpen ? 1 : 0),
+                openCriticalCount: (acc.openCriticalCount || 0) + (isCritical && isOpen ? 1 : 0),
+                totalCriticalCount: (acc.totalCriticalCount || 0) + (isCritical ? 1 : 0),
+                alarmsPerDeviceId: updatedAlarmsPerDeviceId
+              };
+            },
+            { alarmsPerDeviceId: {} }
+          );
           // ================== Critical Alarms Count - START
-          const currentCriticalAlarms = countCriticalAlarms(currentAlarms);
-          const previousCriticalAlarms = countCriticalAlarms(previousAlarms);
+          const currentCriticalAlarms = currentAlarmsStats.totalCriticalCount;
+          const previousCriticalAlarms = previousAlarms.reduce(
+            (count, { severity }) => severity === 'critical' ? count + 1 : count,
+            0
+          );
           const criticalAlarmsChange = ((currentCriticalAlarms - previousCriticalAlarms) / currentCriticalAlarms * 100).toFixed(2);
           // ================== Critical Alarms Count - END
 
@@ -130,7 +151,7 @@ export class Dashboard extends Component {
             .slice(0, maxTopAlarms);
 
           // Find the previous counts for the current top kpis
-          const previousTopAlarms = previousActiveAlarms.reduce(
+          const previousTopAlarmsMap = previousActiveAlarms.reduce(
             (acc, { ruleId, count }) =>
               (ruleId in acc)
                 ? { ...acc, [ruleId]: count }
@@ -138,20 +159,40 @@ export class Dashboard extends Component {
             ,
             currentTopAlarms.reduce((acc, { ruleId }) => ({ ...acc, [ruleId]: 0 }), {})
           );
-          // TODO: Merge these two collections into a single array of objects
-          // ================== Top Alarms - END
-          this.setState({
-            currentTopAlarms,
-            previousTopAlarms,
 
-            currentActiveAlarms,
-            previousActiveAlarms,
-            currentAlarms,
-            previousAlarms,
+          const topAlarms = currentTopAlarms.map(({ ruleId, count }) => ({
+            name: (this.props.rules[ruleId] || {}).name || ruleId,
+            count,
+            previousCount: previousTopAlarmsMap[ruleId] || 0
+          }));
+          // ================== Top Alarms - END
+          return ({
+            kpisIsPending: false,
+
+            // Kpis data
+            topAlarms,
             criticalAlarmsChange,
-            kpisIsPending: false
+            alarmsPerDeviceId: currentAlarmsStats.alarmsPerDeviceId,
+
+            // Map data
+            openWarningCount: currentAlarmsStats.openWarningCount,
+            openCriticalCount: currentAlarmsStats.openCriticalCount,
           });
-        })
+        });
+      // KPI stream - END
+
+      this.subscriptions.push(
+        telemetry$.subscribe(
+          telemetryState => this.setState(telemetryState),
+          telemetryError => this.setState({ telemetryError, telemetryIsPending: false })
+        )
+      );
+
+      this.subscriptions.push(
+        kpis$.subscribe(
+          kpiState => this.setState(kpiState),
+          kpisError => this.setState({ kpisError, kpisIsPending: false })
+        )
       );
   }
 
@@ -161,16 +202,13 @@ export class Dashboard extends Component {
 
   render () {
     const {
+      chartColors,
+
       telemetry,
       telemetryIsPending,
 
-      currentTopAlarms,
-      previousTopAlarms,
-
-      currentActiveAlarms,
-      previousActiveAlarms,
-      currentAlarms,
-      previousAlarms,
+      topAlarms,
+      alarmsPerDeviceId,
       criticalAlarmsChange,
       kpisIsPending
     } = this.state;
@@ -178,7 +216,7 @@ export class Dashboard extends Component {
       <div className="dashboard-container">
         <Grid>
           <Cell className="col-6">
-            <MapPanel />
+            <MapPanel isPending={kpisIsPending} />
           </Cell>
           <Cell className="col-4">
             <AlarmsPanelContainer />
@@ -186,19 +224,16 @@ export class Dashboard extends Component {
           <Cell className="col-6">
             <TelemetryPanel
               telemetry={telemetry}
-              isPending={telemetryIsPending} />
+              isPending={telemetryIsPending}
+              colors={chartColors} />
           </Cell>
           <Cell className="col-4">
             <KpisPanelContainer
-              currentTopAlarms={currentTopAlarms}
-              previousTopAlarms={previousTopAlarms}
-
-              currentActiveAlarms={currentActiveAlarms}
-              previousActiveAlarms={previousActiveAlarms}
-              currentAlarms={currentAlarms}
-              previousAlarms={previousAlarms}
+              topAlarms={topAlarms}
+              alarmsPerDeviceId={alarmsPerDeviceId}
               criticalAlarmsChange={criticalAlarmsChange}
-              isPending={kpisIsPending} />
+              isPending={kpisIsPending}
+              colors={chartColors} />
           </Cell>
         </Grid>
       </div>

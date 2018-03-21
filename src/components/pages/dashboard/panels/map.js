@@ -40,7 +40,7 @@ export class MapPanel extends Component {
         <PanelContent>
           Contents
         </PanelContent>
-        { this.state.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
+        { this.props.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }

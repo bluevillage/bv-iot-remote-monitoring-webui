@@ -18,37 +18,20 @@ import '../../../../../../node_modules/tsiclient/tsiclient.css';
 
 const chartId = 'telemetry-chart-container';
 
-const chartColors = [
-  '#01B8AA',
-  '#F2C80F',
-  '#E81123',
-  '#3599B8',
-  '#33669A',
-  '#26FFDE',
-  '#E0E7EE',
-  '#FDA954',
-  '#FD625E',
-  '#FF4EC2',
-  '#FFEE91'
-];
 
 export class TelemetryPanel extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      telemetry: {},
       telemetryKeys: [],
-      telemetryKey: '',
-      isPending: true
+      telemetryKey: ''
     };
 
-    // Initialize chart client
     this.tsiClient = new window.TsiClient();
   }
 
   componentDidMount() {
-    // Create line chart
     this.lineChart = new this.tsiClient.ux.LineChart(document.getElementById(chartId));
   }
 
@@ -56,14 +39,13 @@ export class TelemetryPanel extends Component {
     const telemetryKeys = Object.keys(telemetry).sort();
     const currentKey = this.state.telemetryKey;
     this.setState({
-      telemetry,
       telemetryKeys,
-      telemetryKey: currentKey in telemetry ? currentKey : telemetryKeys[0],
-      isPending
+      telemetryKey: currentKey in telemetry ? currentKey : telemetryKeys[0]
     });
   }
 
-  componentWillUpdate(_, { telemetry, telemetryKey}) {
+  componentWillUpdate(nextProps, { telemetryKey }) {
+    const { telemetry } = nextProps;
     if (Object.keys(telemetry).length && telemetryKey && telemetry[telemetryKey]) {
       const chartData = Object.keys(telemetry[telemetryKey]).map(deviceId => ({
         [deviceId]: telemetry[telemetryKey][deviceId]
@@ -80,7 +62,7 @@ export class TelemetryPanel extends Component {
             tooltip: true,
             yAxisState: 'shared' // Default to all values being on the same axis
           },
-          chartColors.map(color => ({ color }))
+          this.props.colors.map(color => ({ color }))
         );
       }, 10);
     }
@@ -89,7 +71,8 @@ export class TelemetryPanel extends Component {
   setTelemetryKey = telemetryKey => () => this.setState({ telemetryKey });
 
   render() {
-    const { telemetryKeys, telemetry, telemetryKey } = this.state;
+    const { telemetry } = this.props;
+    const { telemetryKeys, telemetryKey } = this.state;
     return (
       <Panel>
         <PanelHeader>Telemetry</PanelHeader>
@@ -110,7 +93,7 @@ export class TelemetryPanel extends Component {
           </div>
           <div className="chart-container" id={chartId} />
         </PanelContent>
-        { this.state.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
+        { this.props.isPending && <PanelOverlay><Indicator /></PanelOverlay> }
       </Panel>
     );
   }
