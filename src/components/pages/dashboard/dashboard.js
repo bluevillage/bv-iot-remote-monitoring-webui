@@ -229,7 +229,15 @@ export class Dashboard extends Component {
   }
 
   render () {
-    const { t, rules, devices } = this.props;
+    const {
+      t,
+      rules,
+      devices,
+      rulesIsPending,
+      devicesIsPending,
+      rulesError,
+      devicesError
+    } = this.props;
     const {
       chartColors,
 
@@ -283,14 +291,15 @@ export class Dashboard extends Component {
               openCriticalCount={openCriticalCount}
               onlineDeviceCount={onlineDeviceCount}
               offlineDeviceCount={offlineDeviceCount}
-              isPending={kpisIsPending}
+              isPending={kpisIsPending || devicesIsPending}
+              error={devicesError || kpisError}
               t={t} />
           </Cell>
           <Cell className="col-4">
             <AlarmsPanel
               alarms={currentActiveAlarmsWithName}
-              isPending={kpisIsPending}
-              error={kpisError}
+              isPending={kpisIsPending || rulesIsPending}
+              error={rulesError || kpisError}
               t={t} />
           </Cell>
           <Cell className="col-6">
@@ -306,8 +315,8 @@ export class Dashboard extends Component {
               topAlarms={topAlarmsWithName}
               alarmsPerDeviceId={alarmsPerDeviceType}
               criticalAlarmsChange={criticalAlarmsChange}
-              isPending={kpisIsPending}
-              error={kpisError}
+              isPending={kpisIsPending || rulesIsPending || devicesIsPending}
+              error={devicesError || rulesError || kpisError}
               colors={chartColors}
               t={t} />
           </Cell>

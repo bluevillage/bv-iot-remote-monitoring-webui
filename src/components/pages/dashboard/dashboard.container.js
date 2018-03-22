@@ -3,14 +3,26 @@
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next';
 import { epics as rulesEpics } from 'store/reducers/rulesReducer';
-import { getEntities as getRuleEntities } from 'store/reducers/rulesReducer';
-import { getEntities as getDeviceEntities } from 'store/reducers/devicesReducer';
+import {
+  getEntities as getRuleEntities,
+  getRulesPendingStatus,
+  getRulesError
+} from 'store/reducers/rulesReducer';
+import {
+  getEntities as getDeviceEntities,
+  getDevicesPendingStatus,
+  getDevicesError
+} from 'store/reducers/devicesReducer';
 
 import { Dashboard } from './dashboard';
 
 const mapStateToProps = state => ({
   rules: getRuleEntities(state),
-  devices: getDeviceEntities(state)
+  devices: getDeviceEntities(state),
+  rulesIsPending: getRulesPendingStatus(state),
+  devicesIsPending: getDevicesPendingStatus(state),
+  rulesError: getRulesError(state),
+  devicesError: getDevicesError(state)
 });
 
 // Wrap the dispatch method
