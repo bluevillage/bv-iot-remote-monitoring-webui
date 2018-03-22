@@ -52,7 +52,7 @@ class App extends Component {
 
   render() {
     return (
-      <div className="app-container theme-dark">
+      <div className={`app-container theme-${this.props.theme}`}>
         <div className="app">
           <Navigation tabs={tabConfigs} t={this.props.t} />
           <Main>

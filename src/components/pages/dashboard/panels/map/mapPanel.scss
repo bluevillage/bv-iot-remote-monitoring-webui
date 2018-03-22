@@ -3,77 +3,66 @@
 @import 'src/styles/mixins';
 @import 'src/styles/themes';
 
-.map-panel-container {
+.device-stats-container {
   display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
   padding: 0 !important;
 
-  .device-stats {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
-    flex-basis: 30%;
-
-    .stat-header {
-      padding: 10px;
-      font-family: $fontSelawikSemibold;
-      @include rem-font-size(40px);
-    }
-
-    .stat-container {
-      display: flex;
-      flex-flow: row wrap;
-      flex-shrink: 0;
-      padding: 0px 10px 20px 10px;
-
-      .stat-cell {
-        display: flex;
-        flex-flow: column nowrap;
-        flex-shrink: 0;
-
-        &.col-half { flex-basis: 50%; }
-        &.col-third { flex-basis: 33.333%; }
-
-        .stat-value {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: flex-end;
-          flex-shrink: 0;
-          flex-grow: 1;
-          padding: 10px;
-          font-family: $fontSelawikLight;
-          @include rem-font-size(30px);
-
-          > span {
-            font-size: 1em;
-            line-height: 1em;
-            flex-shrink: 0;
-          }
-
-          &.critical,
-          &.warning { font-family: $fontSelawikSemibold; }
-
-          .severity-icon {
-            flex-shrink: 0;
-            margin-left: 8px;
-            @include square-px-rem(10px);
-
-            svg { @include square-px-rem(10px); }
-          }
-        }
-
-        .stat-label {
-          padding: 10px;
-          padding-top: 0;
-          @include rem-font-size(14px);
-        }
-      }
-    }
+  .stat-header {
+    padding: 10px;
+    font-family: $fontSelawikSemibold;
+    @include rem-font-size(40px);
   }
 
-  .map-container {
-    flex-basis: 70%;
-    background-color: #272d31;
-    overflow: hidden;
+  .stat-container {
+    display: flex;
+    flex-flow: row wrap;
+    flex-shrink: 0;
+    padding: 0px 10px 20px 10px;
+
+    .stat-cell {
+      display: flex;
+      flex-flow: column nowrap;
+      flex-shrink: 0;
+
+      &.col-half { flex-basis: 50%; }
+      &.col-third { flex-basis: 33.333%; }
+
+      .stat-value {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-end;
+        flex-shrink: 0;
+        flex-grow: 1;
+        padding: 10px;
+        font-family: $fontSelawikLight;
+        @include rem-font-size(30px);
+
+        > span {
+          font-size: 1em;
+          line-height: 1em;
+          flex-shrink: 0;
+        }
+
+        &.critical,
+        &.warning { font-family: $fontSelawikSemibold; }
+
+        .severity-icon {
+          flex-shrink: 0;
+          margin-left: 8px;
+          @include square-px-rem(10px);
+
+          svg { @include square-px-rem(10px); }
+        }
+      }
+
+      .stat-label {
+        padding: 10px;
+        padding-top: 0;
+        @include rem-font-size(14px);
+      }
+    }
   }
 
   @include themify($themes) {

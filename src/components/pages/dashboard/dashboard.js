@@ -14,6 +14,14 @@ import {
   KpisPanel
 } from './panels';
 
+import {
+  Panel,
+  PanelHeader,
+  PanelHeaderLabel,
+  PanelContent,
+  PanelOverlay
+} from 'components/pages/dashboard/panel';
+
 import './dashboard.css';
 
 const maxDatums = 100; // Max telemetry messages for the telemetry graph
@@ -285,7 +293,7 @@ export class Dashboard extends Component {
     return (
       <div className="dashboard-container">
         <Grid>
-          <Cell className="col-6">
+          <Cell className="col-2 devices-overview-cell">
             <MapPanel
               openWarningCount={openWarningCount}
               openCriticalCount={openCriticalCount}
@@ -295,7 +303,15 @@ export class Dashboard extends Component {
               error={devicesError || kpisError}
               t={t} />
           </Cell>
-          <Cell className="col-4">
+          <Cell className="col-5">
+            <Panel>
+              <PanelHeader>
+                <PanelHeaderLabel>Device locations</PanelHeaderLabel>
+              </PanelHeader>
+              <PanelContent className="device-locations-map"></PanelContent>
+            </Panel>
+          </Cell>
+          <Cell className="col-3">
             <AlarmsPanel
               alarms={currentActiveAlarmsWithName}
               isPending={kpisIsPending || rulesIsPending}
