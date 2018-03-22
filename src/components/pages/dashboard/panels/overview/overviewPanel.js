@@ -15,7 +15,7 @@ import {
 
 import './mapPanel.css';
 
-export class MapPanel extends Component {
+export class OverviewPanel extends Component {
   constructor(props) {
     super(props);
 

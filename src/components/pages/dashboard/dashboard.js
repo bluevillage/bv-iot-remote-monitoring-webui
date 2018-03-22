@@ -8,19 +8,12 @@ import { TelemetryService } from 'services';
 import { compareByProperty } from 'utilities';
 import { Grid, Cell } from './grid';
 import {
-  MapPanel,
+  OverviewPanel,
   AlarmsPanel,
   TelemetryPanel,
-  KpisPanel
+  KpisPanel,
+  MapPanel
 } from './panels';
-
-import {
-  Panel,
-  PanelHeader,
-  PanelHeaderLabel,
-  PanelContent,
-  PanelOverlay
-} from 'components/pages/dashboard/panel';
 
 import './dashboard.css';
 
@@ -294,7 +287,7 @@ export class Dashboard extends Component {
       <div className="dashboard-container">
         <Grid>
           <Cell className="col-2 devices-overview-cell">
-            <MapPanel
+            <OverviewPanel
               openWarningCount={openWarningCount}
               openCriticalCount={openCriticalCount}
               onlineDeviceCount={onlineDeviceCount}
@@ -304,12 +297,7 @@ export class Dashboard extends Component {
               t={t} />
           </Cell>
           <Cell className="col-5">
-            <Panel>
-              <PanelHeader>
-                <PanelHeaderLabel>Device locations</PanelHeaderLabel>
-              </PanelHeader>
-              <PanelContent className="device-locations-map"></PanelContent>
-            </Panel>
+            <MapPanel />
           </Cell>
           <Cell className="col-3">
             <AlarmsPanel
