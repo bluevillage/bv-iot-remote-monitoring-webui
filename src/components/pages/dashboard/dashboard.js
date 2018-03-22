@@ -9,13 +9,14 @@ import { compareByProperty } from 'utilities';
 import { Grid, Cell } from './grid';
 import {
   MapPanel,
-  AlarmsPanelContainer,
+  AlarmsPanel,
   TelemetryPanel,
-  KpisPanelContainer
+  KpisPanel
 } from './panels';
 
 import './dashboard.css';
 
+const maxDatums = 100; // Max telemetry messages for the telemetry graph
 const maxTopAlarms = 5; // TODO: Move to config
 
 const chartColors = [
@@ -46,6 +47,7 @@ export class Dashboard extends Component {
       telemetryError: null,
 
       // Kpis data
+      currentActiveAlarms: [],
       topAlarms: [],
       alarmsPerDeviceId: {},
       criticalAlarmsChange: 0,
@@ -63,6 +65,9 @@ export class Dashboard extends Component {
   }
 
   componentDidMount() {
+    // Load the rules
+    this.props.fetchRules();
+
     // Telemetry stream - START
     const telemetry$ = TelemetryService.getTelemetryByDeviceIdP15M()
       .merge(
@@ -75,23 +80,36 @@ export class Dashboard extends Component {
         Observable.from(items)
           .flatMap(({ data, deviceId, time }) =>
             Observable.from(Object.keys(data))
-              .filter(key => key.indexOf('Unit') < 0)
-              .map(key => ({ key, deviceId, time, data: data[key] }))
+              .filter(metric => metric.indexOf('Unit') < 0)
+              .map(metric => ({ metric, deviceId, time, data: data[metric] }))
           )
-          .reduce((acc, { key, deviceId, time, data }) => ({
+          .reduce((acc, { metric, deviceId, time, data }) => ({
             ...acc,
-            [key]: {
-              ...(acc[key] ? acc[key] : {}),
+            [metric]: {
+              ...(acc[metric] ? acc[metric] : {}),
               [deviceId]: {
-                ...(acc[key] && acc[key][deviceId] ? acc[key][deviceId] : {}),
+                ...(acc[metric] && acc[metric][deviceId] ? acc[metric][deviceId] : {}),
                 '': {
-                  ...(acc[key] && acc[key][deviceId] && acc[key][deviceId][''] ? acc[key][deviceId][''] : {}),
+                  ...(acc[metric] && acc[metric][deviceId] && acc[metric][deviceId][''] ? acc[metric][deviceId][''] : {}),
                   [time]: { val: data }
                 }
               }
             }
           }), this.state.telemetry)
       )
+      .map(telemetry => {
+        Object.keys(telemetry).forEach(metric => {
+          Object.keys(telemetry[metric]).forEach(deviceId => {
+            const datums = Object.keys(telemetry[metric][deviceId]['']);
+            if (datums.length > maxDatums) {
+              telemetry[metric][deviceId][''] = datums.sort()
+                .slice(datums.length - maxDatums, datums.length)
+                .reduce((acc, time) => ({ ...acc, [time]: telemetry[metric][deviceId][''][time]}), {});
+            }
+          })
+        });
+        return telemetry;
+      }) // Remove overflowing items
       .map(telemetry => ({ telemetry, telemetryIsPending: false }));
       // Telemetry stream - END
 
@@ -109,19 +127,24 @@ export class Dashboard extends Component {
         .do(_ => this.setState({ kpisIsPending: true }))
         .flatMap(_ =>
           Observable.forkJoin(
-            TelemetryService.getActiveAlarms(currentParams), // Get current
-            TelemetryService.getActiveAlarms(previousParams), // Get previous
+            TelemetryService.getActiveAlarms(currentParams),
+            TelemetryService.getActiveAlarms(previousParams),
 
             TelemetryService.getAlarms(currentParams),
             TelemetryService.getAlarms(previousParams)
           )
         ).map(([
-          currentActiveAlarms,
+          currentActiveAlarmsTemp,
           previousActiveAlarms,
 
           currentAlarms,
           previousAlarms
         ]) => {
+          const currentActiveAlarms = currentActiveAlarmsTemp.map(alarm => ({
+            ...alarm,
+            name: (this.props.rules[alarm.ruleId] || {}).name || alarm.ruleId,
+          }));
+
           // Process all the data out of the currentAlarms list
           const currentAlarmsStats = currentAlarms.reduce((acc, alarm) => {
               const isOpen = alarm.status === 'open';
@@ -144,10 +167,11 @@ export class Dashboard extends Component {
             },
             { alarmsPerDeviceId: {} }
           );
+
           // ================== Critical Alarms Count - START
           const currentCriticalAlarms = currentAlarmsStats.totalCriticalCount;
           const previousCriticalAlarms = previousAlarms.reduce(
-            (count, { severity }) => severity === 'critical' ? count + 1 : count,
+            (cnt, { severity }) => severity === 'critical' ? cnt + 1 : cnt,
             0
           );
           const criticalAlarmsChange = ((currentCriticalAlarms - previousCriticalAlarms) / currentCriticalAlarms * 100).toFixed(2);
@@ -168,8 +192,8 @@ export class Dashboard extends Component {
             currentTopAlarms.reduce((acc, { ruleId }) => ({ ...acc, [ruleId]: 0 }), {})
           );
 
-          const topAlarms = currentTopAlarms.map(({ ruleId, count }) => ({
-            name: (this.props.rules[ruleId] || {}).name || ruleId,
+          const topAlarms = currentTopAlarms.map(({ name, ruleId, count }) => ({
+            name,
             count,
             previousCount: previousTopAlarmsMap[ruleId] || 0
           }));
@@ -178,6 +202,7 @@ export class Dashboard extends Component {
             kpisIsPending: false,
 
             // Kpis data
+            currentActiveAlarms,
             topAlarms,
             criticalAlarmsChange,
             alarmsPerDeviceId: currentAlarmsStats.alarmsPerDeviceId,
@@ -209,6 +234,7 @@ export class Dashboard extends Component {
   }
 
   render () {
+    const { t, devices } = this.props;
     const {
       chartColors,
 
@@ -216,6 +242,7 @@ export class Dashboard extends Component {
       telemetryIsPending,
       telemetryError,
 
+      currentActiveAlarms,
       topAlarms,
       alarmsPerDeviceId,
       criticalAlarmsChange,
@@ -225,6 +252,11 @@ export class Dashboard extends Component {
       openWarningCount,
       openCriticalCount
     } = this.state;
+
+    const deviceIds = Object.keys(devices);
+    const onlineDeviceCount = deviceIds.reduce((count, deviceId) => devices[deviceId].connected ? count + 1 : count, 0);
+    const offlineDeviceCount = deviceIds.length - onlineDeviceCount;
+
     return (
       <div className="dashboard-container">
         <Grid>
@@ -232,26 +264,35 @@ export class Dashboard extends Component {
             <MapPanel
               openWarningCount={openWarningCount}
               openCriticalCount={openCriticalCount}
-              isPending={kpisIsPending} />
+              onlineDeviceCount={onlineDeviceCount}
+              offlineDeviceCount={offlineDeviceCount}
+              isPending={kpisIsPending}
+              t={t} />
           </Cell>
           <Cell className="col-4">
-            <AlarmsPanelContainer />
+            <AlarmsPanel
+              alarms={currentActiveAlarms}
+              isPending={kpisIsPending}
+              error={kpisError}
+              t={t} />
           </Cell>
           <Cell className="col-6">
             <TelemetryPanel
               telemetry={telemetry}
               isPending={telemetryIsPending}
               error={telemetryError}
-              colors={chartColors} />
+              colors={chartColors}
+              t={t} />
           </Cell>
           <Cell className="col-4">
-            <KpisPanelContainer
+            <KpisPanel
               topAlarms={topAlarms}
               alarmsPerDeviceId={alarmsPerDeviceId}
               criticalAlarmsChange={criticalAlarmsChange}
               isPending={kpisIsPending}
               error={kpisError}
-              colors={chartColors} />
+              colors={chartColors}
+              t={t} />
           </Cell>
         </Grid>
       </div>

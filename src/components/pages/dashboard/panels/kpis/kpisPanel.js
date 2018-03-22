@@ -7,6 +7,7 @@ import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
+  PanelHeaderLabel,
   PanelContent,
   PanelOverlay
 } from 'components/pages/dashboard/panel';
@@ -45,7 +46,7 @@ export class KpisPanel extends Component {
         barChartDatum,
         { grid: false, legend: 'hidden', tooltip: true, yAxisState: 'shared' },
         this.props.colors.map(color => ({ color }))
-      );
+      )
     }
     // ================== Bar chart - END
 
@@ -53,7 +54,8 @@ export class KpisPanel extends Component {
     const deviceTypes = Object.keys(nextProps.alarmsPerDeviceId);
     if (deviceTypes.length) {
       // Convert the raw counts into a chart readable format
-      const pieChartDatum = deviceTypes.map(deviceType => ({
+      // Sort the deviceTypes so the chart sections and color won't change on update
+      const pieChartDatum = deviceTypes.sort().map(deviceType => ({
         [deviceType]: {
           '': { [staticTime]: { val: nextProps.alarmsPerDeviceId[deviceType] } }
         }
@@ -73,7 +75,10 @@ export class KpisPanel extends Component {
     const showOverlay = isPending && !criticalAlarmsChange;
     return (
       <Panel>
-        <PanelHeader>{ isPending ? 'Loading...' : 'System KPIs' }</PanelHeader>
+        <PanelHeader>
+          <PanelHeaderLabel>System KPIs</PanelHeaderLabel>
+          { !showOverlay && isPending && <Indicator size="small" /> }
+        </PanelHeader>
         <PanelContent className="kpis-panel-container">
           <div className="kpi-cell full-width">
             <div className="kpi-header">Top rules triggered</div>

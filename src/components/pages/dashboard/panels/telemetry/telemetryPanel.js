@@ -7,6 +7,7 @@ import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
+  PanelHeaderLabel,
   PanelContent,
   PanelOverlay
 } from 'components/pages/dashboard/panel';
@@ -76,7 +77,10 @@ export class TelemetryPanel extends Component {
     const showOverlay = isPending && !Object.keys(telemetry).length;
     return (
       <Panel>
-        <PanelHeader>{ isPending ? 'Loading...' : 'Telemetry' }</PanelHeader>
+        <PanelHeader>
+          <PanelHeaderLabel>Telemetry</PanelHeaderLabel>
+          { !showOverlay && isPending && <Indicator size="small" /> }
+        </PanelHeader>
         <PanelContent className="telemetry-panel-container">
           <div className="options-container">
             {

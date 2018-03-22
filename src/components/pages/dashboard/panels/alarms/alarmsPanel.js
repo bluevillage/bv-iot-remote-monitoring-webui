@@ -6,6 +6,7 @@ import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
+  PanelHeaderLabel,
   PanelContent,
   PanelOverlay
 } from 'components/pages/dashboard/panel';
@@ -28,11 +29,6 @@ export class AlarmsPanel extends Component {
     ];
   }
 
-  componentDidMount() {
-    if (!this.props.rulesLastUpdated) this.props.fetchRules();
-    this.props.fetchAlarms();
-  }
-
   render() {
     const { t, alarms, isPending } = this.props;
     const gridProps = {
@@ -43,7 +39,10 @@ export class AlarmsPanel extends Component {
     const showOverlay = isPending && !alarms.length;
     return (
       <Panel className="alarms-panel-container">
-        <PanelHeader>{ isPending ? 'Loading...' : 'System alarms' }</PanelHeader>
+        <PanelHeader>
+          <PanelHeaderLabel>System alarms</PanelHeaderLabel>
+          { !showOverlay && isPending && <Indicator size="small" /> }
+        </PanelHeader>
         <PanelContent>
           <RulesGrid {...gridProps} />
         </PanelContent>
