@@ -13,7 +13,7 @@ import {
   PanelOverlay
 } from 'components/pages/dashboard/panel';
 
-import './mapPanel.css';
+import './overviewPanel.css';
 
 export class OverviewPanel extends Component {
   constructor(props) {
