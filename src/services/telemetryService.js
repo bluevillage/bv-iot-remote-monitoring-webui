@@ -4,7 +4,7 @@ import { stringify } from 'query-string';
 import Config from 'app.config';
 import { HttpClient } from './httpClient';
 import {
-  toActicveAlarmsModel,
+  toActiveAlarmsModel,
   toAlarmsForRuleModel,
   toAlarmsModel,
   toRulesModel,
@@ -31,7 +31,7 @@ export class TelemetryService {
   /** Returns a list of active alarms (open or ack) */
   static getActiveAlarms(params = {}) {
     return HttpClient.get(`${ENDPOINT}alarmsbyrule?${stringify(params)}`)
-      .map(toActicveAlarmsModel);
+      .map(toActiveAlarmsModel);
   }
 
   /** Returns a list of alarms created from a given rule */
