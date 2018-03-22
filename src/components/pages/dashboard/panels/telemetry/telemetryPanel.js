@@ -26,14 +26,26 @@ export class TelemetryPanel extends Component {
 
     this.state = {
       telemetryKeys: [],
-      telemetryKey: ''
+      telemetryKey: '',
+      renderChart: true
     };
+
+    window.addEventListener('blur', this.handleWindowBlur);
+    window.addEventListener('focus', this.handleWindowFocus);
 
     this.tsiClient = new window.TsiClient();
   }
 
+  handleWindowBlur = () => this.setState({ renderChart: false });
+  handleWindowFocus = () => this.setState({ renderChart: true });
+
   componentDidMount() {
     this.lineChart = new this.tsiClient.ux.LineChart(document.getElementById(chartId));
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('blur', this.handleWindowBlur);
+    window.removeEventListener('focus', this.handleWindowFocus);
   }
 
   componentWillReceiveProps({ telemetry, isPending }) {
@@ -54,17 +66,19 @@ export class TelemetryPanel extends Component {
       const noAnimate = telemetryKey === this.state.telemetryKey;
       // Set a timeout to allow the panel height to be calculated before updating the graph
       setTimeout(() => {
-        this.lineChart.render(
-          chartData,
-          {
-            grid: false,
-            legend: 'compact',
-            noAnimate, // If the telemetryKey changes, animate
-            tooltip: true,
-            yAxisState: 'shared' // Default to all values being on the same axis
-          },
-          this.props.colors.map(color => ({ color }))
-        );
+        if (this && this.state && this.lineChart && this.state.renderChart) {
+          this.lineChart.render(
+            chartData,
+            {
+              grid: false,
+              legend: 'compact',
+              noAnimate, // If the telemetryKey changes, animate
+              tooltip: true,
+              yAxisState: 'shared' // Default to all values being on the same axis
+            },
+            this.props.colors.map(color => ({ color }))
+          );
+        }
       }, 10);
     }
   }

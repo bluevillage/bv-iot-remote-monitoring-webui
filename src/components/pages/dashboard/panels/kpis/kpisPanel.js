@@ -21,15 +21,29 @@ export class KpisPanel extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = { renderChart: true };
+
+    window.addEventListener('blur', this.handleWindowBlur);
+    window.addEventListener('focus', this.handleWindowFocus);
+
     this.tsiClient = new window.TsiClient();
   }
+
+  handleWindowBlur = () => this.setState({ renderChart: false });
+  handleWindowFocus = () => this.setState({ renderChart: true });
 
   componentDidMount() {
     this.barChart = new this.tsiClient.ux.BarChart(document.getElementById(barChartId));
     this.pieChart = new this.tsiClient.ux.PieChart(document.getElementById(pieChartId));
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUnmount() {
+    window.removeEventListener('blur', this.handleWindowBlur);
+    window.removeEventListener('focus', this.handleWindowFocus);
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     const staticTime = ''; // TODO: Remove hard coded time, needed by the charts
 
     // ================== Bar chart - START
@@ -42,11 +56,13 @@ export class KpisPanel extends Component {
         }
       }));
 
-      this.barChart.render(
-        barChartDatum,
-        { grid: false, legend: 'hidden', tooltip: true, yAxisState: 'shared' },
-        this.props.colors.map(color => ({ color }))
-      )
+      if (nextState.renderChart) {
+        this.barChart.render(
+          barChartDatum,
+          { grid: false, legend: 'hidden', tooltip: true, yAxisState: 'shared' },
+          this.props.colors.map(color => ({ color }))
+        );
+      }
     }
     // ================== Bar chart - END
 
@@ -61,11 +77,13 @@ export class KpisPanel extends Component {
         }
       }));
 
-      this.pieChart.render(
-        pieChartDatum,
-        { grid: false, timestamp: staticTime, legend: 'hidden', arcWidthRatio: .6 },
-        this.props.colors.map(color => ({ color }))
-      );
+      if (nextState.renderChart) {
+        this.pieChart.render(
+          pieChartDatum,
+          { grid: false, timestamp: staticTime, legend: 'hidden', arcWidthRatio: .6 },
+          this.props.colors.map(color => ({ color }))
+        );
+      }
     }
     // ================== Pie chart - END
   }

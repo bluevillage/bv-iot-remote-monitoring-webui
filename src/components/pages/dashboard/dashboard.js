@@ -134,16 +134,12 @@ export class Dashboard extends Component {
             TelemetryService.getAlarms(previousParams)
           )
         ).map(([
-          currentActiveAlarmsTemp,
+          currentActiveAlarms,
           previousActiveAlarms,
 
           currentAlarms,
           previousAlarms
         ]) => {
-          const currentActiveAlarms = currentActiveAlarmsTemp.map(alarm => ({
-            ...alarm,
-            name: (this.props.rules[alarm.ruleId] || {}).name || alarm.ruleId,
-          }));
 
           // Process all the data out of the currentAlarms list
           const currentAlarmsStats = currentAlarms.reduce((acc, alarm) => {
@@ -152,10 +148,9 @@ export class Dashboard extends Component {
               const isCritical = alarm.severity === 'critical';
               let updatedAlarmsPerDeviceId = acc.alarmsPerDeviceId;
               if (alarm.deviceId) {
-                const deviceType = (this.props.devices[alarm.deviceId] || {}).type || 'Other'; // TODO: Translate
                 updatedAlarmsPerDeviceId = {
                   ...updatedAlarmsPerDeviceId,
-                  [deviceType]: (updatedAlarmsPerDeviceId[deviceType] || 0) + 1
+                  [alarm.deviceId]: (updatedAlarmsPerDeviceId[alarm.deviceId] || 0) + 1
                 };
               }
               return {
@@ -192,8 +187,8 @@ export class Dashboard extends Component {
             currentTopAlarms.reduce((acc, { ruleId }) => ({ ...acc, [ruleId]: 0 }), {})
           );
 
-          const topAlarms = currentTopAlarms.map(({ name, ruleId, count }) => ({
-            name,
+          const topAlarms = currentTopAlarms.map(({ ruleId, count }) => ({
+            ruleId,
             count,
             previousCount: previousTopAlarmsMap[ruleId] || 0
           }));
@@ -234,7 +229,7 @@ export class Dashboard extends Component {
   }
 
   render () {
-    const { t, devices } = this.props;
+    const { t, rules, devices } = this.props;
     const {
       chartColors,
 
@@ -253,9 +248,31 @@ export class Dashboard extends Component {
       openCriticalCount
     } = this.state;
 
+    // Count the number of online and offline devices
     const deviceIds = Object.keys(devices);
     const onlineDeviceCount = deviceIds.reduce((count, deviceId) => devices[deviceId].connected ? count + 1 : count, 0);
     const offlineDeviceCount = deviceIds.length - onlineDeviceCount;
+
+    // Add the alarm rule name to the list of top alarms
+    const topAlarmsWithName = topAlarms.map(alarm => ({
+      ...alarm,
+      name: (rules[alarm.ruleId] || {}).name || alarm.ruleId,
+    }));
+
+    // Add the alarm rule name to the list of currently active alarms
+    const currentActiveAlarmsWithName = currentActiveAlarms.map(alarm => ({
+      ...alarm,
+      name: (rules[alarm.ruleId] || {}).name || alarm.ruleId
+    }));
+
+    // Convert the list of alarms by device id to alarms by device type
+    const alarmsPerDeviceType = Object.keys(alarmsPerDeviceId).reduce((acc, deviceId) => {
+      const deviceType = (devices[deviceId] || {}).type || 'Other';
+      return {
+        ...acc,
+        [deviceType]: (acc[deviceType] || 0) + alarmsPerDeviceId[deviceId]
+      };
+    }, {})
 
     return (
       <div className="dashboard-container">
@@ -271,7 +288,7 @@ export class Dashboard extends Component {
           </Cell>
           <Cell className="col-4">
             <AlarmsPanel
-              alarms={currentActiveAlarms}
+              alarms={currentActiveAlarmsWithName}
               isPending={kpisIsPending}
               error={kpisError}
               t={t} />
@@ -286,8 +303,8 @@ export class Dashboard extends Component {
           </Cell>
           <Cell className="col-4">
             <KpisPanel
-              topAlarms={topAlarms}
-              alarmsPerDeviceId={alarmsPerDeviceId}
+              topAlarms={topAlarmsWithName}
+              alarmsPerDeviceId={alarmsPerDeviceType}
               criticalAlarmsChange={criticalAlarmsChange}
               isPending={kpisIsPending}
               error={kpisError}
