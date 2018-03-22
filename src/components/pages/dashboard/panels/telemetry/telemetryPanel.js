@@ -86,13 +86,13 @@ export class TelemetryPanel extends Component {
   setTelemetryKey = telemetryKey => () => this.setState({ telemetryKey });
 
   render() {
-    const { isPending, telemetry } = this.props;
+    const { t, isPending, telemetry } = this.props;
     const { telemetryKeys, telemetryKey } = this.state;
     const showOverlay = isPending && !Object.keys(telemetry).length;
     return (
       <Panel>
         <PanelHeader>
-          <PanelHeaderLabel>Telemetry</PanelHeaderLabel>
+          <PanelHeaderLabel>{t('dashboard.panels.telemetry.header')}</PanelHeaderLabel>
           { !showOverlay && isPending && <Indicator size="small" /> }
         </PanelHeader>
         <PanelContent className="telemetry-panel-container">

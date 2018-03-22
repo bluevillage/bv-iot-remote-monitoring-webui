@@ -56,8 +56,8 @@ export class Dashboard extends Component {
       kpisError: null,
 
       // Map data
-      openWarningCount: 0,
-      openCriticalCount: 0
+      openWarningCount: undefined,
+      openCriticalCount: undefined
     };
 
     this.subscriptions = [];
@@ -259,8 +259,14 @@ export class Dashboard extends Component {
 
     // Count the number of online and offline devices
     const deviceIds = Object.keys(devices);
-    const onlineDeviceCount = deviceIds.reduce((count, deviceId) => devices[deviceId].connected ? count + 1 : count, 0);
-    const offlineDeviceCount = deviceIds.length - onlineDeviceCount;
+    const onlineDeviceCount =
+      deviceIds.length
+        ? deviceIds.reduce((count, deviceId) => devices[deviceId].connected ? count + 1 : count, 0)
+        : undefined;
+    const offlineDeviceCount =
+      deviceIds.length
+        ? deviceIds.length - onlineDeviceCount
+        : undefined;
 
     // Add the alarm rule name to the list of top alarms
     const topAlarmsWithName = topAlarms.map(alarm => ({
@@ -297,7 +303,9 @@ export class Dashboard extends Component {
               t={t} />
           </Cell>
           <Cell className="col-5">
-            <MapPanel />
+            <MapPanel
+              isPending={devicesIsPending}
+              t={t} />
           </Cell>
           <Cell className="col-3">
             <AlarmsPanel

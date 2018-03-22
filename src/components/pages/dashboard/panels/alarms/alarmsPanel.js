@@ -19,7 +19,10 @@ export class AlarmsPanel extends Component {
     super(props);
 
     this.columnDefs = [
-      rulesColumnDefs.ruleName,
+      {
+        ...rulesColumnDefs.ruleName,
+        minWidth: 200
+      },
       rulesColumnDefs.severity,
       {
         headerName: 'rules.grid.count',
@@ -40,7 +43,7 @@ export class AlarmsPanel extends Component {
     return (
       <Panel className="alarms-panel-container">
         <PanelHeader>
-          <PanelHeaderLabel>System alarms</PanelHeaderLabel>
+          <PanelHeaderLabel>{t('dashboard.panels.alarms.header')}</PanelHeaderLabel>
           { !showOverlay && isPending && <Indicator size="small" /> }
         </PanelHeader>
         <PanelContent>

@@ -49,10 +49,12 @@ export class KpisPanel extends Component {
     // ================== Bar chart - START
     if (nextProps.topAlarms.length) {
       // Convert the raw counts into a chart readable format
+      const currentWindow = nextProps.t('dashboard.panels.kpis.currentWindow');
+      const previousWindow = nextProps.t('dashboard.panels.kpis.previousWindow');
       const barChartDatum = nextProps.topAlarms.map(({ name, count, previousCount }) => ({
         [name]: {
-          'Current Month': { [staticTime]: { val: count } }, // TODO: Translate legends
-          'Previous Month': { [staticTime]: { val: previousCount } },
+          [currentWindow]: { [staticTime]: { val: count } }, // TODO: Translate legends
+          [previousWindow]: { [staticTime]: { val: previousCount } },
         }
       }));
 
@@ -89,25 +91,25 @@ export class KpisPanel extends Component {
   }
 
   render() {
-    const { isPending, criticalAlarmsChange } = this.props;
+    const { t, isPending, criticalAlarmsChange } = this.props;
     const showOverlay = isPending && !criticalAlarmsChange;
     return (
       <Panel>
         <PanelHeader>
-          <PanelHeaderLabel>System KPIs</PanelHeaderLabel>
+          <PanelHeaderLabel>{t('dashboard.panels.kpis.header')}</PanelHeaderLabel>
           { !showOverlay && isPending && <Indicator size="small" /> }
         </PanelHeader>
         <PanelContent className="kpis-panel-container">
           <div className="kpi-cell full-width">
-            <div className="kpi-header">Top rules triggered</div>
+            <div className="kpi-header">{t('dashboard.panels.kpis.topRule')}</div>
             <div className="chart-container" id={barChartId} />
           </div>
           <div className="kpi-cell">
-            <div className="kpi-header">Alarm by device type</div>
+            <div className="kpi-header">{t('dashboard.panels.kpis.deviceTypeAlarms')}</div>
             <div className="chart-container" id={pieChartId} />
           </div>
           <div className="kpi-cell">
-            <div className="kpi-header">Critical alarms</div>
+            <div className="kpi-header">{t('dashboard.panels.kpis.criticalAlarms')}</div>
             <div className="critical-alarms">
               {
                 criticalAlarmsChange !== 0 &&

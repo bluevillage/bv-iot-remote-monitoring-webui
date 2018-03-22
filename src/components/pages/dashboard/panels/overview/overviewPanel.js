@@ -15,6 +15,9 @@ import {
 
 import './overviewPanel.css';
 
+const isDef = (val) => typeof val !== 'undefined';
+const EMPTY = '--';
+
 export class OverviewPanel extends Component {
   constructor(props) {
     super(props);
@@ -23,48 +26,59 @@ export class OverviewPanel extends Component {
   }
 
   render() {
-    const { isPending, openCriticalCount, openWarningCount, onlineDeviceCount, offlineDeviceCount } = this.props;
+    const {
+      t,
+      isPending,
+      openCriticalCount,
+      openWarningCount,
+      onlineDeviceCount,
+      offlineDeviceCount
+    } = this.props;
     const showOverlay = isPending && !openCriticalCount && !openWarningCount;
+    const total =
+      isDef(onlineDeviceCount) && isDef(offlineDeviceCount)
+        ? onlineDeviceCount + offlineDeviceCount
+        : undefined;
     return (
       <Panel>
         <PanelHeader>
-          <PanelHeaderLabel>Devices overview</PanelHeaderLabel>
+          <PanelHeaderLabel>{t('dashboard.panels.overview.header')}</PanelHeaderLabel>
           { !showOverlay && isPending && <Indicator size="small" /> }
         </PanelHeader>
         <PanelContent className="device-stats-container">
-          <div className="stat-header">All devices</div>
+          <div className="stat-header">{t('dashboard.panels.overview.allDevices')}</div>
           <div className="stat-container">
             <div className="stat-cell col-third">
               <div className="stat-value critical">
-                <span>{ openCriticalCount }</span>
+                <span>{ isDef(openCriticalCount) ? openCriticalCount : EMPTY }</span>
                 <Svg path={svgs.critical} className="severity-icon"/>
               </div>
-              <div className="stat-label">Critical</div>
+              <div className="stat-label">{t('dashboard.panels.overview.critical')}</div>
             </div>
 
             <div className="stat-cell col-third">
               <div className="stat-value warning">
-                <span>{ openWarningCount }</span>
+                <span>{ isDef(openWarningCount) ? openWarningCount : EMPTY }</span>
                 <Svg path={svgs.warning} className="severity-icon"/>
               </div>
-              <div className="stat-label">Warnings</div>
+              <div className="stat-label">{t('dashboard.panels.overview.warnings')}</div>
             </div>
 
             <div className="stat-cell col-third" />
 
             <div className="stat-cell col-third">
-              <div className="stat-value">{ onlineDeviceCount + offlineDeviceCount }</div>
-              <div className="stat-label">Total</div>
+              <div className="stat-value">{ total || EMPTY }</div>
+              <div className="stat-label">{t('dashboard.panels.overview.total')}</div>
             </div>
 
             <div className="stat-cell col-third">
-              <div className="stat-value">{ onlineDeviceCount }</div>
-              <div className="stat-label">Connected</div>
+              <div className="stat-value">{ isDef(onlineDeviceCount) ? onlineDeviceCount : EMPTY }</div>
+              <div className="stat-label">{t('dashboard.panels.overview.connected')}</div>
             </div>
 
             <div className="stat-cell col-third">
-              <div className="stat-value">{ offlineDeviceCount }</div>
-              <div className="stat-label">Offline</div>
+              <div className="stat-value">{ isDef(offlineDeviceCount) ? offlineDeviceCount : EMPTY }</div>
+              <div className="stat-label">{t('dashboard.panels.overview.notConnected')}</div>
             </div>
           </div>
         </PanelContent>

@@ -14,11 +14,11 @@ import {
 export class MapPanel extends Component {
   render() {
     const showOverlay = false;
-    const isPending = false;
+    const { t, isPending } = this.props;
     return (
       <Panel className="map-panel-container">
         <PanelHeader>
-          <PanelHeaderLabel>Device locations</PanelHeaderLabel>
+          <PanelHeaderLabel>{t('dashboard.panels.map.header')}</PanelHeaderLabel>
           { !showOverlay && isPending && <Indicator size="small" /> }
         </PanelHeader>
         <PanelContent>
