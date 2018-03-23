@@ -9,11 +9,7 @@ import {
   FlyoutContent
 } from 'components/shared';
 
-import {
-  FlyoutSection,
-  FlyoutSectionHeader,
-  FlyoutSectionContent
-} from './flyoutSection';
+import Section from './flyoutSection';
 
 import './settings.css';
 
@@ -26,24 +22,18 @@ export class Settings extends Component {
           <FlyoutTitle>Settings</FlyoutTitle>
           <FlyoutCloseBtn onClick={onClose} />
         </FlyoutHeader>
-        <FlyoutContent className="setting-workflow-container">
-          <FlyoutSection>
-            <FlyoutSectionHeader>
-            Simulation Data
-            </FlyoutSectionHeader>
-            <FlyoutSectionContent>
-              Current theme
-            </FlyoutSectionContent>
-          </FlyoutSection>
+        <FlyoutContent className="settings-workflow-container">
 
-          <FlyoutSection collapsable={false}>
-            <FlyoutSectionHeader>
-              Simulation Data
-            </FlyoutSectionHeader>
-            <FlyoutSectionContent>
-              Coming soon...
-            </FlyoutSectionContent>
-          </FlyoutSection>
+          <Section.Container>
+            <Section.Header>Simulation Data</Section.Header>
+            <Section.Content>Current theme</Section.Content>
+          </Section.Container>
+
+          <Section.Container collapsable={false}>
+            <Section.Header>Simulation Data</Section.Header>
+            <Section.Content>Coming soon...</Section.Content>
+          </Section.Container>
+
         </FlyoutContent>
       </Flyout>
     );
