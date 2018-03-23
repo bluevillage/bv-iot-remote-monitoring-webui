@@ -3,8 +3,7 @@
 import React, { Component } from 'react';
 import { DevicesGrid } from './devicesGrid';
 import { Btn, RefreshBar, PageContent, ContextMenu } from 'components/shared';
-//import { DeviceDetailsContainer } from './flyouts/deviceDetails';
-import { DeviceDeleteContainer } from './flyouts/deviceDelete';
+import { DeviceDetailsContainer } from './flyouts/deviceDetails';
 import { DeviceNewContainer } from './flyouts/deviceNew';
 import { svgs } from 'utilities';
 
@@ -60,7 +59,7 @@ export class Devices extends Component {
   });
 
   render() {
-    const { t, devices, error, isPending, lastUpdated, /* entities,*/ fetchDevices } = this.props;
+    const { t, devices, error, isPending, lastUpdated, entities, fetchDevices } = this.props;
     const gridProps = {
       rowData: isPending ? undefined : devices || [],
       onSoftSelectChange: this.onSoftSelectChange,
