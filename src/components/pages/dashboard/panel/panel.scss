@@ -18,6 +18,7 @@
   .panel-header {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 
     .panel-header-label {
       flex-shrink: 0;
