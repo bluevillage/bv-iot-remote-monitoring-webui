@@ -3,7 +3,8 @@
 import React, { Component } from 'react';
 import { DevicesGrid } from './devicesGrid';
 import { Btn, RefreshBar, PageContent, ContextMenu } from 'components/shared';
-import { DeviceDetailsContainer } from './flyouts/deviceDetails';
+//import { DeviceDetailsContainer } from './flyouts/deviceDetails';
+import { DeviceDeleteContainer } from './flyouts/deviceDelete';
 import { DeviceNewContainer } from './flyouts/deviceNew';
 import { svgs } from 'utilities';
 
@@ -11,7 +12,8 @@ import './devices.css';
 
 const closedFlyoutState = {
   openFlyoutName: undefined,
-  selectedDeviceId: undefined
+  selectedDeviceId: undefined,
+  hardSelectedDevices: undefined
 };
 
 export class Devices extends Component {
@@ -52,14 +54,20 @@ export class Devices extends Component {
 
   getSoftSelectId = ({ id }) => id;
 
+  onHardSelectChange = (devices) => this.setState({
+    flyoutOpen: true,
+    hardSelectedDevices: devices
+  });
+
   render() {
-    const { t, devices, error, isPending, lastUpdated, entities, fetchDevices } = this.props;
+    const { t, devices, error, isPending, lastUpdated, /* entities,*/ fetchDevices } = this.props;
     const gridProps = {
       rowData: isPending ? undefined : devices || [],
       onSoftSelectChange: this.onSoftSelectChange,
       onContextMenuChange: this.onContextMenuChange,
       softSelectId: this.state.selectedDeviceId,
       getSoftSelectId: this.getSoftSelectId,
+      onHardSelectChange: this.onHardSelectChange,
       t: this.props.t
     };
     const detailsFlyoutOpen = this.state.openFlyoutName === 'details';
