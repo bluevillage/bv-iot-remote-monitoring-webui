@@ -34,9 +34,10 @@ export class OverviewPanel extends Component {
       onlineDeviceCount,
       offlineDeviceCount
     } = this.props;
-    const showOverlay = isPending && !openCriticalCount && !openWarningCount;
+    const deviceDataloaded = isDef(onlineDeviceCount) && isDef(offlineDeviceCount);
+    const showOverlay = isPending && (!openCriticalCount || !openWarningCount || !deviceDataloaded);
     const total =
-      isDef(onlineDeviceCount) && isDef(offlineDeviceCount)
+      deviceDataloaded
         ? onlineDeviceCount + offlineDeviceCount
         : undefined;
     return (

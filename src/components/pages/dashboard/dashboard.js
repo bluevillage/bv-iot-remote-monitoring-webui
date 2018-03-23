@@ -282,12 +282,12 @@ export class Dashboard extends Component {
 
     // Convert the list of alarms by device id to alarms by device type
     const alarmsPerDeviceType = Object.keys(alarmsPerDeviceId).reduce((acc, deviceId) => {
-      const deviceType = (devices[deviceId] || {}).type || 'Other';
+      const deviceType = (devices[deviceId] || {}).type || deviceId;
       return {
         ...acc,
         [deviceType]: (acc[deviceType] || 0) + alarmsPerDeviceId[deviceId]
       };
-    }, {})
+    }, {});
 
     return (
       <div className="dashboard-container">
