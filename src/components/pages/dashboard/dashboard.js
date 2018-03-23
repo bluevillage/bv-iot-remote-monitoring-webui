@@ -292,7 +292,7 @@ export class Dashboard extends Component {
     return (
       <div className="dashboard-container">
         <Grid>
-          <Cell className="col-2 devices-overview-cell">
+          <Cell className="col-1 devices-overview-cell">
             <OverviewPanel
               openWarningCount={openWarningCount}
               openCriticalCount={openCriticalCount}

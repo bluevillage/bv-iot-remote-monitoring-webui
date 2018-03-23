@@ -33,7 +33,7 @@
       },
       "map": { "header": "Device locations" },
       "overview": {
-        "header": "Devices overview",
+        "header": "Device statistics",
         "allDevices": "All devices",
         "critical": "Critical",
         "warnings": "Warnings",

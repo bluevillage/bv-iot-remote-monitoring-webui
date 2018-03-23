@@ -64,8 +64,6 @@ export class OverviewPanel extends Component {
               <div className="stat-label">{t('dashboard.panels.overview.warnings')}</div>
             </div>
 
-            <div className="stat-cell col-third" />
-
             <div className="stat-cell col-third">
               <div className="stat-value">{ total || EMPTY }</div>
               <div className="stat-label">{t('dashboard.panels.overview.total')}</div>
