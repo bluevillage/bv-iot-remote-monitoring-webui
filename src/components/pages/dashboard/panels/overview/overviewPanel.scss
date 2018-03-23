@@ -27,11 +27,10 @@
       // flex-flow: column nowrap;
       flex-flow: row wrap;
       flex-shrink: 0;
+      flex-grow: 1;
       align-items: flex-end;
       padding: 10px 10px 10px 0px;
-
-      &.col-half { flex-basis: 50%; }
-      &.col-third { flex-basis: 33.333%; }
+      flex-basis: 100%;
 
       .stat-value {
         display: flex;
@@ -67,6 +66,14 @@
         padding-left: 8px;
         @include rem-font-size(14px);
       }
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .stat-container {
+      flex-flow: row wrap;
+
+      .stat-cell { flex-basis: 48%; }
     }
   }
 
