@@ -13,7 +13,6 @@ export class IoTHubManagerService {
   static getDevices(conditions = []) {
     const query = encodeURIComponent(JSON.stringify(conditions));
     return HttpClient.get(`${ENDPOINT}devices?query=${query}`)
-      .map(toDevicesModel)
-      .delay(10000);
+      .map(toDevicesModel);
   }
 }
