@@ -1,0 +1,43 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+@import 'src/styles/themes';
+@import 'src/styles/mixins';
+
+.flyout-section {
+  border-top: 1px solid #454a4e;
+
+  .flyout-section-header {
+    color: #fff;
+    font-size: 16px;
+    height: 48px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-size: inherit;
+    font-family: inherit;
+
+    .collapse-section-icon {
+      margin-right: 20px;
+      transition: all 100ms linear;
+
+      svg { @include square-px-rem(14px); }
+
+      &.collapsed { transform: rotate(90deg); }
+      &.expanded { transform: rotate(-90deg); }
+    }
+  }
+
+  button.flyout-section-header { cursor: pointer; }
+
+  .flyout-section-content {
+    padding-bottom: 24px;
+    font-size: 14px;
+  }
+
+}
