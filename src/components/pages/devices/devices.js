@@ -11,8 +11,7 @@ import './devices.css';
 
 const closedFlyoutState = {
   openFlyoutName: undefined,
-  selectedDeviceId: undefined,
-  hardSelectedDevices: undefined
+  selectedDeviceId: undefined
 };
 
 export class Devices extends Component {
@@ -53,11 +52,6 @@ export class Devices extends Component {
 
   getSoftSelectId = ({ id }) => id;
 
-  onHardSelectChange = (devices) => this.setState({
-    flyoutOpen: true,
-    hardSelectedDevices: devices
-  });
-
   render() {
     const { t, devices, error, isPending, lastUpdated, entities, fetchDevices } = this.props;
     const gridProps = {
@@ -66,7 +60,6 @@ export class Devices extends Component {
       onContextMenuChange: this.onContextMenuChange,
       softSelectId: this.state.selectedDeviceId,
       getSoftSelectId: this.getSoftSelectId,
-      onHardSelectChange: this.onHardSelectChange,
       t: this.props.t
     };
     const detailsFlyoutOpen = this.state.openFlyoutName === 'details';
