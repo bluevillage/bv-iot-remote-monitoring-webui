@@ -141,7 +141,7 @@ export class DeviceDelete extends Component {
               <div className="device-delete-error">
                 <ErrorMsg>{error}</ErrorMsg>
               </div>
-            }
+              }
             {
               !changesApplied &&
               <BtnToolbar>
@@ -158,6 +158,6 @@ export class DeviceDelete extends Component {
           </div>
         </FlyoutContent>
       </Flyout>
-    );
-  }
-}
+        );
+      }
+    }
