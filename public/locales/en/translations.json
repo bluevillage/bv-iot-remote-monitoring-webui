@@ -44,7 +44,9 @@
   },
   "dashboard": {
     "panels": {
-      "alarms": { "header": "System alarms" },
+      "alarms": {
+        "header": "System alarms"
+      },
       "kpis": {
         "header": "System KPIs",
         "topRule": "Top rules triggered",
@@ -67,7 +69,9 @@
         "connected": "Connected",
         "notConnected": "Offline"
       },
-      "telemetry": { "header": "Telemetry" }
+      "telemetry": {
+        "header": "Telemetry"
+      }
     }
   },
   "refreshBar": {

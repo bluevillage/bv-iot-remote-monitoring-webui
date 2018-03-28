@@ -145,6 +145,14 @@ export class DeviceNew extends LinkedComponent {
         primaryKey: undefined,
         secondaryKey: undefined
       },
+      request: {
+        //Using Pascal Case names here because that is what the request to the server needs
+        Id: '',
+        IsSimulated: false,
+        Authentication: {}
+        //{AuthenticationType: 0, PrimaryKey: "dfad", SecondaryKey: "dafsd"}
+        //{AuthenticationType: 1, PrimaryThumbprint: "fdsaf", SecondaryThumbprint: "dafsd"}
+      },
       provisionedDevice: {}
     };
 
@@ -204,6 +212,7 @@ export class DeviceNew extends LinkedComponent {
 
     // Update normally
     return true;
+    */
   }
 
   formIsValid() {
