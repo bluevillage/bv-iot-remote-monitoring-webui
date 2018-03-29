@@ -235,7 +235,7 @@ class ApiService {
   }
 
   static getDeviceGroupFilters() {
-    return Http.get(`${Config.configApiUrl}devicegroupfilters`);
+    return Http.get(`${Config.iotHubManagerApiUrl}deviceProperties`);
   }
 
   static getMapKey() {
