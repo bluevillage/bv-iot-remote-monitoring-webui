@@ -417,7 +417,7 @@ export class DeviceNew extends LinkedComponent {
             }
           </form>
         </FlyoutContent>
-      </Flyout>
+      </Flyout >
     );
   }
 }
