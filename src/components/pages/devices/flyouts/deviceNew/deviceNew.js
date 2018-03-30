@@ -134,6 +134,7 @@ export class DeviceNew extends LinkedComponent {
       error: undefined,
       successCount: 0,
       changesApplied: false,
+      summaryMessage: props.t('devices.flyouts.new.affected'),
       formData: {
         count: 1,
         deviceId: '',
@@ -144,14 +145,6 @@ export class DeviceNew extends LinkedComponent {
         isGenerateKeys: AuthKeyTypeOptions.generate.value,
         primaryKey: undefined,
         secondaryKey: undefined
-      },
-      request: {
-        //Using Pascal Case names here because that is what the request to the server needs
-        Id: '',
-        IsSimulated: false,
-        Authentication: {}
-        //{AuthenticationType: 0, PrimaryKey: "dfad", SecondaryKey: "dafsd"}
-        //{AuthenticationType: 1, PrimaryThumbprint: "fdsaf", SecondaryThumbprint: "dafsd"}
       },
       provisionedDevice: {}
     };
@@ -210,12 +203,30 @@ export class DeviceNew extends LinkedComponent {
       }));
     }
 
+    // Update the summary message
+    if (isPending) {
+      this.updateSummaryMessage(nextState, t('devices.flyouts.new.pending'));
+    }
+    else if (changesApplied) {
+      this.updateSummaryMessage(nextState, t('devices.flyouts.new.applySuccess'));
+    }
+    else if (summaryMessage !== t('devices.flyouts.new.affected')) {
+      this.updateSummaryMessage(nextState, t('devices.flyouts.new.affected'));
+    }
+
     // Update normally
     return true;
     */
   }
 
+  updateSummaryMessage(nextState, message) {
+    if (nextState.summaryMessage !== message) {
+      this.setState(update(nextState, { summaryMessage: { $set: message } }));
+    }
+  }
+
   formIsValid() {
+    //TODO: Implement validation.
     return [
       this.deviceTypeLink,
       this.countLink,
@@ -227,6 +238,27 @@ export class DeviceNew extends LinkedComponent {
       this.primaryKeyLink,
       this.secondaryKeyLink
     ].every(link => !link.error);
+  }
+
+  toRequestBody(formData) {
+    const isX509 = formData.authenticationType === AuthTypeOptions.x509.value;
+    const isGenerateKeys = this.isGenerateKeysLink.value === AuthKeyTypeOptions.generate.value;
+
+    return {
+      //Using Pascal Case names here because that is what the request to the server needs
+      Id: formData.isGenerateId ? '' : formData.deviceId,
+      IsSimulated: formData.isSimulated,
+      Authentication:
+        isGenerateKeys
+          ? {}
+          : {
+            AuthenticationType: formData.authenticationType,
+            PrimaryKey: isX509 ? null : formData.primaryKey,
+            SecondaryKey: isX509 ? null : formData.secondaryKey,
+            PrimaryThumbprint: isX509 ? formData.primaryKey : null,
+            SecondaryThumbprint: isX509 ? formData.secondaryKey : null
+          }
+    };
   }
 
   apply = () => {
@@ -297,7 +329,6 @@ export class DeviceNew extends LinkedComponent {
                 {t(DeviceTypeOptions.physical.labelName)}
               </Radio>
             </FormGroup>
-
             {
               isSimulatedDevice && [
                 <FormGroup key="deviceCount">
