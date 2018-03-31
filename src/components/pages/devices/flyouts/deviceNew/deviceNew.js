@@ -226,7 +226,6 @@ export class DeviceNew extends LinkedComponent {
   }
 
   formIsValid() {
-    //TODO: Implement validation.
     return [
       this.deviceTypeLink,
       this.countLink,
