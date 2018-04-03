@@ -233,7 +233,8 @@ export class Dashboard extends Component {
       rulesIsPending,
       devicesIsPending,
       rulesError,
-      devicesError
+      devicesError,
+      azureMapsKey
     } = this.props;
     const {
       chartColors,
@@ -309,6 +310,7 @@ export class Dashboard extends Component {
           </Cell>
           <Cell className="col-5">
             <MapPanel
+              azureMapsKey={azureMapsKey}
               isPending={devicesIsPending}
               error={devicesError || kpisError}
               t={t} />
