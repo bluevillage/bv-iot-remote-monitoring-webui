@@ -34,7 +34,7 @@ export class MapPanel extends Component {
         icon: 'pin-blue'
       });
 
-      this.calculatePins(this.props);
+      this.calculatePins(this.props, true);
     }
   }
 
@@ -42,9 +42,9 @@ export class MapPanel extends Component {
     this.calculatePins(nextProps);
   }
 
-  calculatePins(props) {
+  calculatePins(props, initialCall = false) {
     const deviceIds = Object.keys(props.devices);
-    if (deviceIds.join() === Object.keys(this.props.devices).join()) return;
+    if (!initialCall && deviceIds.join() === Object.keys(this.props.devices).join()) return;
 
     const devicePins = deviceIds
       .map(key => props.devices[key])

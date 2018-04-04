@@ -68,7 +68,7 @@ const initialState = {
   activeDeviceGroupId: undefined,
   theme: 'dark',
   version: '0.0.1', // TODO: Version should be requested from the service
-  azureMapsKey: ''
+  azureMapsKey: 'v_r1uH9qfLTJZijJdGbXMt_YHCVPQeXqsgFd2Xs_lpg'
 };
 
 const updateDeviceGroupsReducer = (state, { payload, fromAction }) => {
