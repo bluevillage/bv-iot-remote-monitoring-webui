@@ -1,10 +1,39 @@
 // Copyright (c) Microsoft. All rights reserved.
 
+$zoomBtnPadding: 10px;
+$zoomBtnSize: 40px;
+$zoomBtnFont: 20px;
+
 .map-panel-container {
   display: flex;
   flex-flow: column nowrap;
   flex-grow: 1;
   padding: 0 !important;
+
+  .zoom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    font-size: $zoomBtnFont;
+    width: $zoomBtnSize;
+    height: $zoomBtnSize;
+    line-height: $zoomBtnSize;
+    cursor: pointer;
+    color: #fff;
+    background-color: #121416;
+    border: none;
+
+    &.zoom-in {
+      top: $zoomBtnPadding;
+      right: $zoomBtnPadding;
+    }
+
+    &.zoom-out {
+      top: 2*$zoomBtnPadding + $zoomBtnSize;
+      right: $zoomBtnPadding;
+    }
+  }
 
   #map { flex-grow: 1 }
 }

@@ -309,6 +309,7 @@ export class Dashboard extends Component {
           <Cell className="col-5">
             <MapPanel
               azureMapsKey={azureMapsKey}
+              devices={devices}
               isPending={devicesIsPending}
               error={devicesError || kpisError}
               t={t} />
