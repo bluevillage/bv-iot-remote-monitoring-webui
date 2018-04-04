@@ -206,11 +206,9 @@ export class DeviceNew extends LinkedComponent {
     // Update the summary message
     if (isPending) {
       this.updateSummaryMessage(nextState, t('devices.flyouts.new.pending'));
-    }
-    else if (changesApplied) {
+    } else if (changesApplied) {
       this.updateSummaryMessage(nextState, t('devices.flyouts.new.applySuccess'));
-    }
-    else if (summaryMessage !== t('devices.flyouts.new.affected')) {
+    } else {
       this.updateSummaryMessage(nextState, t('devices.flyouts.new.affected'));
     }
 
@@ -237,27 +235,6 @@ export class DeviceNew extends LinkedComponent {
       this.primaryKeyLink,
       this.secondaryKeyLink
     ].every(link => !link.error);
-  }
-
-  toRequestBody(formData) {
-    const isX509 = formData.authenticationType === AuthTypeOptions.x509.value;
-    const isGenerateKeys = this.isGenerateKeysLink.value === AuthKeyTypeOptions.generate.value;
-
-    return {
-      //Using Pascal Case names here because that is what the request to the server needs
-      Id: formData.isGenerateId ? '' : formData.deviceId,
-      IsSimulated: formData.isSimulated,
-      Authentication:
-        isGenerateKeys
-          ? {}
-          : {
-            AuthenticationType: formData.authenticationType,
-            PrimaryKey: isX509 ? null : formData.primaryKey,
-            SecondaryKey: isX509 ? null : formData.secondaryKey,
-            PrimaryThumbprint: isX509 ? formData.primaryKey : null,
-            SecondaryThumbprint: isX509 ? formData.secondaryKey : null
-          }
-    };
   }
 
   apply = () => {
@@ -416,7 +393,7 @@ export class DeviceNew extends LinkedComponent {
             }
           </form>
         </FlyoutContent>
-      </Flyout >
+      </Flyout>
     );
   }
 }
