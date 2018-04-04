@@ -1,5 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 
+@import 'src/styles/mixins';
+@import 'src/styles/themes';
+
 $zoomBtnPadding: 10px;
 $zoomBtnSize: 40px;
 $zoomBtnFont: 20px;
@@ -19,10 +22,8 @@ $zoomBtnFont: 20px;
     width: $zoomBtnSize;
     height: $zoomBtnSize;
     line-height: $zoomBtnSize;
-    cursor: pointer;
-    color: #fff;
-    background-color: #121416;
     border: none;
+    cursor: pointer;
 
     &.zoom-in {
       top: $zoomBtnPadding;
@@ -30,10 +31,17 @@ $zoomBtnFont: 20px;
     }
 
     &.zoom-out {
-      top: 2*$zoomBtnPadding + $zoomBtnSize;
+      top: 2 * $zoomBtnPadding + $zoomBtnSize;
       right: $zoomBtnPadding;
     }
   }
 
   #map { flex-grow: 1 }
+
+  @include themify($themes) {
+    .zoom-btn {
+      color: themed('colorContentText');
+      background-color: themed('colorContentBackground');
+    }
+  }
 }

@@ -13,16 +13,16 @@ import {
   PanelError
 } from 'components/pages/dashboard/panel';
 
-import './map.css';
+import './mapPanel.css';
 
 const atlas = window.atlas;
 const deviceLayer = 'devices-layer';
-const seattlePosition = new atlas.data.Position(-122.3320708, 47.6062);
 
-// TODO (stpryor): Add error boundary around the map panel
 export class MapPanel extends Component {
+
   componentDidMount() {
     if (this.props.azureMapsKey) {
+      const seattlePosition = new atlas.data.Position(-122.3320708, 47.6062);
       this.map = new atlas.Map('map', {
         'subscription-key': this.props.azureMapsKey,
         center: seattlePosition,
@@ -30,9 +30,9 @@ export class MapPanel extends Component {
       });
 
       this.map.addPins([], {
-          name: deviceLayer,
-          cluster: true,
-          icon: 'pin-darkblue'
+        name: deviceLayer,
+        cluster: true,
+        icon: 'pin-blue'
       });
 
       this.calculatePins(this.props);
@@ -44,10 +44,10 @@ export class MapPanel extends Component {
   }
 
   calculatePins(props) {
-    if (Object.keys(props.devices).join() === Object.keys(this.props.devices).join())
-      return;
+    const deviceIds = Object.keys(props.devices);
+    if (deviceIds.join() === Object.keys(this.props.devices).join()) return;
 
-    const devicePins = Object.keys(props.devices)
+    const devicePins = deviceIds
       .map(key => props.devices[key])
       .filter(({ properties }) => properties.latitude && properties.longitude)
       .map(({ id, properties }) =>
@@ -62,13 +62,17 @@ export class MapPanel extends Component {
         name: deviceLayer
       });
 
-      const lons = devicePins.map(({ geometry }) => geometry.coordinates[0]);
-      const lats = devicePins.map(({ geometry }) => geometry.coordinates[1]);
+      const lons = [];
+      const lats = [];
+      devicePins.forEach(({ geometry: { coordinates: [ longitude, latitude ] } }) => {
+        lons.push(longitude);
+        lats.push(latitude);
+      });
 
-      var swLon = Math.min.apply(null, lons);
-      var swLat = Math.min.apply(null, lats);
-      var neLon = Math.max.apply(null, lons);
-      var neLat = Math.max.apply(null, lats);
+      const swLon = Math.min.apply(null, lons);
+      const swLat = Math.min.apply(null, lats);
+      const neLon = Math.max.apply(null, lons);
+      const neLat = Math.max.apply(null, lats);
 
       // Zoom the map to the bounding box of the devices
       this.map.setCameraBounds({
