@@ -2,8 +2,7 @@
 
 import React, { Component } from 'react';
 
-import { Btn, Indicator } from 'components/shared';
-import { svgs } from 'utilities'
+import { Indicator } from 'components/shared';
 import {
   Panel,
   PanelHeader,
