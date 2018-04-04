@@ -14,14 +14,17 @@ import {
 
 import './map.css';
 
+// TODO (stpryor): Add error boundary around the map panel
 export class MapPanel extends Component {
 
   componentDidMount() {
     if (this.props.azureMapsKey) {
+      // const seattlePos = new window.atlas.data.Position(47.6062, 122.3321 % 90);
+      // console.log('seattlePos', seattlePos);
       this.map = new window.atlas.Map('map', {
         'subscription-key': this.props.azureMapsKey,
-        center: [-118.270293, 34.039737],
-        zoom: 14
+        center: [-122.3320708, 47.6062],
+        zoom: 11
       });
     }
   }
