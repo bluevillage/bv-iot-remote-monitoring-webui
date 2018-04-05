@@ -33,8 +33,7 @@ export class DeviceDelete extends Component {
       isPending: false,
       error: undefined,
       successCount: 0,
-      changesApplied: false,
-      summaryMessage: props.t('devices.flyouts.delete.affected'),
+      changesApplied: false
     };
   }
 
@@ -105,8 +104,7 @@ export class DeviceDelete extends Component {
       isPending,
       error,
       successCount,
-      changesApplied,
-      summaryMessage
+      changesApplied
     } = this.state;
 
     const summaryCount = changesApplied ? successCount : physicalDevices.length;

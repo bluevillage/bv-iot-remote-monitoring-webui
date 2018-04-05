@@ -134,7 +134,6 @@ export class DeviceNew extends LinkedComponent {
       error: undefined,
       successCount: 0,
       changesApplied: false,
-      summaryMessage: props.t('devices.flyouts.new.affected'),
       formData: {
         count: 1,
         deviceId: '',
@@ -203,24 +202,9 @@ export class DeviceNew extends LinkedComponent {
       }));
     }
 
-    // Update the summary message
-    if (isPending) {
-      this.updateSummaryMessage(nextState, t('devices.flyouts.new.pending'));
-    } else if (changesApplied) {
-      this.updateSummaryMessage(nextState, t('devices.flyouts.new.applySuccess'));
-    } else {
-      this.updateSummaryMessage(nextState, t('devices.flyouts.new.affected'));
-    }
-
     // Update normally
     return true;
     */
-  }
-
-  updateSummaryMessage(nextState, message) {
-    if (nextState.summaryMessage !== message) {
-      this.setState(update(nextState, { summaryMessage: { $set: message } }));
-    }
   }
 
   formIsValid() {
