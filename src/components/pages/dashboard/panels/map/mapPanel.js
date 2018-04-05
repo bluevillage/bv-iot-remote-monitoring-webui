@@ -110,7 +110,7 @@ export class MapPanel extends Component {
           <button className="zoom-btn zoom-out" onClick={this.zoomOut}>-</button>
         </PanelContent>
         { showOverlay && <PanelOverlay><Indicator /></PanelOverlay> }
-        { !this.props.azureMapsKey && <PanelError>Azure maps is not correctly configured</PanelError> }
+        { !this.props.azureMapsKey && <PanelError>{t('dashboard.panels.map.notConfiguredError')}</PanelError> }
         { error && <PanelError>{t(error.message)}</PanelError> }
       </Panel>
     );

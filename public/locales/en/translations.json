@@ -45,7 +45,8 @@
       },
       "map": {
         "header": "Device locations",
-        "runtimeError": "An error occurred while rendering the map"
+        "runtimeError": "An error occurred while rendering the map",
+        "notConfiguredError": "Azure maps is not correctly configured"
       },
       "overview": {
         "header": "Device statistics",
