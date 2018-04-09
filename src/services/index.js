@@ -3,6 +3,7 @@
 // Exports the shared react components into as a library
 
 export * from './authService';
+export * from './deviceSimulationService';
 export * from './httpClient';
 export * from './iotHubManagerService';
 export * from './telemetryService';
