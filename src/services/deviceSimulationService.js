@@ -42,7 +42,8 @@ export class DeviceSimulationService {
    * Toggles simulation status
    */
   static toggleSimulation(Etag, Enabled) {
-    return this.updateSimulatedDevices({ Etag, Enabled });
+    return HttpClient.patch(`${ENDPOINT}simulations/${SIMULATION_ID}`, { Etag, Enabled })
+      .map(toDeviceSimulationModel);
   }
 
   /**

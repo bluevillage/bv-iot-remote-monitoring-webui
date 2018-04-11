@@ -11,7 +11,6 @@ import {
 // Wrap the dispatch method
 const mapDispatchToProps = dispatch => ({
   insertDevice: device => dispatch(devicesRedux.actions.insertDevice(device)),
-  //fetchDevices: () => dispatch(devicesEpics.actions.refreshDevices())
   fetchDevices: () => dispatch(devicesEpics.actions.fetchDevices())
 });
 
