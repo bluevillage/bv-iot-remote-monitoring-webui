@@ -4,8 +4,7 @@ import { Observable } from 'rxjs';
 
 import Config from 'app.config';
 import { HttpClient } from './httpClient';
-import { toSimulationStatusModel } from './models';
-import { toDeviceModelSelectOptions, toDeviceSimulationsModel } from './models';
+import { toDeviceModelSelectOptions, toDeviceSimulationModel, toDeviceSimulationRequestModel } from './models';
 
 const ENDPOINT = Config.serviceUrls.deviceSimulation;
 const SIMULATION_ID = Config.simulationId;
@@ -16,11 +15,11 @@ const SIMULATION_ID = Config.simulationId;
 export class DeviceSimulationService {
 
   /**
-   * Toggles simulation status
+   * Returns a list of devicemodels
    */
-  static toggleSimulation(Etag, Enabled) {
-    return HttpClient.patch(`${ENDPOINT}simulations/${SIMULATION_ID}`, { Etag, Enabled })
-      .map(toSimulationStatusModel);
+  static getDeviceModelSelectOptions() {
+    return HttpClient.get(`${ENDPOINT}devicemodels`)
+      .map(toDeviceModelSelectOptions);
   }
 
   /**
@@ -28,52 +27,43 @@ export class DeviceSimulationService {
    */
   static getSimulatedDevices() {
     return HttpClient.get(`${ENDPOINT}simulations/${SIMULATION_ID}`)
-      .map(toSimulationStatusModel);
+      .map(toDeviceSimulationModel);
   }
 
-
-  /** Returns a list of devicemodels */
-  static getDeviceModelSelectOptions() {
-    return HttpClient.get(`${ENDPOINT}devicemodels`)
-      .map(toDeviceModelSelectOptions);
+  /**
+   * Updates simulated device
+   */
+  static updateSimulatedDevices(simulation) {
+    return HttpClient.put(`${ENDPOINT}simulations/${SIMULATION_ID}`, simulation)
+      .map(toDeviceSimulationModel)
   }
 
-  static getDeviceSimulations() {
-    return HttpClient.get(`${ENDPOINT}simulations/1`)
-      .map(toDeviceSimulationsModel);
+  /**
+   * Toggles simulation status
+   */
+  static toggleSimulation(Etag, Enabled) {
+    return this.updateSimulatedDevices({ Etag, Enabled });
   }
 
-  static updateDeviceSimulations(simulations) {
-    return simulations;
-    //    return HttpClient.put(`${ENDPOINT}simulations/1`, simulations)
-    //      .map(toDeviceSimulationsModel)
-  }
-
-  static incrementDeviceSimulations(simId, increment) {
-    this.getDeviceSimulations()
-      .flatMap(simulations => {
+  /**
+   * Gets the simulated device models, increments the given one, then updates on the server
+   */
+  static incrementSimulatedDeviceModel(deviceModelId, increment) {
+    return this.getSimulatedDevices()
+      .flatMap(simulations =>
         Observable.from(simulations.deviceModels)
           .reduce(
             (acc, { id, count }) => ({
-              ...acc, [id]: { id, count: ((acc[id] || {}).count || 0) + count }
+              ...acc,
+              [id]: {
+                id,
+                count: ((acc[id] || {}).count || 0) + count
+              }
             }),
-            { [simId]: { id: simId, count: increment } }
-          ).map(o => console.log(o))
-      })
-      .flatMap(request => this.updateDeviceSimulations(request));
-
-    /*
-    const simulations = this.getDeviceSimulations()
-      .flatMap(simulations => {
-        simulations.deviceModels
-          .reduce(
-            (acc, { id, count }) => ({
-              ...acc, [id]: { id, count: ((acc[id] || {}).count || 0) + count }
-            }),
-            { [simId]: { id: simId, count: increment } }
+            { [deviceModelId]: { id: deviceModelId, count: increment } }
           )
-      })
-      .flatMap(this.updateDeviceSimulations(simulations));
-      */
+          .map(deviceModels => ({ ...simulations, deviceModels: Object.values(deviceModels) }))
+      )
+      .flatMap(simulation => this.updateSimulatedDevices(toDeviceSimulationRequestModel(simulation)));
   }
 }

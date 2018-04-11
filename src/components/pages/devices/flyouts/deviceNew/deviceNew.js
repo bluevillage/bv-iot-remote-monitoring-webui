@@ -129,6 +129,9 @@ const ProvisionedDevice = ({ device, t }) => {
 export class DeviceNew extends LinkedComponent {
   constructor(props) {
     super(props);
+
+    const { t } = this.props;
+
     this.state = {
       isPending: false,
       error: undefined,
@@ -164,15 +167,17 @@ export class DeviceNew extends LinkedComponent {
     this.countLink = this.formDataLink.forkTo('count')
       .reject(nonInteger)
       .map(stringToInt)
-      .check(Validator.notEmpty, 'Number of devices is required.')
-      .check(num => num > 0, 'Number of devices must be greater than zero.');
-
-    this.deviceIdLink = this.formDataLink.forkTo('deviceId');
+      .check(Validator.notEmpty, t('devices.flyouts.new.validation.required'))
+      .check(num => num > 0, t('devices.flyouts.new.validation.greaterThanZero'));
 
     this.isGenerateIdLink = this.formDataLink.forkTo('isGenerateId')
       .map(stringToBoolean);
 
-    this.deviceModelLink = this.formDataLink.forkTo('deviceModel');
+    this.deviceIdLink = this.formDataLink.forkTo('deviceId')
+      .check(devId => (!this.deviceTypeLink.value && !this.isGenerateIdLink.value ? Validator.notEmpty(devId) : true), t('devices.flyouts.new.validation.required'));
+
+    this.deviceModelLink = this.formDataLink.forkTo('deviceModel')
+      .check(devModel => (this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true), t('devices.flyouts.new.validation.required'));
 
     this.authenticationTypeLink = this.formDataLink.forkTo('authenticationType')
       .reject(nonInteger)
@@ -181,9 +186,11 @@ export class DeviceNew extends LinkedComponent {
     this.isGenerateKeysLink = this.formDataLink.forkTo('isGenerateKeys')
       .map(stringToBoolean);
 
-    this.primaryKeyLink = this.formDataLink.forkTo('primaryKey');
+    this.primaryKeyLink = this.formDataLink.forkTo('primaryKey')
+      .check(priKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(priKey) : true), t('devices.flyouts.new.validation.required'));
 
-    this.secondaryKeyLink = this.formDataLink.forkTo('secondaryKey');
+    this.secondaryKeyLink = this.formDataLink.forkTo('secondaryKey')
+      .check(secKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(secKey) : true), t('devices.flyouts.new.validation.required'));
   }
 
   componentDidMount() {
@@ -214,7 +221,6 @@ export class DeviceNew extends LinkedComponent {
 
     // Update normally
     return true;
-    */
   }
 
   fetchDeviceModelOptions = () => {
@@ -226,8 +232,6 @@ export class DeviceNew extends LinkedComponent {
         error => this.setState({ deviceModels: { error, isPending: false } })
       );
   }
-
-  changeDeviceModel = (selected) => this.setState({ formData: { deviceModel: selected.target.value.value } });
 
   formIsValid() {
     return [
@@ -244,29 +248,28 @@ export class DeviceNew extends LinkedComponent {
   }
 
   apply = () => {
+    const { formData } = this.state;
+
     if (this.formIsValid()) {
       this.setState({ isPending: true });
 
       if (this.state.formData.isSimulated) {
-
-        this.provisionSubscription = DeviceSimulationService.incrementDeviceSimulations('chiller-02', 5)
-        .subscribe(
-          provisionedDevice => {
-            console.log(provisionedDevice);
-
-            //this.setState({ provisionedDevice, successCount: this.state.formData.count, isPending: false, changesApplied: true });
-            //this.props.insertDevice(provisionedDevice);
-          },
-          errorResponse => {
-            this.setState({ error: errorResponse.errorMessage, isPending: false, changesApplied: true });
-          }
-        );
+        this.provisionSubscription = DeviceSimulationService.incrementSimulatedDeviceModel(formData.deviceModel.value, formData.count)
+          .subscribe(
+            () => {
+              this.setState({ successCount: formData.count, isPending: false, changesApplied: true });
+              this.props.fetchDevices();
+            },
+            errorResponse => {
+              this.setState({ error: errorResponse.errorMessage, isPending: false, changesApplied: true });
+            }
+          );
 
       } else {
-        this.provisionSubscription = IoTHubManagerService.provisionDevice(toNewDeviceRequestModel(this.state.formData))
+        this.provisionSubscription = IoTHubManagerService.provisionDevice(toNewDeviceRequestModel(formData))
           .subscribe(
             provisionedDevice => {
-              this.setState({ provisionedDevice, successCount: this.state.formData.count, isPending: false, changesApplied: true });
+              this.setState({ provisionedDevice, successCount: formData.count, isPending: false, changesApplied: true });
               this.props.insertDevice(provisionedDevice);
             },
             errorResponse => {
@@ -298,11 +301,12 @@ export class DeviceNew extends LinkedComponent {
       isPending,
       error,
       successCount,
-      changesApplied
+      changesApplied,
+      deviceModels
     } = this.state;
 
     const isGenerateId = this.isGenerateIdLink.value === DeviceIdTypeOptions.generate.value;
-    const deviceName = this.deviceModelLink.value || t('devices.flyouts.new.deviceIdExample.deviceName');
+    const deviceName = (this.deviceModelLink.value ? this.deviceModelLink.value.value : undefined) || t('devices.flyouts.new.deviceIdExample.deviceName');
     const isSimulatedDevice = this.deviceTypeLink.value === DeviceTypeOptions.simulated.value;
     const isX509 = this.authenticationTypeLink.value === AuthTypeOptions.x509.value;
     const isGenerateKeys = this.isGenerateKeysLink.value === AuthKeyTypeOptions.generate.value;
@@ -339,8 +343,7 @@ export class DeviceNew extends LinkedComponent {
                 </FormGroup>,
                 <FormGroup key="deviceModel">
                   <FormLabel>{t('devices.flyouts.new.deviceModel.label')}</FormLabel>
-                  <div className="device-model-temp">{t('devices.flyouts.new.deviceModel.hint')} -- TODO: Add options</div>
-                  <FormControl link={this.deviceModelLink} type="select" options={this.state.deviceModels.options} />
+                  <FormControl link={this.deviceModelLink} type="select" options={deviceModels.options} placeholder={t('devices.flyouts.new.deviceModel.hint')} />
                 </FormGroup>
               ]
             }
@@ -407,8 +410,8 @@ export class DeviceNew extends LinkedComponent {
             }
             {
               !!changesApplied && [
-                <ProvisionedDevice device={provisionedDevice} t={t} />,
-                <BtnToolbar>
+                <ProvisionedDevice key="provDevice" device={provisionedDevice} t={t} />,
+                <BtnToolbar key="buttons">
                   <Btn svg={svgs.cancelX} onClick={onClose}>{t('devices.flyouts.new.close')}</Btn>
                 </BtnToolbar>
               ]
