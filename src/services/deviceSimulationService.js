@@ -50,7 +50,7 @@ export class DeviceSimulationService {
    * Gets the simulated device models, increments the given one, then updates on the server
    */
   static incrementSimulatedDeviceModel(deviceModelId, increment) {
-    return this.getSimulatedDevices()
+    return DeviceSimulationService.getSimulatedDevices()
       .flatMap(simulations =>
         Observable.from(simulations.deviceModels)
           .reduce(
@@ -65,6 +65,6 @@ export class DeviceSimulationService {
           )
           .map(deviceModels => ({ ...simulations, deviceModels: Object.values(deviceModels) }))
       )
-      .flatMap(simulation => this.updateSimulatedDevices(toDeviceSimulationRequestModel(simulation)));
+      .flatMap(simulation => DeviceSimulationService.updateSimulatedDevices(toDeviceSimulationRequestModel(simulation)));
   }
 }
