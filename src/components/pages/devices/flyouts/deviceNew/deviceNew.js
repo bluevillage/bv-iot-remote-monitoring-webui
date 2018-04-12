@@ -130,8 +130,6 @@ export class DeviceNew extends LinkedComponent {
   constructor(props) {
     super(props);
 
-    const { t } = this.props;
-
     this.state = {
       isPending: false,
       error: undefined,
@@ -157,8 +155,6 @@ export class DeviceNew extends LinkedComponent {
     };
 
     // Linked components
-    // TODO: Implement more extensive validation.
-    // TODO: Translate validation messages... hopefully, in a way that doesn't require every form to duplicate the same messages.
     this.formDataLink = this.linkTo('formData');
 
     this.deviceTypeLink = this.formDataLink.forkTo('isSimulated')
@@ -167,17 +163,17 @@ export class DeviceNew extends LinkedComponent {
     this.countLink = this.formDataLink.forkTo('count')
       .reject(nonInteger)
       .map(stringToInt)
-      .check(Validator.notEmpty, t('devices.flyouts.new.validation.required'))
-      .check(num => num > 0, t('devices.flyouts.new.validation.greaterThanZero'));
+      .check(Validator.notEmpty, () => this.props.t('devices.flyouts.new.validation.required'))
+      .check(num => num > 0, () => this.props.t('devices.flyouts.new.validation.greaterThanZero'));
 
     this.isGenerateIdLink = this.formDataLink.forkTo('isGenerateId')
       .map(stringToBoolean);
 
     this.deviceIdLink = this.formDataLink.forkTo('deviceId')
-      .check(devId => (!this.deviceTypeLink.value && !this.isGenerateIdLink.value ? Validator.notEmpty(devId) : true), t('devices.flyouts.new.validation.required'));
+      .check(devId => (!this.deviceTypeLink.value && !this.isGenerateIdLink.value ? Validator.notEmpty(devId) : true), () => this.props.t('devices.flyouts.new.validation.required'));
 
     this.deviceModelLink = this.formDataLink.forkTo('deviceModel')
-      .check(devModel => (this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true), t('devices.flyouts.new.validation.required'));
+      .check(devModel => (this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true), () => this.props.t('devices.flyouts.new.validation.required'));
 
     this.authenticationTypeLink = this.formDataLink.forkTo('authenticationType')
       .reject(nonInteger)
@@ -187,10 +183,10 @@ export class DeviceNew extends LinkedComponent {
       .map(stringToBoolean);
 
     this.primaryKeyLink = this.formDataLink.forkTo('primaryKey')
-      .check(priKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(priKey) : true), t('devices.flyouts.new.validation.required'));
+      .check(priKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(priKey) : true), () => this.props.t('devices.flyouts.new.validation.required'));
 
     this.secondaryKeyLink = this.formDataLink.forkTo('secondaryKey')
-      .check(secKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(secKey) : true), t('devices.flyouts.new.validation.required'));
+      .check(secKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(secKey) : true), () => this.props.t('devices.flyouts.new.validation.required'));
   }
 
   componentDidMount() {
