@@ -135,11 +135,6 @@ export class DeviceNew extends LinkedComponent {
       error: undefined,
       successCount: 0,
       changesApplied: false,
-      deviceModels: {
-        options: undefined,
-        isPending: false,
-        error: undefined
-      },
       formData: {
         count: 1,
         deviceId: '',
@@ -153,6 +148,10 @@ export class DeviceNew extends LinkedComponent {
       },
       provisionedDevice: {}
     };
+
+    if (props.deviceModelOptions === undefined) {
+      props.fetchDeviceModelOptions();
+    }
 
     // Linked components
     this.formDataLink = this.linkTo('formData');
@@ -170,10 +169,16 @@ export class DeviceNew extends LinkedComponent {
       .map(stringToBoolean);
 
     this.deviceIdLink = this.formDataLink.forkTo('deviceId')
-      .check(devId => (!this.deviceTypeLink.value && !this.isGenerateIdLink.value ? Validator.notEmpty(devId) : true), () => this.props.t('devices.flyouts.new.validation.required'));
+      .check(
+        devId => (!this.deviceTypeLink.value && !this.isGenerateIdLink.value ? Validator.notEmpty(devId) : true),
+        () => this.props.t('devices.flyouts.new.validation.required')
+      );
 
     this.deviceModelLink = this.formDataLink.forkTo('deviceModel')
-      .check(devModel => (this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true), () => this.props.t('devices.flyouts.new.validation.required'));
+      .check(
+        devModel => (this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true),
+        () => this.props.t('devices.flyouts.new.validation.required')
+      );
 
     this.authenticationTypeLink = this.formDataLink.forkTo('authenticationType')
       .reject(nonInteger)
@@ -183,18 +188,19 @@ export class DeviceNew extends LinkedComponent {
       .map(stringToBoolean);
 
     this.primaryKeyLink = this.formDataLink.forkTo('primaryKey')
-      .check(priKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(priKey) : true), () => this.props.t('devices.flyouts.new.validation.required'));
+      .check(
+        priKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(priKey) : true),
+        () => this.props.t('devices.flyouts.new.validation.required')
+      );
 
     this.secondaryKeyLink = this.formDataLink.forkTo('secondaryKey')
-      .check(secKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(secKey) : true), () => this.props.t('devices.flyouts.new.validation.required'));
-  }
-
-  componentDidMount() {
-    this.fetchDeviceModelOptions();
+      .check(
+        secKey => (!this.deviceTypeLink.value && !this.isGenerateKeysLink.value ? Validator.notEmpty(secKey) : true),
+        () => this.props.t('devices.flyouts.new.validation.required')
+      );
   }
 
   componentWillUnmount() {
-    if (this.deviceModelSubscription) this.deviceModelSubscription.unsubscribe();
     if (this.provisionSubscription) this.provisionSubscription.unsubscribe();
   }
 
@@ -217,16 +223,6 @@ export class DeviceNew extends LinkedComponent {
 
     // Update normally
     return true;
-  }
-
-  fetchDeviceModelOptions = () => {
-    this.setState({ deviceModels: { isPending: true } });
-
-    this.deviceModelSubscription = DeviceSimulationService.getDeviceModelSelectOptions()
-      .subscribe(
-        options => this.setState({ deviceModels: { options, isPending: false, error: undefined } }),
-        error => this.setState({ deviceModels: { error, isPending: false } })
-      );
   }
 
   formIsValid() {
@@ -290,15 +286,18 @@ export class DeviceNew extends LinkedComponent {
   }
 
   render() {
-    const { t, onClose } = this.props;
+    const {
+      t,
+      onClose,
+      deviceModelOptions
+    } = this.props;
     const {
       formData,
       provisionedDevice,
       isPending,
       error,
       successCount,
-      changesApplied,
-      deviceModels
+      changesApplied
     } = this.state;
 
     const isGenerateId = this.isGenerateIdLink.value === DeviceIdTypeOptions.generate.value;
@@ -339,7 +338,7 @@ export class DeviceNew extends LinkedComponent {
                 </FormGroup>,
                 <FormGroup key="deviceModel">
                   <FormLabel>{t('devices.flyouts.new.deviceModel.label')}</FormLabel>
-                  <FormControl link={this.deviceModelLink} type="select" options={deviceModels.options} placeholder={t('devices.flyouts.new.deviceModel.hint')} />
+                  <FormControl link={this.deviceModelLink} type="select" options={deviceModelOptions} placeholder={t('devices.flyouts.new.deviceModel.hint')} />
                 </FormGroup>
               ]
             }
@@ -400,7 +399,7 @@ export class DeviceNew extends LinkedComponent {
             {
               !changesApplied &&
               <BtnToolbar>
-                <Btn svg={svgs.trash} primary={true} disabled={isPending || !this.formIsValid()} onClick={this.apply}>{t('devices.flyouts.new.apply')}</Btn>
+                <Btn primary={true} disabled={isPending || !this.formIsValid()} onClick={this.apply}>{t('devices.flyouts.new.apply')}</Btn>
                 <Btn svg={svgs.cancelX} onClick={onClose}>{t('devices.flyouts.new.cancel')}</Btn>
               </BtnToolbar>
             }
