@@ -176,7 +176,7 @@ export class DeviceNew extends LinkedComponent {
 
     this.deviceModelLink = this.formDataLink.forkTo('deviceModel')
       .check(
-        devModel => (this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true),
+        devModel => this.deviceTypeLink.value ? Validator.notEmpty(devModel) : true,
         () => this.props.t('devices.flyouts.new.validation.required')
       );
 

@@ -42,9 +42,10 @@ export const epics = createEpicScenario({
   /** Loads the options for Device Models */
   fetchSimulationDeviceModelOptions: {
     type: 'SIMULATION_DEVICE_MODEL_OPTIONS_FETCH',
-    epic: (fromAction) => DeviceSimulationService.getDeviceModelSelectOptions()
-      .map(toActionCreator(redux.actions.getDeviceModelOptions, fromAction))
-      .catch(handleError(fromAction))
+    epic: (fromAction) =>
+      DeviceSimulationService.getDeviceModelSelectOptions()
+        .map(toActionCreator(redux.actions.getDeviceModelOptions, fromAction))
+        .catch(handleError(fromAction))
   }
 });
 // ========================= Epics - END
@@ -77,7 +78,7 @@ const simulationDeviceModelOptionsReducer = (state, { payload, fromAction }) => 
 
 export const redux = createReducerScenario({
   getSimulationStatus: { type: 'SIMULATION_STATUS', reducer: simulationStatusReducer },
-  getDeviceModelOptions: {type:'SIMULATION_DEVICE_MODEL_OPTIONS', reducer: simulationDeviceModelOptionsReducer}
+  getDeviceModelOptions: { type: 'SIMULATION_DEVICE_MODEL_OPTIONS', reducer: simulationDeviceModelOptionsReducer },
   registerError: { type: 'SIMULATION_REDUCER_ERROR', reducer: errorReducer },
   isFetching: { multiType: fetchableTypes, reducer: pendingReducer },
 });
