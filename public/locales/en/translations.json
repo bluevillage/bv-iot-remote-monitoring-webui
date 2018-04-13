@@ -42,6 +42,40 @@
     "loading": "Loading",
     "simulationDescription": "Start or stop simulation of devices. Stopping device simulation will minimize the cost of the solution; no simulated telemetry will be sent to your IoT Hub and alarms will not be generated for simulated devices."
   },
+  "deviceGroupsFlyout": {
+    "actions": "Actions",
+    "cancel": "Cancel",
+    "title": "Manage device groups",
+    "create": "Create new device group",
+    "deviceGroupName": "Device group name",
+    "new": "New device group",
+    "edit": "Edit a device group",
+    "name": "Name",
+    "namePlaceHolder": "Device group name",
+    "save": "Save",
+    "conditions": {
+      "condition": "Condition",
+      "field": "Field",
+      "operator": "Operator",
+      "operatorPlaceholder": "> =",
+      "value": "Value",
+      "valuePlaceholder": "Enter value",
+      "type": "Type",
+      "typePlaceholder": "Select type"
+    },
+    "options": {
+      "EQ": "= Equals",
+      "GT": "> Greater than",
+      "LT": "< Less than",
+      "GE": ">= Greater than/equal",
+      "LE": "<= Less than/equal",
+      "BRACKET": "[] In",
+      "OPENBRACKET": "[ Starts with",
+      "CLOSEBRACKET": "] Ends with",
+      "Number": "Number",
+      "Text": "Text"
+    }
+  },
   "rulesFlyout": {
     "newRule": "New rule",
     "ruleName": "Rule name",
