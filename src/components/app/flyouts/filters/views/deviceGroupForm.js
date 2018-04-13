@@ -168,28 +168,44 @@ class DeviceGroupForm extends LinkedComponent {
     return (
       <form onSubmit={this.apply} className='new-filter-form-container'>
         <Section.Container collapsable={false}>
-          <Section.Header>{editDeviceGroup ? t('deviceGroupsFlyout.edit') : t('deviceGroupsFlyout.new')}</Section.Header>
+          <Section.Header>
+            {editDeviceGroup
+              ? t('deviceGroupsFlyout.edit')
+              : t('deviceGroupsFlyout.new')
+            }
+          </Section.Header>
           <Section.Content>
             <FormGroup>
-              <FormLabel isRequired="true">{t('deviceGroupsFlyout.name')}</FormLabel>
+              <FormLabel isRequired="true">
+                {t('deviceGroupsFlyout.name')}
+              </FormLabel>
               <FormControl
                 type="text"
                 className="long"
                 placeholder={t('deviceGroupsFlyout.namePlaceHolder')}
                 link={this.name} />
             </FormGroup>
-            <Btn className="add-btn" svg={svgs.plus} onClick={this.addCondition}>{t(`rulesFlyout.addCondition`)}</Btn>
+            <Btn className="add-btn" svg={svgs.plus} onClick={this.addCondition}>
+              {t(`rulesFlyout.addCondition`)}
+            </Btn>
             {
               conditionLinks.map((condition, idx) => (
-                <Section.Container key={this.state.conditions[idx].key} collapsable={false}>
-                  <Section.Header>{t('deviceGroupsFlyout.conditions.condition')} {idx + 1}</Section.Header>
-                  <Section.Content>
-                    {
-                      conditionLinks.length > 1 &&
-                      <Btn svg={svgs.trash} onClick={this.deleteCondition(idx)}>Delete</Btn>
+                <Section.Container
+                  key={this.state.conditions[idx].key}
+                  collapsable={false}>
+                  <Section.Header>
+                    {t('deviceGroupsFlyout.conditions.condition')} {idx + 1}
+                    { conditionLinks.length > 1 &&
+                      <Btn svg={svgs.trash} onClick={this.deleteCondition(idx)}>
+                        {t('deviceGroupsFlyout.conditions.delete')}
+                      </Btn>
                     }
+                  </Section.Header>
+                  <Section.Content>
                     <FormGroup>
-                      <FormLabel isRequired="true">{t('deviceGroupsFlyout.conditions.field')}</FormLabel>
+                      <FormLabel isRequired="true">
+                        {t('deviceGroupsFlyout.conditions.field')}
+                      </FormLabel>
                       <FormControl
                         type="select"
                         className="long"
@@ -198,7 +214,9 @@ class DeviceGroupForm extends LinkedComponent {
                         link={condition.field} />
                     </FormGroup>
                     <FormGroup>
-                      <FormLabel isRequired="true">{t('deviceGroupsFlyout.conditions.operator')}</FormLabel>
+                      <FormLabel isRequired="true">
+                        {t('deviceGroupsFlyout.conditions.operator')}
+                      </FormLabel>
                       <FormControl
                         type="select"
                         className="long"
@@ -208,14 +226,18 @@ class DeviceGroupForm extends LinkedComponent {
                         link={condition.operator} />
                     </FormGroup>
                     <FormGroup>
-                      <FormLabel isRequired="true">{t('deviceGroupsFlyout.conditions.value')}</FormLabel>
+                      <FormLabel isRequired="true">
+                        {t('deviceGroupsFlyout.conditions.value')}
+                      </FormLabel>
                       <FormControl
                         type="text"
                         placeholder={t('deviceGroupsFlyout.conditions.valuePlaceholder')}
                         link={condition.value} />
                     </FormGroup>
                     <FormGroup>
-                      <FormLabel isRequired="true">{t('deviceGroupsFlyout.conditions.type')}</FormLabel>
+                      <FormLabel isRequired="true">
+                        {t('deviceGroupsFlyout.conditions.type')}
+                      </FormLabel>
                       <FormControl
                         type="select"
                         className="short"

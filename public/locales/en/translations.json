@@ -58,6 +58,7 @@
     "save": "Save",
     "conditions": {
       "condition": "Condition",
+      "delete": "Delete",
       "field": "Field",
       "operator": "Operator",
       "operatorPlaceholder": "> =",
