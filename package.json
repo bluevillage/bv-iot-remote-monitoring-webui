@@ -6,7 +6,7 @@
     "adal-angular": "1.0.15",
     "ag-grid": "16.0.1",
     "ag-grid-react": "16.0.0",
-    "camelcase-keys": "4.2.0",
+    "camelcase-object": "1.0.0",
     "dot-object": "1.7.0",
     "i18next": "10.3.0",
     "i18next-browser-languagedetector": "2.1.0",
@@ -38,7 +38,6 @@
     "node-fetch": "1.7.1",
     "node-sass-chokidar": "0.0.3",
     "npm-run-all": "4.0.2",
-    "react-scripts": "1.0.7",
     "rxjs-marbles": "2.3.1"
   },
   "scripts": {

@@ -40,7 +40,10 @@
     "stopped": "Stopped",
     "simulationData": "Simulation Data",
     "loading": "Loading",
-    "simulationDescription": "Start or stop simulation of devices. Stopping device simulation will minimize the cost of the solution; no simulated telemetry will be sent to your IoT Hub and alarms will not be generated for simulated devices."
+    "simulationDescription": "Start or stop simulation of devices. Stopping device simulation will minimize the cost of the solution; no simulated telemetry will be sent to your IoT Hub and alarms will not be generated for simulated devices.",
+    "toggleError": "Error updating simulation status",
+    "setLogoError": "Error updating logo",
+    "simulationLoadError": "Error loading simulation status"
   },
   "deviceGroupsFlyout": {
     "actions": "Actions",
@@ -167,7 +170,13 @@
         "notSimulated": "Physical",
         "diagnostics": {
           "title": "Diagnostics",
-          "description": "Diagnostic information from device"
+          "description": "Diagnostic information from device",
+          "keyHeader": "Property",
+          "valueHeader": "Value",
+          "status": "Status",
+          "lastMessage": "Last message",
+          "message": "Message",
+          "showMessage": "Click here to see raw message"
         },
         "methods": {
           "title": "Methods",
@@ -217,6 +226,10 @@
         "pending": "Provisioning devices... ",
         "applySuccess": "devices provisioned successfully!",
         "close": "Close",
+        "validation": {
+          "required": "Is required",
+          "greaterThanZero": "Must be greater than zero"
+        },
         "count": {
           "label": "Number of devices"
         },
