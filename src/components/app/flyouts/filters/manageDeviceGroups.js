@@ -29,8 +29,7 @@ export class ManageDeviceGroups extends LinkedComponent {
     selectedDeviceGroup: undefined
   });
 
-  onEditDeviceGroup = selectedDeviceGroup => () =>
-  this.setState({
+  onEditDeviceGroup = selectedDeviceGroup => () => this.setState({
     selectedDeviceGroup
   });
 

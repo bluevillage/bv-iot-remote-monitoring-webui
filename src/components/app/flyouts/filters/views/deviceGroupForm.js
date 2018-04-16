@@ -38,13 +38,9 @@ class DeviceGroupForm extends LinkedComponent {
       isEdit: !!this.props.selectedDeviceGroup
     };
 
-    const deviceGroupNameValidator = (new Validator())
-      .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
-
     // State to input links
     this.nameLink = this.linkTo('name')
-      .withValidator((new Validator())
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty')));
+      .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
     this.conditionsLink = this.linkTo('conditions');
   }
 
@@ -63,15 +59,15 @@ class DeviceGroupForm extends LinkedComponent {
 
   getFormState = ({
     selectedDeviceGroup: {
-      conditions, displayName, id, eTag
+      conditions, displayName
     }
   }) => {
-    if (!this.state.isEdit) return;
-
-    this.setState({
-      name: displayName,
-      conditions
-    });
+    if (this.state.isEdit) {
+      this.setState({
+        name: displayName,
+        conditions
+      });
+    }
   }
 
   toSelectOption = ({ id, name }) => ({ value: id, label: name });
@@ -92,17 +88,13 @@ class DeviceGroupForm extends LinkedComponent {
     // Create the state link for the dynamic form elements
     const conditionLinks = this.conditionsLink.getLinkedChildren(conditionLink => {
       const field = conditionLink.forkTo('field')
-        .withValidator((new Validator())
-          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.fieldCantBeEmpty')));
+        .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.fieldCantBeEmpty'));
       const operator = conditionLink.forkTo('operator')
-        .withValidator((new Validator())
-          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.operatorCantBeEmpty')));
+        .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.operatorCantBeEmpty'));
       const value = conditionLink.forkTo('value')
-        .withValidator((new Validator())
-          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.valueCantBeEmpty')));
+        .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.valueCantBeEmpty'));
       const type = conditionLink.forkTo('type')
-        .withValidator((new Validator())
-          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.typeCantBeEmpty')));
+        .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.typeCantBeEmpty'));
       const edited = !(!field.value && !operator.value && !value.value && !type.value);
       const error = (edited && (field.error || operator.error || value.error || type.error)) || '';
       return { field, operator, value, type, edited, error };
