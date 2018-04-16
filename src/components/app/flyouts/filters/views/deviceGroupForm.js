@@ -38,7 +38,7 @@ class DeviceGroupForm extends LinkedComponent {
     };
 
     const deviceGroupNameValidator = (new Validator())
-      .check(Validator.notEmpty, this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
+      .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
 
     // State to input links
     this.name = this.linkTo('name')
@@ -90,16 +90,16 @@ class DeviceGroupForm extends LinkedComponent {
 
     // Condition validators
     const fieldValidator = (new Validator())
-      .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.fieldCantBeEmpty'));
+      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.fieldCantBeEmpty'));
 
     const operatorValidator = (new Validator())
-      .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.operatorCantBeEmpty'));
+      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.operatorCantBeEmpty'));
 
     const valueValidator = (new Validator())
-      .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.valueCantBeEmpty'));
+      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.valueCantBeEmpty'));
 
     const typeValidator = (new Validator())
-      .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.typeCantBeEmpty'));
+      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.typeCantBeEmpty'));
 
     // Create the state link for the dynamic form elements
     const conditionLinks = this.conditions.getLinkedChildren(conditionLink => {
