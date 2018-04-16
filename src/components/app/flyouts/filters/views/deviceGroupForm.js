@@ -144,7 +144,6 @@ class DeviceGroupForm extends LinkedComponent {
               conditionLinks.map((condition, idx) => (
                 <Section.Container
                   key={this.state.conditions[idx].key}
-                  collapsable={false}>
                   <Section.Header>
                     {t('deviceGroupsFlyout.conditions.condition')} {idx + 1}
                     {
