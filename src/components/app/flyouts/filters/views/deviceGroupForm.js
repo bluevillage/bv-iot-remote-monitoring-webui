@@ -27,6 +27,9 @@ const newCondition = () => ({
   key: conditionKey++ // Used by react to track the rendered elements
 });
 
+const operators = ['EQ', 'GT', 'LT', 'GE', 'LE', '[]', '[', ']'];
+const valueTypes = ['Number', 'Text'];
+
 class DeviceGroupForm extends LinkedComponent {
 
   constructor(props) {
@@ -104,11 +107,11 @@ class DeviceGroupForm extends LinkedComponent {
     const conditionHasErrors = editedConditions.some(({ error }) => !!error);
     const conditionsHaveErrors = editedConditions.length === 0 || conditionHasErrors
 
-    const operatorOptions = ['EQ', 'GT', 'LT', 'GE', 'LE', '[]', '[', ']' ].map(value => ({
+    const operatorOptions = operators.map(value => ({
       value,
       label: t(`deviceGroupsFlyout.options.${value}`)
     }));
-    const typeOptions = ['Number', 'Text'].map(value => ({
+    const typeOptions = valueTypes.map(value => ({
       value,
       label: t(`deviceGroupsFlyout.options.${value}`)
     }));
