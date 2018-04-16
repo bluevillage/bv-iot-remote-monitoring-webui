@@ -30,11 +30,10 @@ export class ManageDeviceGroups extends LinkedComponent {
     editDeviceGroup: false
   })
 
-  onEditDeviceGroup = deviceGroup => e => {
-    console.log('se;e', deviceGroup )
+  onEditDeviceGroup = selectedDeviceGroup => e => {
     this.setState({
       editDeviceGroup: true,
-      selectedDeviceGroup: deviceGroup
+      selectedDeviceGroup
     })
   }
 
@@ -48,12 +47,13 @@ export class ManageDeviceGroups extends LinkedComponent {
           <Flyout.CloseBtn onClick={onClose} />
         </Flyout.Header>
         <Flyout.Content className="manage-filters-flyout-container">
-          { this.state.addNewFilter || this.state.editDeviceGroup
-            ? <DeviceGroupForm {...this.props} cancel={this.closeForm} {...this.state} />
-            : <Section.Container>
-                <Btn className="add-btn" svg={svgs.plus} onClick={this.toggleNewFilter}>{t('deviceGroupsFlyout.create')}</Btn>
-                {deviceGroups.length > 0 && <DeviceGroups {...this.props} onEditDeviceGroup={this.onEditDeviceGroup}/>}
-              </Section.Container>
+          {
+            this.state.addNewFilter || this.state.editDeviceGroup
+              ? <DeviceGroupForm {...this.props} cancel={this.closeForm} {...this.state} />
+              : <Section.Container>
+                  <Btn className="add-btn" svg={svgs.plus} onClick={this.toggleNewFilter}>{t('deviceGroupsFlyout.create')}</Btn>
+                  { deviceGroups.length > 0 && <DeviceGroups {...this.props} onEditDeviceGroup={this.onEditDeviceGroup}/> }
+                </Section.Container>
           }
         </Flyout.Content>
       </Flyout.Container>

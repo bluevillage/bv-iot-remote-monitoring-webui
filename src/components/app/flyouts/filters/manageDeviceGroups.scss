@@ -19,8 +19,6 @@
   }
 
   @include themify($themes) {
-    .property-grid-container {
-      .grid-header .cell { color: themed('colorContentTextDim'); }
-    }
+    .property-grid-container .grid-header .cell { color: themed('colorContentTextDim'); }
   }
 }

@@ -56,6 +56,13 @@
     "name": "Name",
     "namePlaceHolder": "Device group name",
     "save": "Save",
+    "errorMsg": {
+      "nameCantBeEmpty": "Name is required",
+      "fieldCantBeEmpty": "Field is required",
+      "operatorCantBeEmpty": "Operator is required",
+      "valueCantBeEmpty": "Value is required",
+      "typeCantBeEmpty": "Type is required"
+    },
     "conditions": {
       "condition": "Condition",
       "delete": "Delete",
