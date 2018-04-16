@@ -23,7 +23,7 @@ const newCondition = () => ({
   field: undefined,
   operator: undefined,
   type: undefined,
-  value: undefined,
+  value: '',
   key: conditionKey++ // Used by react to track the rendered elements
 });
 
@@ -34,38 +34,39 @@ class DeviceGroupForm extends LinkedComponent {
 
     this.state = {
       name: '',
-      conditions: [newCondition()]
+      conditions: [newCondition()],
+      isEdit: !!this.props.selectedDeviceGroup
     };
 
     const deviceGroupNameValidator = (new Validator())
       .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
 
     // State to input links
-    this.name = this.linkTo('name')
-      .withValidator(deviceGroupNameValidator);
-    this.conditions = this.linkTo('conditions');
+    this.nameLink = this.linkTo('name')
+      .withValidator((new Validator())
+        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty')));
+    this.conditionsLink = this.linkTo('conditions');
   }
 
   formIsValid() {
     return [
-      this.name,
-      this.conditions
+      this.nameLink,
+      this.conditionsLink
     ].every(link => !link.error);
   }
 
   componentDidMount() {
-    if (this.props.editDeviceGroup) {
+    if (this.state.isEdit) {
       this.getFormState(this.props);
     }
   }
 
   getFormState = ({
-    editDeviceGroup,
     selectedDeviceGroup: {
       conditions, displayName, id, eTag
     }
   }) => {
-    if (!editDeviceGroup) return;
+    if (!this.state.isEdit) return;
 
     this.setState({
       name: displayName,
@@ -80,37 +81,28 @@ class DeviceGroupForm extends LinkedComponent {
     // TODO: calling new device group API
   };
 
-  addCondition = () => this.conditions.set([...this.conditions.value, newCondition()]);
+  addCondition = () => this.conditionsLink.set([...this.conditionsLink.value, newCondition()]);
 
   deleteCondition = (index) =>
-    () => this.conditions.set(this.conditions.value.filter((_, idx) => index !== idx));
+    () => this.conditionsLink.set(this.conditionsLink.value.filter((_, idx) => index !== idx));
 
   render () {
-    const { t, editDeviceGroup } = this.props;
-
-    // Condition validators
-    const fieldValidator = (new Validator())
-      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.fieldCantBeEmpty'));
-
-    const operatorValidator = (new Validator())
-      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.operatorCantBeEmpty'));
-
-    const valueValidator = (new Validator())
-      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.valueCantBeEmpty'));
-
-    const typeValidator = (new Validator())
-      .check(Validator.notEmpty, () => t('deviceGroupsFlyout.errorMsg.typeCantBeEmpty'));
+    const { t } = this.props;
 
     // Create the state link for the dynamic form elements
-    const conditionLinks = this.conditions.getLinkedChildren(conditionLink => {
+    const conditionLinks = this.conditionsLink.getLinkedChildren(conditionLink => {
       const field = conditionLink.forkTo('field')
-        .withValidator(fieldValidator);
+        .withValidator((new Validator())
+          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.fieldCantBeEmpty')));
       const operator = conditionLink.forkTo('operator')
-        .withValidator(operatorValidator);
+        .withValidator((new Validator())
+          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.operatorCantBeEmpty')));
       const value = conditionLink.forkTo('value')
-        .withValidator(valueValidator);
+        .withValidator((new Validator())
+          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.valueCantBeEmpty')));
       const type = conditionLink.forkTo('type')
-        .withValidator(typeValidator);
+        .withValidator((new Validator())
+          .check(Validator.notEmpty, t('deviceGroupsFlyout.errorMsg.typeCantBeEmpty')));
       const edited = !(!field.value && !operator.value && !value.value && !type.value);
       const error = (edited && (field.error || operator.error || value.error || type.error)) || '';
       return { field, operator, value, type, edited, error };
@@ -120,57 +112,21 @@ class DeviceGroupForm extends LinkedComponent {
     const conditionHasErrors = editedConditions.some(({ error }) => !!error);
     const conditionsHaveErrors = editedConditions.length === 0 || conditionHasErrors
 
-    const operatorOptions = [
-      {
-        value: 'EQ',
-        label: t('deviceGroupsFlyout.options.EQ')
-      },
-      {
-        value: 'GT',
-        label: t('deviceGroupsFlyout.options.GT')
-      },
-      {
-        value: 'LT',
-        label: t('deviceGroupsFlyout.options.LT')
-      },
-      {
-        value: 'GE',
-        label: t('deviceGroupsFlyout.options.GE')
-      },
-      {
-        value: 'LE',
-        label: t('deviceGroupsFlyout.options.LE')
-      },
-      {
-        value: '[]',
-        label: t('deviceGroupsFlyout.options.BRACKET')
-      },
-      {
-        value: '[',
-        label: t('deviceGroupsFlyout.options.OPENBRACKET')
-      },
-      {
-        value: ']',
-        label: t('deviceGroupsFlyout.options.CLOSEBRACKET')
-      }
-    ];
-    const typeOptions = [
-      {
-        value: 'Number',
-        label: t('deviceGroupsFlyout.options.Number')
-      },
-      {
-        value: 'Text',
-        label: t('deviceGroupsFlyout.options.Text')
-      }
-    ];
+    const operatorOptions = ['EQ', 'GT', 'LT', 'GE', 'LE', '[]', '[', ']' ].map(value => ({
+      value,
+      label: t(`deviceGroupsFlyout.options.${value}`)
+    }));
+    const typeOptions = ['Number', 'Text'].map(value => ({
+      value,
+      label: t(`deviceGroupsFlyout.options.${value}`)
+    }));
 
     return (
       <form onSubmit={this.apply} className='new-filter-form-container'>
         <Section.Container collapsable={false}>
           <Section.Header>
             {
-              editDeviceGroup
+              this.state.isEdit
                 ? t('deviceGroupsFlyout.edit')
                 : t('deviceGroupsFlyout.new')
             }
@@ -184,7 +140,7 @@ class DeviceGroupForm extends LinkedComponent {
                 type="text"
                 className="long"
                 placeholder={t('deviceGroupsFlyout.namePlaceHolder')}
-                link={this.name} />
+                link={this.nameLink} />
             </FormGroup>
             <Btn className="add-btn" svg={svgs.plus} onClick={this.addCondition}>
               {t(`rulesFlyout.addCondition`)}

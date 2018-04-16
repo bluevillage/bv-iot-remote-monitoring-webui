@@ -80,9 +80,9 @@
       "LT": "< Less than",
       "GE": ">= Greater than/equal",
       "LE": "<= Less than/equal",
-      "BRACKET": "[] In",
-      "OPENBRACKET": "[ Starts with",
-      "CLOSEBRACKET": "] Ends with",
+      "[]": "[] In",
+      "[]": "[ Starts with",
+      "]": "] Ends with",
       "Number": "Number",
       "Text": "Text"
     }

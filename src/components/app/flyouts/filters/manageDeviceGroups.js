@@ -17,25 +17,22 @@ export class ManageDeviceGroups extends LinkedComponent {
     super(props);
 
     this.state = {
-      addNewFilter: false,
-      editDeviceGroup: false,
-      selectedDeviceGroup: {}
+      addNewDeviceGroup: false,
+      selectedDeviceGroup: undefined
     };
   }
 
-  toggleNewFilter = () => this.setState({ addNewFilter: !this.state.addNewFilter });
+  toggleNewFilter = () => this.setState({ addNewDeviceGroup: !this.state.addNewDeviceGroup });
 
   closeForm = () => this.setState({
-    addNewFilter: false,
-    editDeviceGroup: false
-  })
+    addNewDeviceGroup: false,
+    selectedDeviceGroup: undefined
+  });
 
-  onEditDeviceGroup = selectedDeviceGroup => e => {
-    this.setState({
-      editDeviceGroup: true,
-      selectedDeviceGroup
-    })
-  }
+  onEditDeviceGroup = selectedDeviceGroup => () =>
+  this.setState({
+    selectedDeviceGroup
+  });
 
   render() {
     const { onClose, t, deviceGroups = [] } = this.props;
@@ -48,7 +45,7 @@ export class ManageDeviceGroups extends LinkedComponent {
         </Flyout.Header>
         <Flyout.Content className="manage-filters-flyout-container">
           {
-            this.state.addNewFilter || this.state.editDeviceGroup
+            this.state.addNewDeviceGroup || !!this.state.selectedDeviceGroup
               ? <DeviceGroupForm {...this.props} cancel={this.closeForm} {...this.state} />
               : <Section.Container>
                   <Btn className="add-btn" svg={svgs.plus} onClick={this.toggleNewFilter}>{t('deviceGroupsFlyout.create')}</Btn>
