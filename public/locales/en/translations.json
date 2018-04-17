@@ -64,7 +64,7 @@
       "typeCantBeEmpty": "Type is required"
     },
     "conditions": {
-      "condition": "Condition",
+      "condition": "Condition {{headerCount}}",
       "delete": "Delete",
       "field": "Field",
       "operator": "Operator",

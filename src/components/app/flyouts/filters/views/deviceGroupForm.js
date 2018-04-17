@@ -144,8 +144,9 @@ class DeviceGroupForm extends LinkedComponent {
               conditionLinks.map((condition, idx) => (
                 <Section.Container
                   key={this.state.conditions[idx].key}
+                  collapsable={false}>
                   <Section.Header>
-                    {t('deviceGroupsFlyout.conditions.condition')} {idx + 1}
+                    {t('deviceGroupsFlyout.conditions.condition', { headerCount: idx + 1 })}
                     {
                       conditionLinks.length > 1 &&
                       <Btn svg={svgs.trash} onClick={this.deleteCondition(idx)}>
