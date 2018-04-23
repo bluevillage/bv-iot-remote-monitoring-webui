@@ -82,6 +82,22 @@ const insertDeviceReducer = (state, { payload }) => {
   });
 };
 
+const updateTagsReducer = (state, { payload }) => {
+  let updatedTagData = {};
+  payload.commonTags.map(({ name, value }) => (updatedTagData[name] = value));
+
+  const updatedDevices = payload.deviceId
+    .map((id) => state.entities[id])
+    .map((device) => update(device, { tags: { $merge: updatedTagData } }))
+    .map((device) => update(device, { tags: { $unset: payload.deletedTags } }));
+
+  const { entities: { devices } } = normalize(updatedDevices, deviceListSchema);
+  return update(state, {
+    entities: { $merge: devices }
+  });
+};
+
+
 /* Action types that cause a pending flag */
 const fetchableTypes = [
   epics.actionTypes.fetchDevices
@@ -92,7 +108,8 @@ export const redux = createReducerScenario({
   registerError: { type: 'DEVICES_REDUCER_ERROR', reducer: errorReducer },
   isFetching: { multiType: fetchableTypes, reducer: pendingReducer },
   deleteDevice: { type: 'DEVICE_DELETE', reducer: deleteDeviceReducer },
-  insertDevice: { type: 'DEVICE_INSERT', reducer: insertDeviceReducer }
+  insertDevice: { type: 'DEVICE_INSERT', reducer: insertDeviceReducer },
+  updateTags: { type: 'DEVICE_UPDATE_TAGS', reducer: updateTagsReducer },
 });
 
 export const reducer = { devices: redux.getReducer(initialState) };

@@ -3,6 +3,7 @@
 import update from 'immutability-helper';
 import dot from 'dot-object';
 import { camelCaseReshape, getItems } from 'utilities';
+import uuid from 'uuid/v4';
 
 // Contains methods for converting service response
 // object to UI friendly objects
@@ -54,6 +55,23 @@ export const toJobsModel = (response = []) => response.map(job => camelCaseResha
   'type': 'type'
 }));
 
+export const toSubmitTagsJobRequestModel = (devices, { jobName, commonTags, deletedTags }) => {
+  const jobId = jobName ? jobName + '-' + uuid() : uuid();
+  const deviceIds = devices.map(({ id }) => `'${id}'`).join(',');
+  let Tags = {};
+  commonTags.map(({ name, value }) => (Tags[name] = value));
+  deletedTags.map((name) => (Tags[name] = null));
+  const request = {
+    JobId: jobId,
+    QueryCondition: `deviceId in [${deviceIds}]`,
+    MaxExecutionTimeInSeconds: 0,
+    UpdateTwin: {
+      Tags
+    }
+  };
+  return request;
+};
+
 export const toJobStatusModel = (response = {}) => camelCaseReshape(response, {
   'createdTimeUtc': 'createdTimeUtc',
   'devices': 'devices',
@@ -77,7 +95,6 @@ export const toNewDeviceRequestModel = ({
   deviceId,
   isGenerateId,
   isSimulated,
-  deviceModel,
   authenticationType,
   isGenerateKeys,
   primaryKey,

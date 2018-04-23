@@ -239,11 +239,14 @@ export class DeviceNew extends LinkedComponent {
     ].every(link => !link.error);
   }
 
-  apply = () => {
+  apply = (event) => {
+    event.preventDefault();
     const { formData } = this.state;
 
     if (this.formIsValid()) {
       this.setState({ isPending: true });
+
+      if (this.provisionSubscription) this.provisionSubscription.unsubscribe();
 
       if (this.state.formData.isSimulated) {
         this.provisionSubscription = DeviceSimulationService.incrementSimulatedDeviceModel(formData.deviceModel.value, formData.count)
@@ -399,7 +402,7 @@ export class DeviceNew extends LinkedComponent {
             {
               !changesApplied &&
               <BtnToolbar>
-                <Btn primary={true} disabled={isPending || !this.formIsValid()} onClick={this.apply}>{t('devices.flyouts.new.apply')}</Btn>
+                <Btn primary={true} disabled={isPending || !this.formIsValid()} type="submit">{t('devices.flyouts.new.apply')}</Btn>
                 <Btn svg={svgs.cancelX} onClick={onClose}>{t('devices.flyouts.new.cancel')}</Btn>
               </BtnToolbar>
             }
