@@ -28,7 +28,10 @@ export class PcsGrid extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { currentSoftSelectId: undefined };
+    this.state = {
+      currentSoftSelectId: undefined,
+      currentHardSelectIds: []
+    };
 
     this.defaultPcsGridProps = {
       domLayout: 'autoHeight',
@@ -62,6 +65,21 @@ export class PcsGrid extends Component {
     }
   }
 
+  /** Ensure that hard selected rows are maintained by their ids, even when the actual data may change */
+  componentDidUpdate(nextProps, nextState) {
+    const { currentHardSelectIds } = this.state;
+
+    if (this.gridApi && currentHardSelectIds && currentHardSelectIds.length > 0) {
+      const idSet = new Set((currentHardSelectIds || []).map(({ id }) => id));
+
+      this.gridApi.forEachNode(node => {
+        if (idSet.has(node.data.id) && !node.selected) {
+          node.setSelected(true);
+        }
+      });
+    }
+  }
+
   /** Save the gridApi locally on load */
   onGridReady = gridReadyEvent => {
     this.gridApi = gridReadyEvent.api;
@@ -81,6 +99,9 @@ export class PcsGrid extends Component {
 
   /** When a row is hard selected, try to fire a hard select event, plus any props callbacks */
   onSelectionChanged = () => {
+    const currentHardSelectIds = this.gridApi.getSelectedRows().map(({ id }) => ({ id }));
+    this.setState({ currentHardSelectIds });
+
     const { onHardSelectChange, onSelectionChanged } = this.props;
     if (isFunc(onHardSelectChange)) {
       onHardSelectChange(this.gridApi.getSelectedRows());

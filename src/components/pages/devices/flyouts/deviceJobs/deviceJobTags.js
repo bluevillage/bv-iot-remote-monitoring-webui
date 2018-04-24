@@ -78,13 +78,6 @@ export class DeviceJobTags extends LinkedComponent {
     }
   }
 
-  //TODO: Maybe use this to compare instead of length
-  devicesAreEqual(devices, nextDevices) {
-    if (devices.length !== nextDevices.length) return false;
-    const currentDevices = new Set(devices.map(({ id }) => id));
-    return nextDevices.every(({ id }) => currentDevices.has(id));
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.devices && (this.props.devices || []).length !== nextProps.devices.length) {
       this.populateState(nextProps.devices);
