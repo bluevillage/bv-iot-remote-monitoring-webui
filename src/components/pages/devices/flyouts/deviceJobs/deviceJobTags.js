@@ -143,7 +143,7 @@ export class DeviceJobTags extends LinkedComponent {
       this.subscription = IoTHubManagerService.sumbitJob(request)
         .subscribe(
           ({ jobId }) => {
-            this.setState({ jobId, successCount: devices.length, isPending: false, changesApplied: true, foo: Date.now() });
+            this.setState({ jobId, successCount: devices.length, isPending: false, changesApplied: true });
             this.props.updateTags({ deviceId: devices.map(({ id }) => id), commonTags, deletedTags });
           },
           errorResponse => {
