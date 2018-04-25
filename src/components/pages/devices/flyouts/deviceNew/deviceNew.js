@@ -19,7 +19,6 @@ import {
   AjaxError,
   Btn,
   BtnToolbar,
-  ErrorMsg,
   Flyout,
   FlyoutHeader,
   FlyoutTitle,
