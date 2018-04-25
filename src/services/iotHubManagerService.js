@@ -24,7 +24,7 @@ export class IoTHubManagerService {
   }
 
   /** Submits a job */
-  static sumbitJob(body) {
+  static submitJob(body) {
     return HttpClient.post(`${ENDPOINT}jobs`, body)
       .map(toJobStatusModel);
   }

@@ -58,9 +58,9 @@ export const toJobsModel = (response = []) => response.map(job => camelCaseResha
 export const toSubmitTagsJobRequestModel = (devices, { jobName, commonTags, deletedTags }) => {
   const jobId = jobName ? jobName + '-' + uuid() : uuid();
   const deviceIds = devices.map(({ id }) => `'${id}'`).join(',');
-  let Tags = {};
-  commonTags.map(({ name, value }) => (Tags[name] = value));
-  deletedTags.map((name) => (Tags[name] = null));
+  const Tags = {};
+  commonTags.forEach(({ name, value }) => (Tags[name] = value));
+  deletedTags.forEach((name) => (Tags[name] = null));
   const request = {
     JobId: jobId,
     QueryCondition: `deviceId in [${deviceIds}]`,

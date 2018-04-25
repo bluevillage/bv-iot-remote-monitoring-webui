@@ -19,10 +19,6 @@
     .form-group-label { @include rem-font-size(14px); }
   }
 
-  .shorter-select { @include rem-fallback(width, 100px); }
-
-  .shorter.form-control { @include rem-fallback(width, 100px); }
-
   .row {
     .cell {
       &.col-1 { @include rem-fallback(width, 16px); }

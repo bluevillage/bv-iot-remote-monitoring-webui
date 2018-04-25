@@ -10,6 +10,7 @@ import { toSubmitTagsJobRequestModel } from 'services/models';
 import { LinkedComponent } from 'utilities';
 import { svgs, Validator } from 'utilities';
 import {
+  AjaxError,
   Btn,
   BtnToolbar,
   ErrorMsg,
@@ -140,14 +141,14 @@ export class DeviceJobTags extends LinkedComponent {
       const { commonTags, deletedTags } = this.state;
       const request = toSubmitTagsJobRequestModel(devices, this.state);
 
-      this.subscription = IoTHubManagerService.sumbitJob(request)
+      this.subscription = IoTHubManagerService.submitJob(request)
         .subscribe(
           ({ jobId }) => {
             this.setState({ jobId, successCount: devices.length, isPending: false, changesApplied: true });
-            this.props.updateTags({ deviceId: devices.map(({ id }) => id), commonTags, deletedTags });
+            this.props.updateTags({ deviceIds: devices.map(({ id }) => id), commonTags, deletedTags });
           },
-          errorResponse => {
-            this.setState({ error: errorResponse.errorMessage, isPending: false, changesApplied: true });
+          error => {
+            this.setState({ error, isPending: false, changesApplied: true });
           }
         );
     }
@@ -207,11 +208,11 @@ export class DeviceJobTags extends LinkedComponent {
     // Link these values in render because they need to update based on component state
     const tagLinks = this.tagsLink.getLinkedChildren(tagLink => {
       const name = tagLink.forkTo('name')
-        .check(Validator.notEmpty, () => this.props.t('devices.flyouts.jobs.validation.required'));
+        .check(Validator.notEmpty, this.props.t('devices.flyouts.jobs.validation.required'));
       const value = tagLink.forkTo('value')
-        .check(Validator.notEmpty, () => this.props.t('devices.flyouts.jobs.validation.required'));
+        .check(Validator.notEmpty, this.props.t('devices.flyouts.jobs.validation.required'));
       const type = tagLink.forkTo('type')
-        .check(Validator.notEmpty, () => this.props.t('devices.flyouts.jobs.validation.required'));
+        .check(Validator.notEmpty, this.props.t('devices.flyouts.jobs.validation.required'));
       const edited = !(!name.value && !value.value && !type.value);
       const error = (edited && (name.error || value.error || type.error)) || '';
       return { name, value, type, edited, error };
@@ -253,12 +254,12 @@ export class DeviceJobTags extends LinkedComponent {
                 tagLinks.map(({ name, value, type, edited, error }, idx) => [
                   <Row key={idx} className={error ? "error-data-row" : ""}>
                     <Cell className="col-3">
-                      <FormControl className="shorter" type="text" link={name} errorState={!!error} />
+                      <FormControl className="small" type="text" link={name} errorState={!!error} />
                     </Cell>
                     <Cell className="col-3">
-                      <FormControl className="shorter" type="text" link={value} errorState={!!error} /></Cell>
+                      <FormControl className="small" type="text" link={value} errorState={!!error} /></Cell>
                     <Cell className="col-3">
-                      <FormControl className="shorter-select" type="select" link={type} options={typeOptions} clearable={false} searchable={true} errorState={!!error} />
+                      <FormControl className="small" type="select" link={type} options={typeOptions} clearable={false} searchable={true} errorState={!!error} />
                     </Cell>
                     <Cell className="col-1">
                       <Btn className="icon-only-btn" svg={svgs.trash} onClick={this.deleteTag(idx)} />
@@ -281,7 +282,7 @@ export class DeviceJobTags extends LinkedComponent {
 
           {
             error &&
-            <ErrorMsg className="device-jobs-error">{error}</ErrorMsg>
+            <AjaxError className="device-jobs-error" t={t} error={error} />
           }
           {
             !changesApplied &&

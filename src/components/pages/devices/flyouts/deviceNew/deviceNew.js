@@ -16,6 +16,7 @@ import {
 } from 'utilities';
 import { Svg } from 'components/shared/svg/svg';
 import {
+  AjaxError,
   Btn,
   BtnToolbar,
   ErrorMsg,
@@ -255,8 +256,8 @@ export class DeviceNew extends LinkedComponent {
               this.setState({ successCount: formData.count, isPending: false, changesApplied: true });
               this.props.fetchDevices();
             },
-            errorResponse => {
-              this.setState({ error: errorResponse.errorMessage, isPending: false, changesApplied: true });
+            error => {
+              this.setState({ error, isPending: false, changesApplied: true });
             }
           );
 
@@ -267,8 +268,8 @@ export class DeviceNew extends LinkedComponent {
               this.setState({ provisionedDevice, successCount: formData.count, isPending: false, changesApplied: true });
               this.props.insertDevice(provisionedDevice);
             },
-            errorResponse => {
-              this.setState({ error: errorResponse.errorMessage, isPending: false, changesApplied: true });
+            error => {
+              this.setState({ error, isPending: false, changesApplied: true });
             }
           );
       }
@@ -399,7 +400,7 @@ export class DeviceNew extends LinkedComponent {
 
             {
               error &&
-              <ErrorMsg className="devices-new-error">{error}</ErrorMsg>
+              <AjaxError className="devices-new-error" t={t} error={error} />
             }
             {
               !changesApplied &&

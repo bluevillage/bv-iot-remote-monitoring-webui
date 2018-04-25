@@ -83,13 +83,12 @@ const insertDeviceReducer = (state, { payload }) => {
 };
 
 const updateTagsReducer = (state, { payload }) => {
-  let updatedTagData = {};
-  payload.commonTags.map(({ name, value }) => (updatedTagData[name] = value));
+  const updatedTagData = {};
+  payload.commonTags.forEach(({ name, value }) => (updatedTagData[name] = value));
 
-  const updatedDevices = payload.deviceId
+  const updatedDevices = payload.deviceIds
     .map((id) => state.entities[id])
-    .map((device) => update(device, { tags: { $merge: updatedTagData } }))
-    .map((device) => update(device, { tags: { $unset: payload.deletedTags } }));
+    .map((device) => update(device, { tags: { $merge: updatedTagData, $unset: payload.deletedTags } }));
 
   const { entities: { devices } } = normalize(updatedDevices, deviceListSchema);
   return update(state, {

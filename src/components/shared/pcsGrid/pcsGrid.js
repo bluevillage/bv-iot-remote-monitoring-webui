@@ -67,13 +67,14 @@ export class PcsGrid extends Component {
 
   /** Ensure that hard selected rows are maintained by their ids, even when the actual data may change */
   componentDidUpdate(nextProps, nextState) {
+    const { idName = 'id' } = this.props; //Allow override of the name of the identifier property on the data items.
     const { currentHardSelectIds } = this.state;
 
     if (this.gridApi && currentHardSelectIds && currentHardSelectIds.length > 0) {
-      const idSet = new Set((currentHardSelectIds || []).map(({ id }) => id));
+      const idSet = new Set((currentHardSelectIds || []).map((dataItem) => dataItem[idName]));
 
       this.gridApi.forEachNode(node => {
-        if (idSet.has(node.data.id) && !node.selected) {
+        if (idSet.has(node.data[idName]) && !node.selected) {
           node.setSelected(true);
         }
       });
