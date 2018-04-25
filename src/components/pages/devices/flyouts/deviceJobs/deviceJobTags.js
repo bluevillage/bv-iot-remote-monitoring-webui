@@ -33,6 +33,12 @@ import {
   PropertyCell as Cell
 } from 'components/pages/devices/flyouts/deviceDetails/propertyGrid';
 
+update.extend('$autoArray', function(value, object) {
+  return object ?
+    update(object, value):
+    update([], value);
+});
+
 const isNumeric = value => typeof value === 'number' || !isNaN(parseInt(value, 10));
 const isAlphaNumericRegex = /^[a-zA-Z0-9]*$/;
 const nonAlphaNumeric = x => !x.match(isAlphaNumericRegex);
@@ -86,44 +92,35 @@ export class DeviceJobTags extends LinkedComponent {
   }
 
   populateState(devices) {
-    // Create a stream of devices
-    const deviceStream = Observable.of(devices).flatMap(_ => _);
-    deviceStream
-      // Convert the device stream into a stream of tab names
-      .flatMap(device => Object.keys(device.tags))
-      // Remove duplicate tag names from the stream
-      .distinct()
-      // Extract only the common tag names
-      .filter(tagName =>
-        devices.every(device => (typeof (device.tags[tagName]) !== 'undefined'))
-      )
-      // Compute the tag values for each tag name into a map
-      .flatMap(tagName =>
-        deviceStream
-          .map(device => {
-            // Explicitly check undefined because empty string is valid
-            return device.tags[tagName];
-          })
-          .distinct()
-          .filter(value => value !== undefined)
-          .reduce((acc, curr) => [...acc, curr], [])
-          .map(values => ({ tagName: tagName, values: values }))
-      )
-      // Construct the new component state
-      .reduce(
-        (newState, { tagName, values }) => {
-          const value = values.length === 1 ? values[0] : TagJobConstants.multipleValues;
-          const type = values.every(isNumeric) ? TagJobConstants.numberType : TagJobConstants.stringType;
-          return (update(newState, {
-            commonTags: { $push: [{ name: tagName, value, type }] }
-          }));
-        },
-        initialState
-      )
-      // Update the component state
-      .subscribe(newState => {
-        this.setState(newState);
-      });
+    Observable.from(devices)
+    .map(({ tags }) => new Set(Object.keys(tags)))
+    .reduce((commonTags, deviceTags) =>
+      commonTags
+        ? new Set([...commonTags].filter(tag => deviceTags.has(tag)))
+        : deviceTags
+    ) // At this point, a stream of a single event. A common set of tags.
+    .flatMap(commonTagsSet =>
+      Observable.from(devices)
+        .flatMap(({ tags }) => Object.entries(tags))
+        .filter(([ tag ]) => commonTagsSet.has(tag))
+    )
+    .distinct(([ tagName, tagVal ]) => `${tagName} ${tagVal}`)
+    .reduce((acc, [ tagName, tagVal ]) => update(acc, {
+      [tagName]: { $autoArray: {
+        $push: [ tagVal ]
+      }}
+    }), {})
+    .flatMap(tagToValMap => Object.entries(tagToValMap))
+    .reduce(
+      (newState, [ name, values ]) => {
+        const value = values.length === 1 ? values[0] : TagJobConstants.multipleValues;
+        const type = values.every(isNumeric) ? TagJobConstants.numberType : TagJobConstants.stringType;
+        return update(newState, {
+          commonTags: { $push: [{ name, value, type }] }
+        });
+      },
+      initialState
+    ).subscribe(newState => this.setState(newState));
   }
 
   formIsValid() {
