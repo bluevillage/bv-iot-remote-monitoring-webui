@@ -85,7 +85,7 @@ export const toJobStatusModel = (response = {}) => camelCaseReshape(response, {
   'type': 'type'
 });
 
-export const AuthenticationTypeOptions = {
+export const authenticationTypeOptions = {
   symmetric: 0,
   x509: 1
 };
@@ -100,7 +100,7 @@ export const toNewDeviceRequestModel = ({
   primaryKey,
   secondaryKey
 }) => {
-  const isX509 = authenticationType === AuthenticationTypeOptions.x509;
+  const isX509 = authenticationType === authenticationTypeOptions.x509;
 
   return {
     Id: isGenerateId ? '' : deviceId,

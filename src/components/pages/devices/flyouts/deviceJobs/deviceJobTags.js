@@ -39,7 +39,7 @@ const isNumeric = value => typeof value === 'number' || !isNaN(parseInt(value, 1
 const isAlphaNumericRegex = /^[a-zA-Z0-9]*$/;
 const nonAlphaNumeric = x => !x.match(isAlphaNumericRegex);
 
-const TagJobConstants = {
+const tagJobConstants = {
   multipleValues: 'Multiple',
   stringType: 'Text',
   numberType: 'Number'
@@ -59,7 +59,7 @@ const initialState = {
 const newTag = () => ({
   name: '',
   value: '',
-  type: TagJobConstants.stringType
+  type: tagJobConstants.stringType
 });
 
 export class DeviceJobTags extends LinkedComponent {
@@ -117,8 +117,8 @@ export class DeviceJobTags extends LinkedComponent {
       .flatMap(tagToValMap => Object.entries(tagToValMap))
       .reduce(
         (newState, [name, values]) => {
-          const value = values.length === 1 ? values[0] : TagJobConstants.multipleValues;
-          const type = values.every(isNumeric) ? TagJobConstants.numberType : TagJobConstants.stringType;
+          const value = values.length === 1 ? values[0] : tagJobConstants.multipleValues;
+          const type = values.every(isNumeric) ? tagJobConstants.numberType : tagJobConstants.stringType;
           return update(newState, {
             commonTags: { $push: [{ name, value, type }] }
           });
@@ -198,11 +198,11 @@ export class DeviceJobTags extends LinkedComponent {
     const summaryMessage = this.getSummaryMessage();
     const typeOptions = [
       {
-        value: TagJobConstants.numberType,
+        value: tagJobConstants.numberType,
         label: t('devices.flyouts.jobs.tags.typeNumber')
       },
       {
-        value: TagJobConstants.stringType,
+        value: tagJobConstants.stringType,
         label: t('devices.flyouts.jobs.tags.typeString')
       }
     ];
