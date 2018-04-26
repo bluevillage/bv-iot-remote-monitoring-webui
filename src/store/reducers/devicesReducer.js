@@ -87,15 +87,13 @@ const updateTagsReducer = (state, { payload }) => {
   payload.commonTags.forEach(({ name, value }) => (updatedTagData[name] = value));
 
   const updatedDevices = payload.deviceIds
-    .map((id) => state.entities[id])
-    .map((device) => update(device, { tags: { $merge: updatedTagData, $unset: payload.deletedTags } }));
+    .map((id) => update(state.entities[id], { tags: { $merge: updatedTagData, $unset: payload.deletedTags } }));
 
   const { entities: { devices } } = normalize(updatedDevices, deviceListSchema);
   return update(state, {
     entities: { $merge: devices }
   });
 };
-
 
 /* Action types that cause a pending flag */
 const fetchableTypes = [

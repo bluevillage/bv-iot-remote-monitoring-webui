@@ -67,14 +67,14 @@ export class PcsGrid extends Component {
 
   /** Ensure that hard selected rows are maintained by their ids, even when the actual data may change */
   componentDidUpdate(nextProps, nextState) {
-    const { idName = 'id' } = this.props; //Allow override of the name of the identifier property on the data items.
+    const { getSoftSelectId } = this.props;
     const { currentHardSelectIds } = this.state;
 
-    if (this.gridApi && currentHardSelectIds && currentHardSelectIds.length > 0) {
-      const idSet = new Set((currentHardSelectIds || []).map((dataItem) => dataItem[idName]));
+    if (this.gridApi && isFunc(getSoftSelectId) && currentHardSelectIds && currentHardSelectIds.length > 0) {
+      const idSet = new Set((currentHardSelectIds || []));
 
       this.gridApi.forEachNode(node => {
-        if (idSet.has(node.data[idName]) && !node.selected) {
+        if (idSet.has(getSoftSelectId(node.data)) && !node.selected) {
           node.setSelected(true);
         }
       });
@@ -100,8 +100,10 @@ export class PcsGrid extends Component {
 
   /** When a row is hard selected, try to fire a hard select event, plus any props callbacks */
   onSelectionChanged = () => {
-    const currentHardSelectIds = this.gridApi.getSelectedRows().map(({ id }) => ({ id }));
-    this.setState({ currentHardSelectIds });
+    if (isFunc(this.props.getSoftSelectId)) {
+      const currentHardSelectIds = this.gridApi.getSelectedRows().map((data) => (this.props.getSoftSelectId(data)));
+      this.setState({ currentHardSelectIds });
+    }
 
     const { onHardSelectChange, onSelectionChanged } = this.props;
     if (isFunc(onHardSelectChange)) {

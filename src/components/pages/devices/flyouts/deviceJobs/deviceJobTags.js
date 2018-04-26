@@ -33,11 +33,7 @@ import {
   PropertyCell as Cell
 } from 'components/pages/devices/flyouts/deviceDetails/propertyGrid';
 
-update.extend('$autoArray', function(value, object) {
-  return object ?
-    update(object, value):
-    update([], value);
-});
+update.extend('$autoArray', (val, obj) => update(obj || [], val));
 
 const isNumeric = value => typeof value === 'number' || !isNaN(parseInt(value, 10));
 const isAlphaNumericRegex = /^[a-zA-Z0-9]*$/;
@@ -91,36 +87,44 @@ export class DeviceJobTags extends LinkedComponent {
     }
   }
 
+  componentWillUnmount() {
+    if (this.populateStateSubscription) this.populateStateSubscription.unsubscribe();
+    if (this.submitJobSubscription) this.submitJobSubscription.unsubscribe();
+  }
+
   populateState(devices) {
-    Observable.from(devices)
-    .map(({ tags }) => new Set(Object.keys(tags)))
-    .reduce((commonTags, deviceTags) =>
-      commonTags
-        ? new Set([...commonTags].filter(tag => deviceTags.has(tag)))
-        : deviceTags
-    ) // At this point, a stream of a single event. A common set of tags.
-    .flatMap(commonTagsSet =>
-      Observable.from(devices)
-        .flatMap(({ tags }) => Object.entries(tags))
-        .filter(([ tag ]) => commonTagsSet.has(tag))
-    )
-    .distinct(([ tagName, tagVal ]) => `${tagName} ${tagVal}`)
-    .reduce((acc, [ tagName, tagVal ]) => update(acc, {
-      [tagName]: { $autoArray: {
-        $push: [ tagVal ]
-      }}
-    }), {})
-    .flatMap(tagToValMap => Object.entries(tagToValMap))
-    .reduce(
-      (newState, [ name, values ]) => {
-        const value = values.length === 1 ? values[0] : TagJobConstants.multipleValues;
-        const type = values.every(isNumeric) ? TagJobConstants.numberType : TagJobConstants.stringType;
-        return update(newState, {
-          commonTags: { $push: [{ name, value, type }] }
-        });
-      },
-      initialState
-    ).subscribe(newState => this.setState(newState));
+    if (this.populateStateSubscription) this.populateStateSubscription.unsubscribe();
+    this.populateStateSubscription = Observable.from(devices)
+      .map(({ tags }) => new Set(Object.keys(tags)))
+      .reduce((commonTags, deviceTags) =>
+        commonTags
+          ? new Set([...commonTags].filter(tag => deviceTags.has(tag)))
+          : deviceTags
+      ) // At this point, a stream of a single event. A common set of tags.
+      .flatMap(commonTagsSet =>
+        Observable.from(devices)
+          .flatMap(({ tags }) => Object.entries(tags))
+          .filter(([tag]) => commonTagsSet.has(tag))
+      )
+      .distinct(([tagName, tagVal]) => `${tagName} ${tagVal}`)
+      .reduce((acc, [tagName, tagVal]) => update(acc, {
+        [tagName]: {
+          $autoArray: {
+            $push: [tagVal]
+          }
+        }
+      }), {})
+      .flatMap(tagToValMap => Object.entries(tagToValMap))
+      .reduce(
+        (newState, [name, values]) => {
+          const value = values.length === 1 ? values[0] : TagJobConstants.multipleValues;
+          const type = values.every(isNumeric) ? TagJobConstants.numberType : TagJobConstants.stringType;
+          return update(newState, {
+            commonTags: { $push: [{ name, value, type }] }
+          });
+        },
+        initialState
+      ).subscribe(newState => this.setState(newState));
   }
 
   formIsValid() {
@@ -138,7 +142,8 @@ export class DeviceJobTags extends LinkedComponent {
       const { commonTags, deletedTags } = this.state;
       const request = toSubmitTagsJobRequestModel(devices, this.state);
 
-      this.subscription = IoTHubManagerService.submitJob(request)
+      if (this.submitJobSubscription) this.submitJobSubscription.unsubscribe();
+      this.submitJobSubscription = IoTHubManagerService.submitJob(request)
         .subscribe(
           ({ jobId }) => {
             this.setState({ jobId, successCount: devices.length, isPending: false, changesApplied: true });
@@ -249,7 +254,7 @@ export class DeviceJobTags extends LinkedComponent {
               {
                 Object.keys(commonTags).length > 0 &&
                 tagLinks.map(({ name, value, type, edited, error }, idx) => [
-                  <Row key={idx} className={error ? "error-data-row" : ""}>
+                  <Row key={idx} className={error ? 'error-data-row' : ''}>
                     <Cell className="col-3">
                       <FormControl className="small" type="text" link={name} errorState={!!error} />
                     </Cell>
