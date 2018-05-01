@@ -29,7 +29,7 @@ import { toNewRuleRequestModel } from 'services/models';
 import './ruleEditor.css';
 
 const Section = Flyout.Section;
-const severityLevels = ['Critical', 'Warning', 'Info'];
+const severityLevels = ['critical', 'warning', 'info'];
 const calculations = ['Average', 'Instant'];
 // Represented in milliSeconds
 const timePeriodOptions = [
