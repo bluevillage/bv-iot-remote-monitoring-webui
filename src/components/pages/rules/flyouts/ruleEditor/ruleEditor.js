@@ -75,6 +75,7 @@ export class RuleEditor extends LinkedComponent {
     this.state = {
       error: undefined,
       fieldOptions: [],
+      fieldQueryPending: true,
       devicesAffected: 0,
       formData,
       isPending: false
@@ -164,7 +165,7 @@ export class RuleEditor extends LinkedComponent {
 
   onGroupIdChange = ({ target: { value: { value = {} } } }) => {
     this.setState({
-      devicesAffected: undefined,
+      fieldQueryPending: true,
       isPending: true
     });
     this.getDeviceCountAndFields(value);
@@ -178,6 +179,7 @@ export class RuleEditor extends LinkedComponent {
           .subscribe(
             groupDevices => {
               this.setState({
+                fieldQueryPending: false,
                 fieldOptions: this.getConditionFields(groupDevices),
                 devicesAffected: groupDevices.length,
                 isPending: false
@@ -210,7 +212,7 @@ export class RuleEditor extends LinkedComponent {
 
   render() {
     const { onClose, t, deviceGroups = [] } = this.props;
-    const { error, formData, fieldOptions, devicesAffected, isPending } = this.state;
+    const { error, formData, fieldOptions, devicesAffected, isPending, fieldQueryPending } = this.state;
     const calculationOptions = calculations.map(value => ({
       label: t(`rules.flyouts.ruleEditor.calculationOptions.${value.toLowerCase()}`),
       value
@@ -308,7 +310,7 @@ export class RuleEditor extends LinkedComponent {
           </Section.Content>
         </Section.Container>
         {
-          devicesAffected && <div>
+          !fieldQueryPending && <div>
             <Section.Container collapsable={false}>
               <Section.Header>{t('rules.flyouts.ruleEditor.conditions')}</Section.Header>
               <Section.Content>
