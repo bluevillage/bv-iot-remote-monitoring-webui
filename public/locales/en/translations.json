@@ -61,7 +61,8 @@
       "fieldCantBeEmpty": "Field is required",
       "operatorCantBeEmpty": "Operator is required",
       "valueCantBeEmpty": "Value is required",
-      "typeCantBeEmpty": "Type is required"
+      "typeCantBeEmpty": "Type is required",
+      "selectedType": "Must be of the selected type"
     },
     "conditions": {
       "condition": "Condition {{headerCount}}",
