@@ -53,7 +53,7 @@ export class Maintenance extends Component {
     this.subscriptions = [];
   }
 
-  getData = (deviceEntities) => {
+  getData = (deviceEntities = {}) => {
     const deviceIds = Object.keys(deviceEntities);
     const devices = deviceIds.length ? deviceIds.join(',') : undefined;
     const [ timeParams ] = getIntervalParams(this.state.timeInterval);
@@ -180,7 +180,9 @@ export class Maintenance extends Component {
     }));
   };
 
-  onTimeIntervalChange = (timeInterval) => this.setState({ timeInterval }, () => this.getData());
+  refreshData = () => this.getData(this.props.deviceEntities);
+
+  onTimeIntervalChange = (timeInterval) => this.setState({ timeInterval }, () => this.refreshData());
 
   render() {
     const { rulesEntities, deviceEntities, rulesIsPending, theme, t, history } = this.props;
@@ -225,7 +227,7 @@ export class Maintenance extends Component {
     const generalProps = {
       t,
       history,
-      refreshData: this.getData,
+      refreshData: this.refreshData,
       lastUpdated: this.state.lastUpdated
     };
     const alertProps = {
