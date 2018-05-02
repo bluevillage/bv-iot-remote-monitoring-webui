@@ -395,7 +395,7 @@
         },
         "validation": {
           "required": "Is required",
-          "greaterThanZero": "Must be greater than zero"
+          "nan": "Must be a number"
         },
         "severityLevel": "Severity level",
         "ruleStatus": "Rule status",
