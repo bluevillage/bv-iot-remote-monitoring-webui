@@ -241,7 +241,7 @@ export class RuleEditor extends LinkedComponent {
     // Create the state link for the dynamic form elements
     const conditionLinks = this.conditionsLink.getLinkedChildren(conditionLink => {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
-      const operatorLink = conditionLink.forkTo('operator').map(({ value }).withValidator(requiredValidator);
+      const operatorLink = conditionLink.forkTo('operator').map(({ value }) => value).withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value')
         .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'))
         .check(val =>  !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
