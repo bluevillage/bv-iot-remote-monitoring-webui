@@ -244,7 +244,7 @@ export class RuleEditor extends LinkedComponent {
       const operatorLink = conditionLink.forkTo('operator').map(({ value }) => value).withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value')
         .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'))
-        .check(val =>  !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
+        .check(val => !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
       const error = fieldLink.error || operatorLink.error || valueLink.error;
       return { fieldLink, operatorLink, valueLink, error };
     });
