@@ -321,7 +321,7 @@ export class RuleEditor extends LinkedComponent {
             </Section.Container>
             {
               conditionLinks.map((condition, idx) => (
-                <Section.Container key={formData.conditions[idx].key}>
+                <Section.Container key={formData.conditions[idx].key ? formData.conditions[idx].key : idx}>
                   <Section.Header>{t('rules.flyouts.ruleEditor.condition.condition')} {idx + 1}</Section.Header>
                   <Section.Content>
                     <FormGroup>
