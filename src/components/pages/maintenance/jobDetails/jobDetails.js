@@ -54,6 +54,11 @@ export class JobDetails extends Component {
       );
   }
 
+  getJobName(jobId){
+    this.clearSubscription();
+    this.subscription = IoTHubManagerService.getJobStatus(jobId);
+  }
+
   refreshJobStatus = () => {
     if (this.state.selectedJob && this.state.selectedJob.jobId) {
       this.getJobStatus(this.state.selectedJob.jobId);
@@ -101,12 +106,13 @@ export class JobDetails extends Component {
           t={this.props.t} />
       </ContextMenu>,
       <PageContent className="maintenance-container" key="page-content">
+      <h1 className="maintenance-header">{selectedJob ? selectedJob.jobId : ""}</h1>
         {
           !this.props.error
             ? <div>
                 <JobGrid {...jobGridProps} />
                 <JobStatusGrid {...jobStatusGridProps} />
-                <h4 className="sub-heading">{this.props.t('maintenance.devices')}</h4>
+                <h4 className="maintenance-sub-header">{this.props.t('maintenance.devices')}</h4>
                 {
                   this.state.selectedDevices
                     ? <DevicesGrid
