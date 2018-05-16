@@ -51,10 +51,10 @@ export class JobDetails extends Component {
       .subscribe(
         jobStatus => this.setState({ jobStatus, jobStatusIsPending: false }),
         jobStatusError => this.setState({ jobStatusError, jobStatusIsPending: false }),
-      );
+    );
   }
 
-  getJobName(jobId){
+  getJobName(jobId) {
     this.clearSubscription();
     this.subscription = IoTHubManagerService.getJobStatus(jobId);
   }
@@ -70,7 +70,7 @@ export class JobDetails extends Component {
   }
 
   refreshData = () => {
-    this.setState({refreshPending: true});
+    this.setState({ refreshPending: true });
     this.props.refreshData();
     // TODO: When refreshPending is removed in favor of normalizing the job data, the next line may be needed.
     // this.refreshJobStatus();
@@ -98,7 +98,7 @@ export class JobDetails extends Component {
 
     return [
       <ContextMenu key="context-menu">
-        { this.state.contextBtns }
+        {this.state.contextBtns}
         <RefreshBar
           refresh={this.refreshData}
           time={this.props.lastUpdated}
@@ -106,26 +106,25 @@ export class JobDetails extends Component {
           t={this.props.t} />
       </ContextMenu>,
       <PageContent className="maintenance-container" key="page-content">
-      <h1 className="maintenance-header">{selectedJob ? selectedJob.jobId : ""}</h1>
+        <h1 className="maintenance-header">{selectedJob ? selectedJob.jobId : ""}</h1>
         {
           !this.props.error
             ? <div>
-                <JobGrid {...jobGridProps} />
-                <JobStatusGrid {...jobStatusGridProps} />
-                <h4 className="maintenance-sub-header">{this.props.t('maintenance.devices')}</h4>
-                {
-                  this.state.selectedDevices
-                    ? <DevicesGrid
-                        t={this.props.t}
-                        rowData={this.state.selectedDevices}
-                        onContextMenuChange={this.onContextMenuChange} />
-                    : this.props.t('maintenance.noOccurrenceSelected')
-                }
-              </div>
+              <JobGrid {...jobGridProps} />
+              <JobStatusGrid {...jobStatusGridProps} />
+              <h4 className="maintenance-sub-header">{this.props.t('maintenance.devices')}</h4>
+              {
+                this.state.selectedDevices
+                  ? <DevicesGrid
+                    t={this.props.t}
+                    rowData={this.state.selectedDevices}
+                    onContextMenuChange={this.onContextMenuChange} />
+                  : this.props.t('maintenance.noOccurrenceSelected')
+              }
+            </div>
             : <AjaxError t={this.props.t} error={this.props.error} />
         }
       </PageContent>
     ];
   }
-
 }
