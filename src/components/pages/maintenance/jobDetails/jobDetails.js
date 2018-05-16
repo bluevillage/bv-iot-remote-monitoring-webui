@@ -54,11 +54,6 @@ export class JobDetails extends Component {
     );
   }
 
-  getJobName(jobId) {
-    this.clearSubscription();
-    this.subscription = IoTHubManagerService.getJobStatus(jobId);
-  }
-
   refreshJobStatus = () => {
     if (this.state.selectedJob && this.state.selectedJob.jobId) {
       this.getJobStatus(this.state.selectedJob.jobId);
