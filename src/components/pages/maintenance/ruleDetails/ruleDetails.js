@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 
 import Config from 'app.config';
 import { RulesGrid } from 'components/pages/rules/rulesGrid';
-import { AjaxError, Btn, PageContent, ContextMenu, RefreshBar } from 'components/shared';
+import { AjaxError, Btn, PageContent, ContextMenu, RefreshBar, Indicator } from 'components/shared';
 import { svgs, joinClasses, renderUndefined } from 'utilities';
 import { DevicesGrid } from 'components/pages/devices/devicesGrid';
 import { TelemetryChart, transformTelemetryResponse, chartColorObjects } from 'components/pages/dashboard/panels/telemetry';
@@ -43,6 +43,8 @@ export class RuleDetails extends Component {
       deviceIds: '',
       occurrences: [],
       selectedTab: tabIds.all,
+
+      isAlertStatusPending: undefined,
 
       ruleContextBtns: undefined,
       alertContextBtns: undefined,
@@ -132,17 +134,24 @@ export class RuleDetails extends Component {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  // TODO: Handle error and isPending states
-  updateAlertStatus = (selectedAlerts, status) =>
+  // TODO: Handle error states
+  updateAlertStatus = (selectedAlerts, status) => {
+    this.setState({
+      isAlertStatusPending: true,
+      alertContextBtns: this.getAlertContextBtns(selectedAlerts, true)
+    });
+
     this.subscriptions.push(
       Observable.from(selectedAlerts)
         .flatMap(({ id }) => TelemetryService.updateAlertStatus(id, status))
         .toArray() // Use toArray to wait for all calls to succeed
         .subscribe(() => {
+          this.setState({ isAlertStatusPending: false });
           this.props.setAlertStatus(selectedAlerts, status);
           this.onAlertGridHardSelectChange([]);
         })
     );
+  }
 
   // TODO: Move constant values to central location
   closeAlerts = () => this.updateAlertStatus(this.state.selectedAlerts, Config.alertStatus.closed);
@@ -162,21 +171,25 @@ export class RuleDetails extends Component {
       if (selectedRows.length > 0) this.deselectOtherGrids(gridName);
     };
 
+  getAlertContextBtns = (selectedRows, isPendingOverride)  => {
+    const isAlertStatusPending = isPendingOverride || this.state.isAlertStatusPending;
+    return selectedRows.length > 0
+      ? [
+        isAlertStatusPending ? <Indicator pattern="bar" /> : null,
+        <Btn svg={svgs.closeAlert} onClick={this.closeAlerts} key="close">
+          <Trans i18nKey="maintenance.close">Close</Trans>
+        </Btn>,
+        <Btn svg={svgs.ackAlert} onClick={this.ackAlerts} key="ack">
+          <Trans i18nKey="maintenance.acknowledge">Acknowledge</Trans>
+        </Btn>
+      ]
+      : null;
+  }
+
   onAlertGridHardSelectChange = selectedRows => {
-    const alertContextBtns =
-      selectedRows.length > 0
-        ? [
-            <Btn svg={svgs.closeAlert} onClick={this.closeAlerts} key="close">
-              <Trans i18nKey="maintenance.close">Close</Trans>
-            </Btn>,
-            <Btn svg={svgs.ackAlert} onClick={this.ackAlerts} key="ack">
-              <Trans i18nKey="maintenance.acknowledge">Acknowledge</Trans>
-            </Btn>
-          ]
-        : null;
     this.setState({
       selectedAlerts: selectedRows,
-      alertContextBtns
+      alertContextBtns: this.getAlertContextBtns(selectedRows)
     });
     this.onHardSelectChange('alerts')(selectedRows);
   }
