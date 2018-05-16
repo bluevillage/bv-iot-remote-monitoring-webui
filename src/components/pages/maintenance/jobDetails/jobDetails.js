@@ -51,7 +51,7 @@ export class JobDetails extends Component {
       .subscribe(
         jobStatus => this.setState({ jobStatus, jobStatusIsPending: false }),
         jobStatusError => this.setState({ jobStatusError, jobStatusIsPending: false }),
-    );
+      );
   }
 
   refreshJobStatus = () => {
@@ -105,17 +105,17 @@ export class JobDetails extends Component {
         {
           !this.props.error
             ? <div>
-              <JobGrid {...jobGridProps} />
-              <JobStatusGrid {...jobStatusGridProps} />
-              <h4 className="maintenance-sub-header">{this.props.t('maintenance.devices')}</h4>
-              {
-                this.state.selectedDevices
-                  ? <DevicesGrid
-                    t={this.props.t}
-                    rowData={this.state.selectedDevices}
-                    onContextMenuChange={this.onContextMenuChange} />
-                  : this.props.t('maintenance.noOccurrenceSelected')
-              }
+                <JobGrid {...jobGridProps} />
+                <JobStatusGrid {...jobStatusGridProps} />
+                <h4 className="maintenance-sub-header">{this.props.t('maintenance.devices')}</h4>
+                {
+                  this.state.selectedDevices
+                    ? <DevicesGrid
+                      t={this.props.t}
+                      rowData={this.state.selectedDevices}
+                      onContextMenuChange={this.onContextMenuChange} />
+                    : this.props.t('maintenance.noOccurrenceSelected')
+                }
             </div>
             : <AjaxError t={this.props.t} error={this.props.error} />
         }
