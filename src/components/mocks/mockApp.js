@@ -35,9 +35,7 @@ class MockApp extends Component {
   }
 
   render() {
-
     return (
-
       <Provider store={this.store}>
         <Router>
           <I18nextProvider i18n={i18n}>
