@@ -65,7 +65,7 @@ export class JobDetails extends Component {
   }
 
   refreshData = () => {
-    this.setState({ refreshPending: true });
+    this.setState({refreshPending: true});
     this.props.refreshData();
     // TODO: When refreshPending is removed in favor of normalizing the job data, the next line may be needed.
     // this.refreshJobStatus();
