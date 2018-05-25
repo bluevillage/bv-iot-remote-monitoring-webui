@@ -372,6 +372,61 @@ export class RuleEditor extends LinkedComponent {
                 </Section.Container>
               ))
             }
+
+
+            <div>
+            <Section.Container collapsable={false}>
+              <Section.Header>Actions</Section.Header>
+              <Section.Content>
+                <Btn svg={svgs.plus}>Add action</Btn>
+              </Section.Content>
+              <div>
+                <Section.Content>
+                  <FormGroup>
+                        <FormLabel isRequired="true">Choose an action</FormLabel>
+                        <FormControl
+                          type="select"
+                          className="long"
+                          placeholder='Select action'
+                          options={actionOptions}
+                          clearable={false}
+                          searchable={false} />
+                  </FormGroup>
+                </Section.Content>
+              </div>
+              <div>
+                <FormGroup>
+                  <FormLabel isRequired="true">Email addresses</FormLabel>
+                    <FormControl
+                      type="text"
+                      className="long"
+                      placeholder='Enter email of notification recipients'/>
+                  </FormGroup>
+                  <FormGroup>
+                    <FormLabel>Email comments</FormLabel>
+                    <FormControl
+                      type="textarea"
+                      placeholder='Enter comments for the email recipient'/>
+                </FormGroup>
+              </div>
+              <div>
+                <FormGroup>
+                  <FormLabel isRequired="true">Phone numbers</FormLabel>
+                    <FormControl
+                      type="text"
+                      className="long"
+                      placeholder='Enter phone number of notification recipients'/>
+                  </FormGroup>
+                  <FormGroup>
+                    <FormLabel>Message comments</FormLabel>
+                    <FormControl
+                      type="textarea"
+                      placeholder='Enter comments for the text recipient'/>
+                </FormGroup>
+              </div>
+            </Section.Container>
+          </div>
+
             <Section.Container collapsable={false}>
               <Section.Content>
                 <FormGroup className="padded-top">
@@ -410,7 +465,9 @@ export class RuleEditor extends LinkedComponent {
                 </FormGroup>
               </Section.Content>
             </Section.Container>
+
           </div>
+
         }
 
 
@@ -421,7 +478,7 @@ export class RuleEditor extends LinkedComponent {
 
 
 
-          <div>
+          {/* <div>
             <Section.Container collapsable={false}>
               <Section.Header>Actions</Section.Header>
               <Section.Content>
@@ -450,14 +507,29 @@ export class RuleEditor extends LinkedComponent {
                       placeholder='Enter email of notification recipients'/>
                   </FormGroup>
                   <FormGroup>
-                    <FormLabel>{t('rules.flyouts.ruleEditor.description')}</FormLabel>
+                    <FormLabel>Email comments</FormLabel>
                     <FormControl
                       type="textarea"
                       placeholder='Enter comments for the email recipient'/>
                 </FormGroup>
               </div>
+              <div>
+                <FormGroup>
+                  <FormLabel isRequired="true">Phone numbers</FormLabel>
+                    <FormControl
+                      type="text"
+                      className="long"
+                      placeholder='Enter phone number of notification recipients'/>
+                  </FormGroup>
+                  <FormGroup>
+                    <FormLabel>Message comments</FormLabel>
+                    <FormControl
+                      type="textarea"
+                      placeholder='Enter comments for the text recipient'/>
+                </FormGroup>
+              </div>
             </Section.Container>
-          </div>
+          </div> */}
 
 
 
