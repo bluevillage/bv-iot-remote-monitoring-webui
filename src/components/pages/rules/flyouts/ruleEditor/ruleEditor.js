@@ -46,13 +46,20 @@ const operatorOptions = [
   { label: '<=', value: 'LessThanOrEqual' },
   { label: '=', value: 'Equals' }
 ];
+
+//pls work
 const actionOptions = [
-  {label: 'Send SMS', value: 'SMS'},
-  {label: 'Send email', value: 'Email'},
-  {label: 'No action', value: 'none'}
+  { label: 'Send SMS', value: 'SMS' },
+  { label: 'Send email', value: 'Email' },
+  { label: 'No action', value: 'none' }
 ]
+
 // A counter for creating unique keys per new condition
 let conditionKey = 0;
+
+//pls work
+// A counter for creating unique keys per new action
+let actionKey = 0;
 
 // Creates a state object for a condition
 const newCondition = () => ({
@@ -60,6 +67,16 @@ const newCondition = () => ({
   operator: operatorOptions[0].value,
   value: '',
   key: conditionKey++ // Used by react to track the rendered elements
+});
+
+//pls work
+const newAction = () => ({
+  actionItem: actionOptions[0].value,
+  emailAddresses: [],
+  emailTemplate: '',
+  smsNumbers: [],
+  smsTemplate: '',
+  key: actionKey++
 });
 
 // A state object for a new rule
@@ -70,6 +87,8 @@ const newRule = {
   calculation: '',
   timePeriod: '',
   conditions: [newCondition()], // Start with one condition
+  //pls work
+  actions: [newAction()], // Start with one action
   severity: Config.ruleSeverity.critical,
   enabled: true
 }
@@ -83,6 +102,7 @@ export class RuleEditor extends LinkedComponent {
       error: undefined,
       fieldOptions: [],
       fieldQueryPending: true,
+      actionQueryType: null,
       devicesAffected: 0,
       formData: newRule,
       isPending: false
@@ -108,6 +128,12 @@ export class RuleEditor extends LinkedComponent {
       conditions: (rule.conditions || []).map(condition => ({
         ...condition,
         key: conditionKey++
+      })),
+
+      //pls work
+      actions: (rule.actions || []).map(action => ({
+        ...action,
+        key: actionKey++
       }))
     }
   });
@@ -120,14 +146,22 @@ export class RuleEditor extends LinkedComponent {
 
   addCondition = () => this.conditionsLink.set([...this.conditionsLink.value, newCondition()]);
 
+  // pls work
+  addAction = () => this.actionsLink.set([...this.actionsLink.value, newAction()]);
+
   deleteCondition = (index) =>
     (evt) => this.conditionsLink.set(this.conditionsLink.value.filter((_, idx) => index !== idx));
+
+  // pls work
+  deleteAction = (index) =>
+    (evt) => this.actionsLink.set(this.actionsLink.value.filter((_, idx) => index !== idx));
 
   formIsValid() {
     return [
       this.ruleNameLink,
       this.deviceGroupLink,
       this.conditionsLink,
+      this.actionsLink,
       this.timePeriodLink,
       this.calculationLink
     ].every(link => !link.error);
@@ -184,6 +218,13 @@ export class RuleEditor extends LinkedComponent {
     this.getDeviceCountAndFields(value);
   }
 
+  onActionTypeChange = (event) => {
+    this.setState({
+      actionQueryType: event.target.value.value
+    });
+    console.log(event.target.value.value);
+  }
+
   getDeviceCountAndFields(groupId) {
     this.props.deviceGroups.some(group => {
       if (group.id === groupId) {
@@ -225,7 +266,7 @@ export class RuleEditor extends LinkedComponent {
 
   render() {
     const { onClose, t, deviceGroups = [] } = this.props;
-    const { error, formData, fieldOptions, devicesAffected, isPending, fieldQueryPending } = this.state;
+    const { error, formData, fieldOptions, devicesAffected, isPending, fieldQueryPending, actionQueryType } = this.state;
     const calculationOptions = calculations.map(value => ({
       label: t(`rules.flyouts.ruleEditor.calculationOptions.${value.toLowerCase()}`),
       value
@@ -248,6 +289,10 @@ export class RuleEditor extends LinkedComponent {
         this.props.t('rules.flyouts.ruleEditor.validation.required')
       );
     this.conditionsLink = this.formDataLink.forkTo('conditions').withValidator(requiredValidator);
+
+    //pls work
+    this.actionsLink = this.formDataLink.forkTo('actions').withValidator(requiredValidator);
+
     this.severityLink = this.formDataLink.forkTo('severity');
     //todo toggle button didn't support link
     this.enabledLink = this.formDataLink.forkTo('enabled');
@@ -262,7 +307,22 @@ export class RuleEditor extends LinkedComponent {
       return { fieldLink, operatorLink, valueLink, error };
     });
 
+    //pls work
+    const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
+      const actionItemLink = actionLink.forkTo('actionItem').map(({ value }) => value).withValidator(requiredValidator);
+      const emailAddressesLink = actionLink.forkTo('emailAddresses').map(({ value }) => value).withValidator(requiredValidator);
+      const emailTemplateLink = actionLink.forkTo('emailTemplate').map(({ value }) => value).withValidator(requiredValidator);
+      const smsNumbersLink = actionLink.forkTo('smsNumbers').map(({ value }) => value).withValidator(requiredValidator);
+      const smsTemplateLink = actionLink.forkTo('smsTemplate').map(({ value }) => value).withValidator(requiredValidator);
+
+      const error = actionItemLink.error || emailAddressesLink.error || emailTemplateLink.error || smsNumbersLink.error || smsTemplateLink.error;
+      return { actionItemLink, emailAddressesLink, emailTemplateLink, smsNumbersLink, smsTemplateLink };
+    });
+
     const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
+
+    //pls work
+    const actionsHaveErrors = actionLinks.some(({ error }) => error);
 
     return (
       <form onSubmit={this.apply} className="new-rule-flyout-container">
@@ -374,8 +434,79 @@ export class RuleEditor extends LinkedComponent {
             }
 
 
-            <div>
-            <Section.Container collapsable={false}>
+
+            {
+              actionLinks.map((action, idx) => (
+                <Section.Container collapsable={false}>
+                  <Section.Header>Actions</Section.Header>
+                  <Section.Content>
+                    <Btn svg={svgs.plus}>Add action</Btn>
+                  </Section.Content>
+                  <div>
+                    <Section.Content>
+                      <FormGroup>
+                        <FormLabel isRequired="true">Choose an action</FormLabel>
+                        <FormControl
+                          type="select"
+                          className="long"
+                          placeholder='Select action'
+                          options={actionOptions}
+                          clearable={false}
+                          onChange={this.onActionTypeChange}
+                          link={action.actionItemLink}
+                          searchable={false} />
+                      </FormGroup>
+                    </Section.Content>
+                  </div>
+
+                  {this.actionQueryType === "Email" &&
+                    <div>
+                      <FormGroup>
+                        <FormLabel isRequired="true">Email addresses</FormLabel>
+                        <FormControl
+                          type="text"
+                          className="long"
+                          link={action.emailAddressesLink}
+                          placeholder='Enter email of notification recipients' />
+                      </FormGroup>
+                      <FormGroup>
+                        <FormLabel>Email comments</FormLabel>
+                        <FormControl
+                          type="textarea"
+                          link={action.emailTemplateLink}
+                          placeholder='Enter comments for the email recipient' />
+                      </FormGroup>
+                    </div>
+                  }
+
+                  {this.actionQueryType === "SMS" &&
+                    <div>
+                      <FormGroup>
+                        <FormLabel isRequired="true">Phone numbers</FormLabel>
+                        <FormControl
+                          type="text"
+                          className="long"
+                          link={action.smsNumbersLink}
+                          placeholder='Enter phone number of notification recipients' />
+                      </FormGroup>
+                      <FormGroup>
+                        <FormLabel>Message comments</FormLabel>
+                        <FormControl
+                          type="textarea"
+                          link={action.smsTemplateLink}
+                          placeholder='Enter comments for the text recipient' />
+                      </FormGroup>
+                    </div>
+                  }
+                </Section.Container>
+              ))
+            }
+
+
+
+
+
+            {/* <Section.Container collapsable={false}>
               <Section.Header>Actions</Section.Header>
               <Section.Content>
                 <Btn svg={svgs.plus}>Add action</Btn>
@@ -424,8 +555,13 @@ export class RuleEditor extends LinkedComponent {
                       placeholder='Enter comments for the text recipient'/>
                 </FormGroup>
               </div>
-            </Section.Container>
-          </div>
+            </Section.Container> */}
+
+
+
+
+
+
 
             <Section.Container collapsable={false}>
               <Section.Content>
