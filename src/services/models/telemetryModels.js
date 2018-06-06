@@ -10,6 +10,7 @@ export const toRuleModel = (response = {}) => {
   const model = camelCaseReshape(response, {
     'id': 'id',
     'conditions': 'conditions',
+    'actions': 'actions',
     'dateCreated': 'dateCreated',
     'dateModified': 'dateModified',
     'description': 'description',
@@ -98,6 +99,7 @@ export const toNewRuleRequestModel = ({
   description,
   groupId,
   conditions,
+  actions,
   severity,
   enabled,
   calculation,
@@ -108,6 +110,11 @@ export const toNewRuleRequestModel = ({
     Operator: condition.operator,
     Value: condition.value
   }));
+  const Actions = actions.map(act =>({
+    ActionType: act.actionItem,
+    Value: act.actionItem === "Email" ? act.emailAddresses[0] : act.smsNumbers[0],
+    ActionTemplate: act.actionItem === "Email" ? act.emailTemplate : act.smsTemplate
+  }))
   return {
     Name: name,
     Description: description,
@@ -116,6 +123,7 @@ export const toNewRuleRequestModel = ({
     Enabled: enabled,
     Calculation: calculation,
     TimePeriod: timePeriod,
-    Conditions
+    Conditions,
+    Actions
   };
 }
