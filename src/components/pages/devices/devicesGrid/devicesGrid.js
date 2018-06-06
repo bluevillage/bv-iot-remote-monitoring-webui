@@ -126,6 +126,7 @@ export class DevicesGrid extends Component {
       ...this.props, // Allow default property overrides
       deltaRowDataMode: true,
       getRowNodeId: ({ id }) => id,
+      enableSorting: true,
       context: {
         t: this.props.t
       },

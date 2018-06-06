@@ -7,6 +7,10 @@
 .devices-container {
   padding: $baseContentPadding;
 
+  .ag-icon-asc {
+    background-image: url('');
+  }
+
   @include themify($themes) {
     .status { color: themed('colorContentText'); }
   }
