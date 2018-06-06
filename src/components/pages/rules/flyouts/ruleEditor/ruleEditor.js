@@ -222,7 +222,7 @@ export class RuleEditor extends LinkedComponent {
     this.setState({
       actionQueryType: value
     });
-    console.log(value);
+    console.log(value === "SMS");
   }
 
   getDeviceCountAndFields(groupId) {
@@ -447,7 +447,6 @@ export class RuleEditor extends LinkedComponent {
 
                       <Section.Content>
                         <FormGroup>
-                          <h1>{this.actionQueryType}</h1>
                           <FormLabel isRequired="true">Choose an action</FormLabel>
                           <FormControl
                             type="select"
@@ -462,8 +461,9 @@ export class RuleEditor extends LinkedComponent {
 
 
 
-                    {this.actionQueryType === "Email" &&
+                    {actionQueryType === "Email" ?
                       <div>
+                        <Section.Content>
                         <FormGroup>
                           <FormLabel isRequired="true">Email addresses</FormLabel>
                           <FormControl
@@ -479,11 +479,13 @@ export class RuleEditor extends LinkedComponent {
                             link={action.emailTemplateLink}
                             placeholder='Enter comments for the email recipient' />
                         </FormGroup>
+                        </Section.Content>
                       </div>
-                    }
 
-                    {this.actionQueryType === "SMS" &&
+
+                    : actionQueryType === "SMS" ?
                       <div>
+                        <Section.Content>
                         <FormGroup>
                           <FormLabel isRequired="true">Phone numbers</FormLabel>
                           <FormControl
@@ -499,7 +501,9 @@ export class RuleEditor extends LinkedComponent {
                             link={action.smsTemplateLink}
                             placeholder='Enter comments for the text recipient' />
                         </FormGroup>
+                        </Section.Content>
                       </div>
+                      : <div></div>
                     }
                     {
                       actionLinks.length > 1 &&
