@@ -112,7 +112,7 @@ export const toNewRuleRequestModel = ({
   }));
   const Actions = actions.map(act =>({
     ActionType: act.actionItem,
-    Value: act.actionItem === "Email" ? act.emailAddresses[0] : act.smsNumbers[0],
+    Value: act.actionItem === "Email" ? act.emailAddresses : act.smsNumbers,
     ActionTemplate: act.actionItem === "Email" ? act.emailTemplate : act.smsTemplate
   }))
   return {
