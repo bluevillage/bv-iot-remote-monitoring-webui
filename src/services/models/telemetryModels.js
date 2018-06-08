@@ -110,7 +110,7 @@ export const toNewRuleRequestModel = ({
     Operator: condition.operator,
     Value: condition.value
   }));
-  const Actions = actions.map(act =>({
+  const Actions = actions.map(act => ({
     ActionType: act.actionItem,
     Value: act.actionItem === "Email" ? act.emailAddresses : act.smsNumbers,
     ActionTemplate: {"TemplateString": act.actionItem === "Email" ? act.emailTemplate : act.smsTemplate}

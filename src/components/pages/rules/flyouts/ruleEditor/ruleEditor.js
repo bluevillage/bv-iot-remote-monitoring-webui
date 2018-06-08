@@ -72,7 +72,7 @@ const newCondition = () => ({
 
 //pls work
 const newAction = () => ({
-  actionItem: actionOptions[0].value,
+  actionItem: '',
   emailAddresses: [],
   emailTemplate: '',
   smsNumbers: [],
