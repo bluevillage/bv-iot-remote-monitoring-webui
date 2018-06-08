@@ -162,6 +162,7 @@ export class RuleEditor extends LinkedComponent {
       this.ruleNameLink,
       this.deviceGroupLink,
       this.conditionsLink,
+      //pls work
       this.actionsLink,
       this.timePeriodLink,
       this.calculationLink
@@ -184,6 +185,7 @@ export class RuleEditor extends LinkedComponent {
         },
         lastTrigger: {
           response: undefined,
+          //should this be error?
           erroe: undefined
         }
       };
@@ -219,11 +221,11 @@ export class RuleEditor extends LinkedComponent {
     this.getDeviceCountAndFields(value);
   }
 
+  //pls work
   onActionTypeChange = ({ target: { value: { value = {} } } }) => {
     this.setState({
       actionQueryType: value
     });
-    console.log(value === "SMS");
   }
 
   getDeviceCountAndFields(groupId) {
