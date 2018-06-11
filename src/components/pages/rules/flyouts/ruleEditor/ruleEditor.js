@@ -72,13 +72,12 @@ const newCondition = () => ({
 
 //pls work
 const newAction = () => ({
-  actionItem: '',
-  emailAddresses: [],
-  emailTemplate: '',
-  smsNumbers: [],
-  smsTemplate: '',
-  key: actionKey++
-});
+  ActionType: '',
+  Value: '',
+  ActionTemplate: {
+    TemplateString: ''
+  }
+})
 
 // A state object for a new rule
 const newRule = {
@@ -312,15 +311,13 @@ export class RuleEditor extends LinkedComponent {
 
     //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      const actionItemLink = actionLink.forkTo('actionItem').map(({ value }) => value);
-      const emailAddressesLink = actionLink.forkTo('emailAddresses');
-      const emailTemplateLink = actionLink.forkTo('emailTemplate');
-      const smsNumbersLink = actionLink.forkTo('smsNumbers');
-      const smsTemplateLink = actionLink.forkTo('smsTemplate');
+      const actionTypeLink = actionLink.forkTo('ActionType').map(({ value }) => value);
+      const valueLink = actionLink.forkTo('Value');
+      const actionTemplateLink = actionLink.forkTo('ActionTemplate').forkTo('TemplateString');
 
-      const error = actionItemLink.error || emailAddressesLink.error || emailTemplateLink.error || smsNumbersLink.error || smsTemplateLink.error;
-      return { actionItemLink, emailAddressesLink, emailTemplateLink, smsNumbersLink, smsTemplateLink };
-    });
+      const error = actionTypeLink.error || valueLink.error || actionTemplateLink.error;
+      return { actionTypeLink, valueLink, actionTemplateLink };
+    })
 
     const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
 
@@ -459,84 +456,32 @@ export class RuleEditor extends LinkedComponent {
                             options={actionOptions}
                             clearable={false}
                             onChange={this.onActionTypeChange}
-                            link={action.actionItemLink}
+                            link={action.actionTypeLink}
                             searchable={false} />
                         </FormGroup>
                       </Section.Content>
 
-                      {actionQueryType === "Email" ?
+                      {actionQueryType !== "none" ?
                         <div>
                           <Section.Content>
                             <FormGroup>
-                              <FormLabel isRequired="true">Email addresses</FormLabel>
+                              <FormLabel isRequired="true">{actionQueryType === "Email" ? "Email addresses" : "Phone numbers"}</FormLabel>
                               <FormControl
                                 type="text"
                                 className="long"
-                                link={action.emailAddressesLink}
-                                placeholder='Enter email of notification recipients' />
+                                link={action.valueLink}
+                                placeholder= {actionQueryType === 'Email' ? 'Enter email of notification recipients' : 'Enter phone number of notification recipients'} />
                             </FormGroup>
                             <FormGroup>
-                              <FormLabel>Email comments</FormLabel>
+                              <FormLabel>{actionQueryType === 'Email' ? 'Email comments' : 'Message comments'}</FormLabel>
                               <FormControl
                                 type="textarea"
-                                link={action.emailTemplateLink}
-                                placeholder='Enter comments for the email recipient' />
+                                link={action.actionTemplateLink}
+                                placeholder={actionQueryType === 'Email' ? 'Enter comments for the email recipient' : 'Enter comments for the text recipient'} />
                             </FormGroup>
                           </Section.Content>
                         </div>
-
-
-                        : actionQueryType === "SMS" ?
-                          <div>
-                            <Section.Content>
-                              <FormGroup>
-                                <FormLabel isRequired="true">Phone numbers</FormLabel>
-                                <FormControl
-                                  type="text"
-                                  className="long"
-                                  link={action.smsNumbersLink}
-                                  placeholder='Enter phone number of notification recipients' />
-                              </FormGroup>
-                              <FormGroup>
-                                <FormLabel>Message comments</FormLabel>
-                                <FormControl
-                                  type="textarea"
-                                  link={action.smsTemplateLink}
-                                  placeholder='Enter comments for the text recipient' />
-                              </FormGroup>
-                            </Section.Content>
-                          </div>
-                          : actionQueryType === "SMS/Email" ?
-
-                            <div>
-                              <Section.Content>
-                                <FormGroup>
-                                  <FormLabel isRequired="true">Email addresses</FormLabel>
-                                  <FormControl
-                                    type="text"
-                                    className="long"
-                                    link={action.emailAddressesLink}
-                                    placeholder='Enter email of notification recipients' />
-                                </FormGroup>
-                                <FormGroup>
-                                  <FormLabel isRequired="true">Phone numbers</FormLabel>
-                                  <FormControl
-                                    type="text"
-                                    className="long"
-                                    link={action.smsNumbersLink}
-                                    placeholder='Enter phone number of notification recipients' />
-                                </FormGroup>
-                                <FormGroup>
-                                  <FormLabel>Message comments</FormLabel>
-                                  <FormControl
-                                    type="textarea"
-                                    link={action.smsTemplateLink}
-                                    placeholder='Enter comments for the notification recipient' />
-                                </FormGroup>
-                              </Section.Content>
-
-                            </div>
-                            : <div></div>
+                        : <div></div>
                       }
                       {
                         actionLinks.length > 1 &&
