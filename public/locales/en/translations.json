@@ -57,6 +57,7 @@
     "namePlaceHolder": "Device group name",
     "save": "Save",
     "errorMsg": {
+      "isRequired": "Is required",
       "nameCantBeEmpty": "Name is required",
       "fieldCantBeEmpty": "Field is required",
       "operatorCantBeEmpty": "Operator is required",
@@ -401,6 +402,21 @@
           "operatorPlaceholder": ">=",
           "value": "Value",
           "valuePlaceholder": "Enter value"
+        },
+        "actions":{
+          "actions": "Actions",
+          "action": "Action",
+          "addAction": "Add action",
+          "select": "Choose an action",
+          "selectionPlaceholder": "Select action",
+          "emailAddresses": "Email addresses",
+          "phoneNumbers": "Phone numbers",
+          "enterEmail": "Enter email of notification recipients",
+          "enterPhoneNumber": "Enter phone number of notification recipients",
+          "emailComments": "Email comments",
+          "smsComments": "Message comments",
+          "enterEmailComm": "Enter comments for the email recipient",
+          "enterSMSComm": "Enter comments for the text recipient"
         },
         "calculationOptions": {
           "average": "Average",
