@@ -303,7 +303,7 @@ export class RuleEditor extends LinkedComponent {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
       const operatorLink = conditionLink.forkTo('operator').map(({ value }) => value).withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value')
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty')) //should this really say name can't be empty??
+        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired')) //should this really say name can't be empty??
         .check(val => !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
       const error = fieldLink.error || operatorLink.error || valueLink.error;
       return { fieldLink, operatorLink, valueLink, error };
@@ -312,8 +312,8 @@ export class RuleEditor extends LinkedComponent {
     //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
       const actionTypeLink = actionLink.forkTo('ActionType').map(({ value }) => value).withValidator(requiredValidator);
-      const valueLink = actionLink.forkTo('Value').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
-      const actionTemplateLink = actionLink.forkTo('ActionTemplate').forkTo('TemplateString').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
+      const valueLink = actionLink.forkTo('Value').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const actionTemplateLink = actionLink.forkTo('ActionTemplate').forkTo('TemplateString').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
 
       const error = actionTypeLink.error || valueLink.error || actionTemplateLink.error;
       return { actionTypeLink, valueLink, actionTemplateLink, error};
@@ -437,22 +437,22 @@ export class RuleEditor extends LinkedComponent {
 
             {
               <Section.Container collapsable={false}>
-                <Section.Header>Actions</Section.Header>
+                <Section.Header>{t('rules.flyouts.ruleEditor.actions.actions')}</Section.Header>
                 <Section.Content>
-                  <Btn svg={svgs.plus} onClick={this.addAction}>Add action</Btn>
+                  <Btn svg={svgs.plus} onClick={this.addAction}>{t('rules.flyouts.ruleEditor.actions.addAction')}</Btn>
                 </Section.Content>
                 {actionLinks.map((action, idx) => (
                   <Section.Container key={formData.actions[idx].key}>
-                    <Section.Header>Action {idx + 1}</Section.Header>
+                    <Section.Header>{t('rules.flyouts.ruleEditor.actions.action')} {idx + 1}</Section.Header>
 
                     <Section.Content>
                       <Section.Content>
                         <FormGroup>
-                          <FormLabel isRequired="true">Choose an action</FormLabel>
+                          <FormLabel isRequired="true">{t('rules.flyouts.ruleEditor.actions.select')}</FormLabel>
                           <FormControl
                             type="select"
                             className="long"
-                            placeholder="Select action"
+                            placeholder={t('rules.flyouts.ruleEditor.actions.selectionPlaceholder')}
                             options={actionOptions}
                             clearable={false}
                             onChange={this.onActionTypeChange}
@@ -465,19 +465,19 @@ export class RuleEditor extends LinkedComponent {
                         <div>
                           <Section.Content>
                             <FormGroup>
-                              <FormLabel isRequired="true">{actionQueryType === "Email" ? "Email addresses" : "Phone numbers"}</FormLabel>
+                              <FormLabel isRequired="true">{actionQueryType === "Email" ? t('rules.flyouts.ruleEditor.actions.emailAddresses') : t('rules.flyouts.ruleEditor.actions.phoneNumbers')}</FormLabel>
                               <FormControl
                                 type="text"
                                 className="long"
                                 link={action.valueLink}
-                                placeholder= {actionQueryType === 'Email' ? 'Enter email of notification recipients' : 'Enter phone number of notification recipients'} />
+                                placeholder= {actionQueryType === 'Email' ? t('rules.flyouts.ruleEditor.actions.enterEmail') : t('rules.flyouts.ruleEditor.actions.enterPhoneNumber')} />
                             </FormGroup>
                             <FormGroup>
-                              <FormLabel>{actionQueryType === 'Email' ? 'Email comments' : 'Message comments'}</FormLabel>
+                              <FormLabel>{actionQueryType === 'Email' ? t('rules.flyouts.ruleEditor.actions.emailComments') : t('rules.flyouts.ruleEditor.actions.smsComments')}</FormLabel>
                               <FormControl
                                 type="textarea"
                                 link={action.actionTemplateLink}
-                                placeholder={actionQueryType === 'Email' ? 'Enter comments for the email recipient' : 'Enter comments for the text recipient'} />
+                                placeholder={actionQueryType === 'Email' ? t('rules.flyouts.ruleEditor.actions.enterEmailComm') : t('rules.flyouts.ruleEditor.actions.enterSMSComm')} />
                             </FormGroup>
                           </Section.Content>
                         </div>
