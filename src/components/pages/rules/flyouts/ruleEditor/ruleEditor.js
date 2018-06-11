@@ -72,10 +72,10 @@ const newCondition = () => ({
 
 //pls work
 const newAction = () => ({
-  ActionType: '',
-  Value: '',
-  ActionTemplate: {
-    TemplateString: ''
+  actionType: '',
+  value: '',
+  actionTemplate: {
+    templateString: ''
   }
 })
 
@@ -102,7 +102,7 @@ export class RuleEditor extends LinkedComponent {
       error: undefined,
       fieldOptions: [],
       fieldQueryPending: true,
-      actionQueryType: "none",
+      actionQueryType: "SMS",
       devicesAffected: 0,
       formData: newRule,
       isPending: false
@@ -134,7 +134,9 @@ export class RuleEditor extends LinkedComponent {
       actions: (rule.actions || []).map(action => ({
         ...action,
         key: actionKey++
-      }))
+      })),
+
+      actionQueryType: rule.actions ? rule.actions[0] ? rule.actions[0].actionType : 'none' : 'none'
     }
   });
 
@@ -311,9 +313,9 @@ export class RuleEditor extends LinkedComponent {
 
     //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      const actionTypeLink = actionLink.forkTo('ActionType').map(({ value }) => value).withValidator(requiredValidator);
-      const valueLink = actionLink.forkTo('Value').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
-      const actionTemplateLink = actionLink.forkTo('ActionTemplate').forkTo('TemplateString').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const actionTypeLink = actionLink.forkTo('actionType').map(({ value }) => value).withValidator(requiredValidator);
+      const valueLink = actionLink.forkTo('value').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const actionTemplateLink = actionLink.forkTo('actionTemplate').forkTo('templateString').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
 
       const error = actionTypeLink.error || valueLink.error || actionTemplateLink.error;
       return { actionTypeLink, valueLink, actionTemplateLink, error};
