@@ -303,7 +303,7 @@ export class RuleEditor extends LinkedComponent {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
       const operatorLink = conditionLink.forkTo('operator').map(({ value }) => value).withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value')
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'))
+        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty')) //should this really say name can't be empty??
         .check(val => !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
       const error = fieldLink.error || operatorLink.error || valueLink.error;
       return { fieldLink, operatorLink, valueLink, error };
@@ -311,13 +311,13 @@ export class RuleEditor extends LinkedComponent {
 
     //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      const actionTypeLink = actionLink.forkTo('ActionType').map(({ value }) => value);
-      const valueLink = actionLink.forkTo('Value');
-      const actionTemplateLink = actionLink.forkTo('ActionTemplate').forkTo('TemplateString');
+      const actionTypeLink = actionLink.forkTo('ActionType').map(({ value }) => value).withValidator(requiredValidator);
+      const valueLink = actionLink.forkTo('Value').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
+      const actionTemplateLink = actionLink.forkTo('ActionTemplate').forkTo('TemplateString').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.nameCantBeEmpty'));
 
       const error = actionTypeLink.error || valueLink.error || actionTemplateLink.error;
-      return { actionTypeLink, valueLink, actionTemplateLink };
-    })
+      return { actionTypeLink, valueLink, actionTemplateLink, error};
+    });
 
     const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
 
@@ -485,7 +485,7 @@ export class RuleEditor extends LinkedComponent {
                       }
                       {
                         actionLinks.length > 1 &&
-                        <Btn className="padded-top" svg={svgs.trash} onClick={this.deleteAction(idx)}>{t('rules.flyouts.ruleEditor.delete')}</Btn>
+                        <Btn svg={svgs.trash} onClick={this.deleteAction(idx)}>{t('rules.flyouts.ruleEditor.delete')}</Btn>
                       }
                     </Section.Content>
                   </Section.Container>
@@ -563,7 +563,7 @@ export class RuleEditor extends LinkedComponent {
         {
           !isPending &&
           <BtnToolbar>
-            <Btn svg={svgs.apply} primary={true} type="submit" disabled={!this.formIsValid() || conditionsHaveErrors}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
+            <Btn svg={svgs.apply} primary={true} type="submit" disabled={!this.formIsValid() || conditionsHaveErrors || actionsHaveErrors}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
             <Btn svg={svgs.cancelX} onClick={onClose}>{t('rules.flyouts.ruleEditor.cancel')}</Btn>
           </BtnToolbar>
         }
