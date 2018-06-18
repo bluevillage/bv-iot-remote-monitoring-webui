@@ -11,6 +11,8 @@ export * from './formControl';
 export * from './formGroup';
 export * from './formLabel';
 export * from './formSection';
+export * from './pill';
+export * from './pillContainer';
 export * from './radio';
 export * from './sectionDesc';
 export * from './sectionHeader';

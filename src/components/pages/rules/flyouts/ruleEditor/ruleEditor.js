@@ -8,6 +8,8 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  Pill,
+  PillContainer,
   Radio,
   ToggleBtn,
   SectionDesc,
@@ -71,11 +73,19 @@ const newCondition = () => ({
 });
 
 //pls work
-const newAction = () => ({
-  actionType: '',
-  value: '',
+/* const newAction = () => ({
+  actionType: 'Email',
+  value: [],
   actionTemplate: {
     templateString: ''
+  }
+}) */
+
+const newAction = () => ({
+  type: 'Email',
+  parameters: {
+    recipients: [],
+    template: ''
   }
 })
 
@@ -90,8 +100,10 @@ const newRule = {
   //pls work
   actions: [newAction()], // Start with one action
   severity: Config.ruleSeverity.critical,
-  enabled: true
+  enabled: true,
+  actionEnabled: false
 }
+//FIX ENABLE DISABLE REQUIREMENT THING
 
 export class RuleEditor extends LinkedComponent {
 
@@ -105,6 +117,7 @@ export class RuleEditor extends LinkedComponent {
       actionQueryType: "SMS",
       devicesAffected: 0,
       formData: newRule,
+      newRecipient: '',
       isPending: false
     };
   }
@@ -136,7 +149,7 @@ export class RuleEditor extends LinkedComponent {
         key: actionKey++
       })),
 
-      actionQueryType: rule.actions ? rule.actions[0] ? rule.actions[0].actionType : 'none' : 'none'
+      //actionQueryType: rule.actions ? rule.actions[0] ? rule.actions[0].actionType : 'none' : 'none'
     }
   });
 
@@ -229,6 +242,14 @@ export class RuleEditor extends LinkedComponent {
     });
   }
 
+  onAddRecipient = (link) => (e) => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      link.set([...link.value], this.newRecipientLink.value);
+      this.newRecipientLink.set([]);
+    }
+  }
+
   getDeviceCountAndFields(groupId) {
     this.props.deviceGroups.some(group => {
       if (group.id === groupId) {
@@ -268,6 +289,11 @@ export class RuleEditor extends LinkedComponent {
     this.setState({ formData: { ...this.state.formData, enabled: value } })
   }
 
+  //pls work
+  onActionToggle = ({ target: { value } }) => {
+    this.setState({ formData: { ...this.state.formData, actionEnabled: value } })
+  }
+
   render() {
     const { onClose, t, deviceGroups = [] } = this.props;
     const { error, formData, fieldOptions, devicesAffected, isPending, fieldQueryPending, actionQueryType } = this.state;
@@ -280,6 +306,7 @@ export class RuleEditor extends LinkedComponent {
     const requiredValidator = (new Validator()).check(Validator.notEmpty, t('rules.flyouts.ruleEditor.validation.required'));
     // State links
     this.formDataLink = this.linkTo('formData');
+    this.newRecipientLink = this.linkTo('newRecipient');
     this.ruleNameLink = this.formDataLink.forkTo('name').withValidator(requiredValidator);
     this.descriptionLink = this.formDataLink.forkTo('description');
     this.deviceGroupLink = this.formDataLink.forkTo('groupId')
@@ -300,6 +327,8 @@ export class RuleEditor extends LinkedComponent {
     this.severityLink = this.formDataLink.forkTo('severity');
     //todo toggle button didn't support link
     this.enabledLink = this.formDataLink.forkTo('enabled');
+    //pls work
+    this.actionEnabledLink = this.formDataLink.forkTo('actionEnabled');
     // Create the state link for the dynamic form elements
     const conditionLinks = this.conditionsLink.getLinkedChildren(conditionLink => {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
@@ -313,12 +342,12 @@ export class RuleEditor extends LinkedComponent {
 
     //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      const actionTypeLink = actionLink.forkTo('actionType').map(({ value }) => value).withValidator(requiredValidator);
-      const valueLink = actionLink.forkTo('value').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
-      const actionTemplateLink = actionLink.forkTo('actionTemplate').forkTo('templateString').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      //const actionTypeLink = actionLink.forkTo('actionType').map(({ value }) => value).withValidator(requiredValidator);
+      const recipientLink = actionLink.forkTo('parameters').forkTo('recipients').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const templateLink = actionLink.forkTo('parameters').forkTo('template').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
 
-      const error = actionTypeLink.error || valueLink.error || actionTemplateLink.error;
-      return { actionTypeLink, valueLink, actionTemplateLink, error};
+      const error = recipientLink.error || templateLink.error;
+      return { recipientLink, templateLink, error };
     });
 
     const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
@@ -440,54 +469,41 @@ export class RuleEditor extends LinkedComponent {
             {
               <Section.Container collapsable={false}>
                 <Section.Header>{t('rules.flyouts.ruleEditor.actions.actions')}</Section.Header>
-                <Section.Content>
-                  <Btn svg={svgs.plus} onClick={this.addAction}>{t('rules.flyouts.ruleEditor.actions.addAction')}</Btn>
-                </Section.Content>
+                <ToggleBtn
+                  value={formData.actionEnabled}
+                  onChange={this.onActionToggle} >
+                  {formData.enabled ? 'On' : 'Off'}
+                </ToggleBtn>
+                {formData.actionEnabled && <p>Send an email when alert is triggered</p>}
                 {actionLinks.map((action, idx) => (
                   <Section.Container key={formData.actions[idx].key}>
-                    <Section.Header>{t('rules.flyouts.ruleEditor.actions.action')} {idx + 1}</Section.Header>
-
                     <Section.Content>
-                      <Section.Content>
-                        <FormGroup>
-                          <FormLabel isRequired="true">{t('rules.flyouts.ruleEditor.actions.select')}</FormLabel>
-                          <FormControl
-                            type="select"
-                            className="long"
-                            placeholder={t('rules.flyouts.ruleEditor.actions.selectionPlaceholder')}
-                            options={actionOptions}
-                            clearable={false}
-                            onChange={this.onActionTypeChange}
-                            link={action.actionTypeLink}
-                            searchable={false} />
-                        </FormGroup>
-                      </Section.Content>
-
-                      {actionQueryType !== "none" ?
-                        <div>
-                          <Section.Content>
-                            <FormGroup>
-                              <FormLabel isRequired="true">{actionQueryType === "Email" ? t('rules.flyouts.ruleEditor.actions.emailAddresses') : t('rules.flyouts.ruleEditor.actions.phoneNumbers')}</FormLabel>
-                              <FormControl
-                                type="text"
-                                className="long"
-                                link={action.valueLink}
-                                placeholder= {actionQueryType === 'Email' ? t('rules.flyouts.ruleEditor.actions.enterEmail') : t('rules.flyouts.ruleEditor.actions.enterPhoneNumber')} />
-                            </FormGroup>
-                            <FormGroup>
-                              <FormLabel>{actionQueryType === 'Email' ? t('rules.flyouts.ruleEditor.actions.emailComments') : t('rules.flyouts.ruleEditor.actions.smsComments')}</FormLabel>
-                              <FormControl
-                                type="textarea"
-                                link={action.actionTemplateLink}
-                                placeholder={actionQueryType === 'Email' ? t('rules.flyouts.ruleEditor.actions.enterEmailComm') : t('rules.flyouts.ruleEditor.actions.enterSMSComm')} />
-                            </FormGroup>
-                          </Section.Content>
-                        </div>
-                        : <div></div>
-                      }
                       {
-                        actionLinks.length > 1 &&
-                        <Btn svg={svgs.trash} onClick={this.deleteAction(idx)}>{t('rules.flyouts.ruleEditor.delete')}</Btn>
+                        formData.actionEnabled &&
+                        <div>
+                          <FormGroup>
+                            <FormControl
+                              type="text"
+                              className="long"
+                              onKeyPress={this.onAddRecipient(action.recipientLink)}
+                              link={this.newRecipientLink}
+                              placeholder={t('rules.flyouts.ruleEditor.actions.enterEmail')} />
+                          </FormGroup>
+                          <button onClick={() => action.recipientLink.set([...action.recipientLink.value, this.newRecipientLink.value])}>Temp</button>
+
+                          <PillContainer
+                            pills={action.recipientLink.value}
+                            svg={svgs.trash}
+                            onSvgClick={() => action.recipientLink.set([...action.recipientLink.value, 'new'])}
+                          ></PillContainer>
+
+                          <FormGroup>
+                            <FormControl
+                              type="textarea"
+                              link={action.templateLink}
+                              placeholder={t('rules.flyouts.ruleEditor.actions.enterEmailComm')} />
+                          </FormGroup>
+                        </div>
                       }
                     </Section.Content>
                   </Section.Container>

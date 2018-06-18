@@ -15,4 +15,9 @@
     padding-left: 0px;
     @include rem-fallback(margin-top, 24px);
   }
+
+  .pill-container{
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
