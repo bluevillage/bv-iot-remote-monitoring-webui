@@ -4,7 +4,7 @@
 @import 'src/styles/mixins';
 
 $pillHeight: 30px;
-$pillMinWidth: 120px;
+$pillMinWidth: 82px;
 $pillIconSize: 14px;
 .pill {
   display: flex;
@@ -12,7 +12,9 @@ $pillIconSize: 14px;
   background-color: transparent;
   border: 0;
   align-items: center;
-  justify-content: center;
+  text-align: left;
+  //justify-content: center;
+  margin: 7px 7px 0px 0px;
   cursor: pointer;
   font-family: inherit;
   @include rem-fallback(padding, 0px, $pillHeight);

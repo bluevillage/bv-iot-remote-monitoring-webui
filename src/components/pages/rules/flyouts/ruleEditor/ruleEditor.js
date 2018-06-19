@@ -30,6 +30,7 @@ import Flyout from 'components/shared/flyout';
 import { IoTHubManagerService, TelemetryService } from 'services';
 import { toNewRuleRequestModel } from 'services/models';
 import Config from 'app.config';
+import update from 'immutability-helper';
 
 import './ruleEditor.css';
 
@@ -86,7 +87,8 @@ const newAction = () => ({
   parameters: {
     recipients: [],
     template: ''
-  }
+  },
+  key: actionKey++
 })
 
 // A state object for a new rule
@@ -243,11 +245,21 @@ export class RuleEditor extends LinkedComponent {
   }
 
   onAddRecipient = (link) => (e) => {
-    if(e.key === 'Enter'){
+    if (e.key === 'Enter') {
       e.preventDefault();
-      link.set([...link.value], this.newRecipientLink.value);
-      this.newRecipientLink.set([]);
+      const newState = update(
+        this.state,
+        {
+          ...link.setter({ $set: [ ...link.value, this.newRecipientLink.value ] }),
+          ...this.newRecipientLink.setter({ $set: '' })
+        }
+      );
+      this.setState(newState);
     }
+  }
+
+  addRecipient = (link) => {
+    link.set([...link.value, this.newRecipientLink.value]);
   }
 
   getDeviceCountAndFields(groupId) {
@@ -343,7 +355,9 @@ export class RuleEditor extends LinkedComponent {
     //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
       //const actionTypeLink = actionLink.forkTo('actionType').map(({ value }) => value).withValidator(requiredValidator);
+      //state.formData.actions.parameters
       const recipientLink = actionLink.forkTo('parameters').forkTo('recipients').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      //state.formData.actions.parameters
       const templateLink = actionLink.forkTo('parameters').forkTo('template').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
 
       const error = recipientLink.error || templateLink.error;
@@ -476,7 +490,7 @@ export class RuleEditor extends LinkedComponent {
                 </ToggleBtn>
                 {formData.actionEnabled && <p>Send an email when alert is triggered</p>}
                 {actionLinks.map((action, idx) => (
-                  <Section.Container key={formData.actions[idx].key}>
+                  <div key={formData.actions[idx].key}>
                     <Section.Content>
                       {
                         formData.actionEnabled &&
@@ -489,13 +503,11 @@ export class RuleEditor extends LinkedComponent {
                               link={this.newRecipientLink}
                               placeholder={t('rules.flyouts.ruleEditor.actions.enterEmail')} />
                           </FormGroup>
-                          <button onClick={() => action.recipientLink.set([...action.recipientLink.value, this.newRecipientLink.value])}>Temp</button>
 
                           <PillContainer
                             pills={action.recipientLink.value}
                             svg={svgs.trash}
-                            onSvgClick={() => action.recipientLink.set([...action.recipientLink.value, 'new'])}
-                          ></PillContainer>
+                            onSvgClick={() => action.recipientLink.set([...action.recipientLink.value, 'new'])} />
 
                           <FormGroup>
                             <FormControl
@@ -506,7 +518,7 @@ export class RuleEditor extends LinkedComponent {
                         </div>
                       }
                     </Section.Content>
-                  </Section.Container>
+                  </div>
                 ))}
               </Section.Container>
             }

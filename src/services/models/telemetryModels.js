@@ -110,11 +110,12 @@ export const toNewRuleRequestModel = ({
     Operator: condition.operator,
     Value: condition.value
   }));
+
   const Actions = actions.map(act => ({
-    ActionType: act.ActionType,
-    Value: act.Value,
-    ActionTemplate: act.ActionTemplate
-  }))
+    type: act.type,
+    parameters: act.parameters
+  }));
+
   return {
     Name: name,
     Description: description,

@@ -9,10 +9,10 @@ import './styles/pill.css';
 export const Pill = (props) => {
   const { svg, label, onSvgClick} = props;
   return (
-    <p className={joinClasses('pill', 'pill-primary')} onClick={onSvgClick}>
+    <div className={joinClasses('pill', 'pill-primary')} onClick={onSvgClick}>
       {label}
       { props.svg && <Svg path={props.svg} className="pill-icon" /> }
-    </p>
+    </div>
   );
 };
 
