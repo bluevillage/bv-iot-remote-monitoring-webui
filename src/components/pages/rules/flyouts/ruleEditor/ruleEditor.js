@@ -85,7 +85,7 @@ const newCondition = () => ({
 const newAction = () => ({
   type: 'Email',
   parameters: {
-    recipients: [],
+    email: [],
     template: ''
   },
   key: actionKey++
@@ -119,7 +119,7 @@ export class RuleEditor extends LinkedComponent {
       actionQueryType: "SMS",
       devicesAffected: 0,
       formData: newRule,
-      newRecipient: '',
+      newEmail: '',
       isPending: false
     };
   }
@@ -181,8 +181,7 @@ export class RuleEditor extends LinkedComponent {
       //pls work
       this.actionsLink,
       this.timePeriodLink,
-      this.calculationLink,
-      this.newRecipientLink
+      this.calculationLink
     ].every(link => !link.error);
   }
 
@@ -245,21 +244,24 @@ export class RuleEditor extends LinkedComponent {
     });
   }
 
-  onAddRecipient = (link) => (e) => {
+  onAddEmail = (link) => (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const newState = update(
-        this.state,
-        {
-          ...link.setter({ $set: [ ...link.value, this.newRecipientLink.value ] }),
-          ...this.newRecipientLink.setter({ $set: '' })
-        }
-      );
-      this.setState(newState);
+      const errors = this.newEmailLink.error;
+      if(!errors){
+        const newState = update(
+          this.state,
+          {
+            ...link.setter({ $set: [ ...link.value, this.newEmailLink.value ] }),
+            ...this.newEmailLink.setter({ $set: '' })
+          }
+        );
+        this.setState(newState);
+      }
     }
   }
 
-  deleteRecipient = (index) => (link) =>
+  deleteEmail = (index) => (link) =>
   (e) => link.set(link.value.filter((_, idx) => index !== idx));
 
   getDeviceCountAndFields(groupId) {
@@ -324,7 +326,7 @@ export class RuleEditor extends LinkedComponent {
     // State links
     this.formDataLink = this.linkTo('formData');
     //pls work
-    this.newRecipientLink = this.linkTo('newRecipient').check(val => val.split("@").length === 2 && val.split("@")[0].length > 0 && val.split("@")[1].length > 0, "Invalid syntax");
+    this.newEmailLink = this.linkTo('newEmail').check(val => (val.split("@").length === 2 && val.split("@")[0].length > 0 && val.split("@")[1].length > 0) || val.length === 0, "Invalid syntax");
     this.ruleNameLink = this.formDataLink.forkTo('name').withValidator(requiredValidator);
     this.descriptionLink = this.formDataLink.forkTo('description');
     this.deviceGroupLink = this.formDataLink.forkTo('groupId')
@@ -352,7 +354,7 @@ export class RuleEditor extends LinkedComponent {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
       const operatorLink = conditionLink.forkTo('operator').map(({ value }) => value).withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value')
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired')) //should this really say name can't be empty??
+        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'))
         .check(val => !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
       const error = fieldLink.error || operatorLink.error || valueLink.error;
       return { fieldLink, operatorLink, valueLink, error };
@@ -362,12 +364,12 @@ export class RuleEditor extends LinkedComponent {
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
       //const actionTypeLink = actionLink.forkTo('actionType').map(({ value }) => value).withValidator(requiredValidator);
       //state.formData.actions.parameters
-      const recipientLink = actionLink.forkTo('parameters').forkTo('recipients').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const emailLink = actionLink.forkTo('parameters').forkTo('email').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
       //state.formData.actions.parameters
       const templateLink = actionLink.forkTo('parameters').forkTo('template').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
 
-      const error = recipientLink.error || templateLink.error;
-      return { recipientLink, templateLink, error };
+      const error = formData.actionEnabled ? (emailLink.error || templateLink.error) : false;
+      return { emailLink, templateLink, error };
     });
 
     const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
@@ -505,15 +507,15 @@ export class RuleEditor extends LinkedComponent {
                             <FormControl
                               type="text"
                               className="long"
-                              onKeyPress={this.onAddRecipient(action.recipientLink)}
-                              link={this.newRecipientLink}
+                              onKeyPress={this.onAddEmail(action.emailLink)}
+                              link={this.newEmailLink}
                               placeholder={t('rules.flyouts.ruleEditor.actions.enterEmail')} />
                           </FormGroup>
 
                           <PillContainer
-                            pills={action.recipientLink.value}
+                            pills={action.emailLink}
                             svg={svgs.cancelX}
-                            onSvgClick={this.deletePill(action.recipientLink)}/>
+                            onSvgClick={this.deletePill(action.emailLink)}/>
 
                           <FormGroup className="thin-pad-top">
                             <FormControl
