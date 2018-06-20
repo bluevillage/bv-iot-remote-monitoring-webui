@@ -15,4 +15,8 @@
     padding-left: 0px;
     @include rem-fallback(margin-top, 24px);
   }
+
+  .thin-pad-top{
+    @include rem-fallback(margin-top, 10px);
+  }
 }

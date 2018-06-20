@@ -15,7 +15,7 @@ export const PillContainer = (props) => {
           key={idx}
           label={pill}
           svg={props.svg}
-          onSvgClick={props.onSvgClick}
+          onSvgClick={props.onSvgClick(idx)}
         ></Pill>
       ))}
     </div>

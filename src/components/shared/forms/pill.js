@@ -10,8 +10,8 @@ export const Pill = (props) => {
   const { svg, label, onSvgClick} = props;
   return (
     <div className={joinClasses('pill', 'pill-primary')} onClick={onSvgClick}>
-      {label}
-      { props.svg && <Svg path={props.svg} className="pill-icon" /> }
+      <p>{label}</p>
+      <div>{ props.svg && <Svg path={props.svg} className="pill-icon" /> }</div>
     </div>
   );
 };

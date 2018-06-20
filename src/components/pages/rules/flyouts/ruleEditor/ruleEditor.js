@@ -181,7 +181,8 @@ export class RuleEditor extends LinkedComponent {
       //pls work
       this.actionsLink,
       this.timePeriodLink,
-      this.calculationLink
+      this.calculationLink,
+      this.newRecipientLink
     ].every(link => !link.error);
   }
 
@@ -258,9 +259,8 @@ export class RuleEditor extends LinkedComponent {
     }
   }
 
-  addRecipient = (link) => {
-    link.set([...link.value, this.newRecipientLink.value]);
-  }
+  deleteRecipient = (index) => (link) =>
+  (e) => link.set(link.value.filter((_, idx) => index !== idx));
 
   getDeviceCountAndFields(groupId) {
     this.props.deviceGroups.some(group => {
@@ -302,6 +302,11 @@ export class RuleEditor extends LinkedComponent {
   }
 
   //pls work
+  deletePill = link => index => e => {
+    link.set(link.value.filter((_, idx) => index !== idx));
+  }
+
+  //pls work
   onActionToggle = ({ target: { value } }) => {
     this.setState({ formData: { ...this.state.formData, actionEnabled: value } })
   }
@@ -318,7 +323,8 @@ export class RuleEditor extends LinkedComponent {
     const requiredValidator = (new Validator()).check(Validator.notEmpty, t('rules.flyouts.ruleEditor.validation.required'));
     // State links
     this.formDataLink = this.linkTo('formData');
-    this.newRecipientLink = this.linkTo('newRecipient');
+    //pls work
+    this.newRecipientLink = this.linkTo('newRecipient').check(val => val.split("@").length === 2 && val.split("@")[0].length > 0 && val.split("@")[1].length > 0, "Invalid syntax");
     this.ruleNameLink = this.formDataLink.forkTo('name').withValidator(requiredValidator);
     this.descriptionLink = this.formDataLink.forkTo('description');
     this.deviceGroupLink = this.formDataLink.forkTo('groupId')
@@ -506,10 +512,10 @@ export class RuleEditor extends LinkedComponent {
 
                           <PillContainer
                             pills={action.recipientLink.value}
-                            svg={svgs.trash}
-                            onSvgClick={() => action.recipientLink.set([...action.recipientLink.value, 'new'])} />
+                            svg={svgs.cancelX}
+                            onSvgClick={this.deletePill(action.recipientLink)}/>
 
-                          <FormGroup>
+                          <FormGroup className="thin-pad-top">
                             <FormControl
                               type="textarea"
                               link={action.templateLink}

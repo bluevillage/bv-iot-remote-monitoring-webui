@@ -4,34 +4,45 @@
 @import 'src/styles/mixins';
 
 $pillHeight: 30px;
-$pillMinWidth: 82px;
+$pillMinWidth: 127px;
 $pillIconSize: 14px;
 .pill {
   display: flex;
   flex-shrink: 0;
-  background-color: transparent;
+  justify-content: space-between;
+  background-color: white;
   border: 0;
   align-items: center;
   text-align: left;
-  //justify-content: center;
+  float: right;
+  white-space: nowrap;
   margin: 7px 7px 0px 0px;
   cursor: pointer;
   font-family: inherit;
-  @include rem-fallback(padding, 0px, $pillHeight);
+  @include rem-fallback(padding, 0px, $pillHeight/4);
   @include rem-fallback(min-width, $pillMinWidth);
+  p{
+    padding: 0px;
+    margin: 0px;
+  }
+  div{
+    float:right;
+  }
 
   .pill-icon {
     @include rem-fallback(height, $pillHeight);
     @include rem-fallback(width, $pillIconSize);
 
-    svg { @include square-px-rem($pillIconSize); }
+    float: right;
+    position: relative;
+    svg { @include square-px-rem($pillIconSize);}
+
 
     + .pill-text { @include rem-fallback(padding-left, 5px); }
   }
 
   .pill-text {
-    @include rem-fallback(line-height, $pillHeight);
-    @include rem-fallback(padding-right, (($pillHeight - $pillIconSize) / 2));
+    @include rem-fallback(padding-right, $pillHeight - $pillIconSize);
     @include rem-font-size(14px);
   }
 
@@ -60,7 +71,7 @@ $pillIconSize: 14px;
 
     &.pill-primary {
       color: themed('colorBtnPrimaryText');
-      background-color: themed('colorBtnPrimaryBackground');
+      background-color: themed('colorBtnText');
 
       .pill-icon svg { fill: themed('colorBtnPrimarySvgFill'); }
 
