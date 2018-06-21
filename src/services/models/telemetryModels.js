@@ -10,7 +10,6 @@ export const toRuleModel = (response = {}) => {
   const model = camelCaseReshape(response, {
     'id': 'id',
     'conditions': 'conditions',
-    'actions': 'actions',
     'dateCreated': 'dateCreated',
     'dateModified': 'dateModified',
     'description': 'description',
@@ -24,9 +23,24 @@ export const toRuleModel = (response = {}) => {
     'action.type': 'type'
   });
   return update(model, {
-    severity: { $set: (model.severity || '').toLowerCase() }
+    severity: { $set: (model.severity || '').toLowerCase() },
+    actions: { $set: (response.Actions || []).map(toActionModel)}
   });
 };
+
+export const toActionModel = (response = {}) => {
+  const model = camelCaseReshape(response, {
+    'type': 'type',
+    'parameters': 'parameters'
+  });
+  const params = response.Parameters || {};
+  if(params.Email) console.log("Uppercase");
+  if(params.email) console.log("lowercase");
+  //should all be uppercase now i think
+  return update(model, {
+    parameters: { email: { $set: params.Email || params.email || [] }}
+  });
+}
 
 // TODO: Double check the response from alertsByRule and alerts, might only need one model
 export const toAlertsModel = (response = {}) => getItems(response)
@@ -113,7 +127,10 @@ export const toNewRuleRequestModel = ({
 
   const Actions = actions.map(act => ({
     Type: act.type,
-    Parameters: act.parameters
+    Parameters: {
+      Type: act.parameters.type,
+      Email: act.parameters.email
+    }
   }));
 
   return {

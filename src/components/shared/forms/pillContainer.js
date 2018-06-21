@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import { joinClasses } from 'utilities';
 import {Pill} from './pill';
 import {Link} from 'utilities';
 import './styles/pillContainer.css';
@@ -13,7 +12,7 @@ export class PillContainer extends Component {
 
   render(){
     const { pills, onSvgClick, svg } = this.props;
-
+    console.log(pills.value);
     return (
       <div className="pill-container">
         {pills.value.map((pill, idx) => (

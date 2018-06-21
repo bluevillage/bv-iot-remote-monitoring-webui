@@ -11,7 +11,7 @@ export const Pill = (props) => {
   return (
     <div className={joinClasses('pill', 'pill-primary')} onClick={onSvgClick}>
       <p>{label}</p>
-      <div>{ props.svg && <Svg path={props.svg} className="pill-icon" /> }</div>
+      <div>{ svg && <Svg path={props.svg} className="pill-icon" /> }</div>
     </div>
   );
 };

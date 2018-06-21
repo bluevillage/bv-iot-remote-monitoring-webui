@@ -8,7 +8,6 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  Pill,
   PillContainer,
   Radio,
   ToggleBtn,
@@ -71,7 +70,7 @@ const newCondition = () => ({
 });
 
 const newAction = () => ({
-  type: actionOptions[0].value,
+  type: actionOptions[1].value,
   parameters: {
     email: [],
     template: ''
@@ -170,6 +169,7 @@ export class RuleEditor extends LinkedComponent {
     const requestProps = { ...this.state.formData };
     const { devicesAffected } = this.state;
     if (requestProps.calculation === calculations[1]) requestProps.timePeriod = '';
+    if (this.state.formData.actionEnabled === false) requestProps.actions = [];
     if (this.formIsValid()) {
       this.setState({ isPending: true });
       if (this.subscription) this.subscription.unsubscribe();
