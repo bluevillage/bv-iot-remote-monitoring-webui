@@ -416,7 +416,11 @@
           "emailComments": "Email comments",
           "smsComments": "Message comments",
           "enterEmailComm": "Enter comments for the email recipient",
-          "enterSMSComm": "Enter comments for the text recipient"
+          "enterSMSComm": "Enter comments for the text recipient",
+          "syntaxError": "Invalid syntax",
+          "on": "On",
+          "off": "Off",
+          "sendEmailOnTrigger": "Send an email when alert is triggered"
         },
         "calculationOptions": {
           "average": "Average",

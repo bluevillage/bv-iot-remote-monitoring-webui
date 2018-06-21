@@ -11,7 +11,6 @@ export class PillContainer extends Component {
     super(props);
   }
 
-
   render(){
     const { pills, onSvgClick, svg } = this.props;
 

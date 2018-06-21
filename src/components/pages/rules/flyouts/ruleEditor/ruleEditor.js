@@ -50,40 +50,28 @@ const operatorOptions = [
   { label: '=', value: 'Equals' }
 ];
 
-//pls work
 const actionOptions = [
   { label: 'Send SMS', value: 'SMS' },
   { label: 'Send email', value: 'Email' },
-  /*{ label: 'Send SMS and email', value: 'SMS/Email' },*/
   { label: 'No action', value: 'none' }
 ]
 
 // A counter for creating unique keys per new condition
 let conditionKey = 0;
 
-//pls work
 // A counter for creating unique keys per new action
 let actionKey = 0;
 
 // Creates a state object for a condition
 const newCondition = () => ({
   field: '',
-  operator: operatorOptions[0].value,
+  operator: operatorOptions[1].value,
   value: '',
   key: conditionKey++ // Used by react to track the rendered elements
 });
 
-//pls work
-/* const newAction = () => ({
-  actionType: 'Email',
-  value: [],
-  actionTemplate: {
-    templateString: ''
-  }
-}) */
-
 const newAction = () => ({
-  type: 'Email',
+  type: actionOptions[0].value,
   parameters: {
     email: [],
     template: ''
@@ -99,13 +87,11 @@ const newRule = {
   calculation: '',
   timePeriod: '',
   conditions: [newCondition()], // Start with one condition
-  //pls work
   actions: [newAction()], // Start with one action
   severity: Config.ruleSeverity.critical,
   enabled: true,
   actionEnabled: false
 }
-//FIX ENABLE DISABLE REQUIREMENT THING
 
 export class RuleEditor extends LinkedComponent {
 
@@ -116,7 +102,6 @@ export class RuleEditor extends LinkedComponent {
       error: undefined,
       fieldOptions: [],
       fieldQueryPending: true,
-      actionQueryType: "SMS",
       devicesAffected: 0,
       formData: newRule,
       newEmail: '',
@@ -144,14 +129,11 @@ export class RuleEditor extends LinkedComponent {
         ...condition,
         key: conditionKey++
       })),
-
-      //pls work
       actions: (rule.actions || []).map(action => ({
         ...action,
         key: actionKey++
       })),
-
-      //actionQueryType: rule.actions ? rule.actions[0] ? rule.actions[0].actionType : 'none' : 'none'
+      actionEnabled: (rule.actions || []).length > 0 ? true : false
     }
   });
 
@@ -163,13 +145,11 @@ export class RuleEditor extends LinkedComponent {
 
   addCondition = () => this.conditionsLink.set([...this.conditionsLink.value, newCondition()]);
 
-  // pls work
   addAction = () => this.actionsLink.set([...this.actionsLink.value, newAction()]);
 
   deleteCondition = (index) =>
     (evt) => this.conditionsLink.set(this.conditionsLink.value.filter((_, idx) => index !== idx));
 
-  // pls work
   deleteAction = (index) =>
     (evt) => this.actionsLink.set(this.actionsLink.value.filter((_, idx) => index !== idx));
 
@@ -178,7 +158,6 @@ export class RuleEditor extends LinkedComponent {
       this.ruleNameLink,
       this.deviceGroupLink,
       this.conditionsLink,
-      //pls work
       this.actionsLink,
       this.timePeriodLink,
       this.calculationLink
@@ -237,22 +216,15 @@ export class RuleEditor extends LinkedComponent {
     this.getDeviceCountAndFields(value);
   }
 
-  //pls work
-  onActionTypeChange = ({ target: { value: { value = {} } } }) => {
-    this.setState({
-      actionQueryType: value
-    });
-  }
-
   onAddEmail = (link) => (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const errors = this.newEmailLink.error;
-      if(!errors){
+      if (!errors) {
         const newState = update(
           this.state,
           {
-            ...link.setter({ $set: [ ...link.value, this.newEmailLink.value ] }),
+            ...link.setter({ $set: [...link.value, this.newEmailLink.value] }),
             ...this.newEmailLink.setter({ $set: '' })
           }
         );
@@ -262,7 +234,7 @@ export class RuleEditor extends LinkedComponent {
   }
 
   deleteEmail = (index) => (link) =>
-  (e) => link.set(link.value.filter((_, idx) => index !== idx));
+    (e) => link.set(link.value.filter((_, idx) => index !== idx));
 
   getDeviceCountAndFields(groupId) {
     this.props.deviceGroups.some(group => {
@@ -298,24 +270,21 @@ export class RuleEditor extends LinkedComponent {
     return [...conditions.values()].map(field => ({ label: field, value: field }));
   }
 
-  //todo toggle button didn't support link
   onToggle = ({ target: { value } }) => {
     this.setState({ formData: { ...this.state.formData, enabled: value } })
   }
 
-  //pls work
   deletePill = link => index => e => {
     link.set(link.value.filter((_, idx) => index !== idx));
   }
 
-  //pls work
   onActionToggle = ({ target: { value } }) => {
     this.setState({ formData: { ...this.state.formData, actionEnabled: value } })
   }
 
   render() {
     const { onClose, t, deviceGroups = [] } = this.props;
-    const { error, formData, fieldOptions, devicesAffected, isPending, fieldQueryPending, actionQueryType } = this.state;
+    const { error, formData, fieldOptions, devicesAffected, isPending, fieldQueryPending } = this.state;
     const calculationOptions = calculations.map(value => ({
       label: t(`rules.flyouts.ruleEditor.calculationOptions.${value.toLowerCase()}`),
       value
@@ -325,8 +294,7 @@ export class RuleEditor extends LinkedComponent {
     const requiredValidator = (new Validator()).check(Validator.notEmpty, t('rules.flyouts.ruleEditor.validation.required'));
     // State links
     this.formDataLink = this.linkTo('formData');
-    //pls work
-    this.newEmailLink = this.linkTo('newEmail').check(val => (val.split("@").length === 2 && val.split("@")[0].length > 0 && val.split("@")[1].length > 0) || val.length === 0, "Invalid syntax");
+    this.newEmailLink = this.linkTo('newEmail').check(val => (val.split("@").length === 2 && val.split("@")[0].length > 0 && val.split("@")[1].length > 0) || val.length === 0, t('rules.flyouts.ruleEditor.actions.syntaxError'));
     this.ruleNameLink = this.formDataLink.forkTo('name').withValidator(requiredValidator);
     this.descriptionLink = this.formDataLink.forkTo('description');
     this.deviceGroupLink = this.formDataLink.forkTo('groupId')
@@ -340,15 +308,9 @@ export class RuleEditor extends LinkedComponent {
         this.props.t('rules.flyouts.ruleEditor.validation.required')
       );
     this.conditionsLink = this.formDataLink.forkTo('conditions').withValidator(requiredValidator);
-
-    //pls work
     this.actionsLink = this.formDataLink.forkTo('actions').withValidator(requiredValidator);
-
     this.severityLink = this.formDataLink.forkTo('severity');
-    //todo toggle button didn't support link
-    this.enabledLink = this.formDataLink.forkTo('enabled');
-    //pls work
-    this.actionEnabledLink = this.formDataLink.forkTo('actionEnabled');
+
     // Create the state link for the dynamic form elements
     const conditionLinks = this.conditionsLink.getLinkedChildren(conditionLink => {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
@@ -360,21 +322,14 @@ export class RuleEditor extends LinkedComponent {
       return { fieldLink, operatorLink, valueLink, error };
     });
 
-    //pls work
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      //const actionTypeLink = actionLink.forkTo('actionType').map(({ value }) => value).withValidator(requiredValidator);
-      //state.formData.actions.parameters
       const emailLink = actionLink.forkTo('parameters').forkTo('email').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
-      //state.formData.actions.parameters
       const templateLink = actionLink.forkTo('parameters').forkTo('template').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
-
       const error = formData.actionEnabled ? (emailLink.error || templateLink.error) : false;
       return { emailLink, templateLink, error };
     });
 
     const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
-
-    //pls work
     const actionsHaveErrors = actionLinks.some(({ error }) => error);
 
     return (
@@ -485,19 +440,18 @@ export class RuleEditor extends LinkedComponent {
                 </Section.Container>
               ))
             }
-
-
-
-            {
-              <Section.Container collapsable={false}>
-                <Section.Header>{t('rules.flyouts.ruleEditor.actions.actions')}</Section.Header>
-                <ToggleBtn
-                  value={formData.actionEnabled}
-                  onChange={this.onActionToggle} >
-                  {formData.enabled ? 'On' : 'Off'}
-                </ToggleBtn>
-                {formData.actionEnabled && <p>Send an email when alert is triggered</p>}
-                {actionLinks.map((action, idx) => (
+            <Section.Container collapsable={false}>
+              <Section.Header>{t('rules.flyouts.ruleEditor.actions.actions')}</Section.Header>
+              <ToggleBtn
+                value={formData.actionEnabled}
+                onChange={this.onActionToggle} >
+                {formData.actionEnabled ? t('rules.flyouts.ruleEditor.actions.on') : t('rules.flyouts.ruleEditor.actions.off')}
+              </ToggleBtn>
+              {
+                formData.actionEnabled && <p>{t('rules.flyouts.ruleEditor.actions.sendEmailOnTrigger')}</p>
+              }
+              {
+                actionLinks.map((action, idx) => (
                   <div key={formData.actions[idx].key}>
                     <Section.Content>
                       {
@@ -511,12 +465,10 @@ export class RuleEditor extends LinkedComponent {
                               link={this.newEmailLink}
                               placeholder={t('rules.flyouts.ruleEditor.actions.enterEmail')} />
                           </FormGroup>
-
                           <PillContainer
                             pills={action.emailLink}
                             svg={svgs.cancelX}
-                            onSvgClick={this.deletePill(action.emailLink)}/>
-
+                            onSvgClick={this.deletePill(action.emailLink)} />
                           <FormGroup className="thin-pad-top">
                             <FormControl
                               type="textarea"
@@ -528,14 +480,7 @@ export class RuleEditor extends LinkedComponent {
                     </Section.Content>
                   </div>
                 ))}
-              </Section.Container>
-            }
-
-
-
-
-
-
+            </Section.Container>
             <Section.Container collapsable={false}>
               <Section.Content>
                 <FormGroup className="padded-top">
