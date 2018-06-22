@@ -34,11 +34,8 @@ export const toActionModel = (response = {}) => {
     'parameters': 'parameters'
   });
   const params = response.Parameters || {};
-  if(params.Email) console.log("Uppercase");
-  if(params.email) console.log("lowercase");
-  //should all be uppercase now i think
   return update(model, {
-    parameters: { email: { $set: params.Email || params.email || [] }}
+    parameters: { email: { $set: params.Email || [] }, template: { $set: params.Template || ''}}
   });
 }
 
@@ -128,7 +125,7 @@ export const toNewRuleRequestModel = ({
   const Actions = actions.map(act => ({
     Type: act.type,
     Parameters: {
-      Type: act.parameters.type,
+      Template: act.parameters.template,
       Email: act.parameters.email
     }
   }));

@@ -128,7 +128,7 @@ export class RuleEditor extends LinkedComponent {
         ...condition,
         key: conditionKey++
       })),
-      actions: (rule.actions || []).map(action => ({
+      actions: (rule.actions.length === 0 ? [newAction()] : rule.actions).map(action => ({
         ...action,
         key: actionKey++
       })),
