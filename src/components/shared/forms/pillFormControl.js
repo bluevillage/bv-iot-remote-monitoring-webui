@@ -2,15 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Pill } from './pill';
-import { Link } from 'utilities';
-import './styles/pillContainer.css';
+import './styles/pillFormControl.css';
 
-export const PillContainer = (props) => {
-  const { pills, onSvgClick, svg } = props;
-
+export const PillFormControl = ({ pills, onSvgClick, svg }) => {
   return (
-    <div className="pill-container">
-      {pills.value.map((pill, idx) => (
+    <div className="pill-form-control">
+      {pills.map((pill, idx) => (
         <Pill
           key={idx}
           label={pill}
@@ -22,8 +19,8 @@ export const PillContainer = (props) => {
   );
 };
 
-PillContainer.propTypes = {
+PillFormControl.propTypes = {
   svg: PropTypes.string,
   onSvgClick: PropTypes.func,
-  pills: PropTypes.instanceOf(Link)
+  pills: PropTypes.arrayOf(PropTypes.string)
 };

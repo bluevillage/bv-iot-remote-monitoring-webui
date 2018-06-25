@@ -8,7 +8,7 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  PillContainer,
+  PillFormControl,
   Radio,
   ToggleBtn,
   SectionDesc,
@@ -49,12 +49,6 @@ const operatorOptions = [
   { label: '=', value: 'Equals' }
 ];
 
-const actionOptions = [
-  { label: 'Send SMS', value: 'SMS' },
-  { label: 'Send email', value: 'Email' },
-  { label: 'No action', value: 'none' }
-]
-
 // A counter for creating unique keys per new condition
 let conditionKey = 0;
 
@@ -70,7 +64,7 @@ const newCondition = () => ({
 });
 
 const newAction = () => ({
-  type: actionOptions[1].value,
+  type: "Email",
   parameters: {
     email: [],
     template: ''
@@ -106,6 +100,10 @@ export class RuleEditor extends LinkedComponent {
       newEmail: '',
       isPending: false
     };
+
+    this.formDataLink = this.linkTo('formData');
+    this.newEmailLink = this.linkTo('newEmail') // Matches email address pattern
+      .check(val => val.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/), props.t('rules.flyouts.ruleEditor.actions.syntaxError'));
   }
 
   componentDidMount() {
@@ -180,7 +178,6 @@ export class RuleEditor extends LinkedComponent {
         },
         lastTrigger: {
           response: undefined,
-          //should this be error?
           erroe: undefined
         }
       };
@@ -219,12 +216,13 @@ export class RuleEditor extends LinkedComponent {
   onAddEmail = (link) => (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const errors = this.newEmailLink.error;
-      if (!errors) {
+      if (!this.newEmailLink.error) {
         const newState = update(
           this.state,
           {
+            // Saves user entered email value into action object's list of emails
             ...link.setter({ $set: [...link.value, this.newEmailLink.value] }),
+            // Clears new email input textfield of user's entered email value
             ...this.newEmailLink.setter({ $set: '' })
           }
         );
@@ -293,8 +291,6 @@ export class RuleEditor extends LinkedComponent {
     // Validators
     const requiredValidator = (new Validator()).check(Validator.notEmpty, t('rules.flyouts.ruleEditor.validation.required'));
     // State links
-    this.formDataLink = this.linkTo('formData');
-    this.newEmailLink = this.linkTo('newEmail').check(val => (val.split("@").length === 2 && val.split("@")[0].length > 0 && val.split("@")[1].length > 0) || val.length === 0, t('rules.flyouts.ruleEditor.actions.syntaxError'));
     this.ruleNameLink = this.formDataLink.forkTo('name').withValidator(requiredValidator);
     this.descriptionLink = this.formDataLink.forkTo('description');
     this.deviceGroupLink = this.formDataLink.forkTo('groupId')
@@ -323,8 +319,12 @@ export class RuleEditor extends LinkedComponent {
     });
 
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      const emailLink = actionLink.forkTo('parameters').forkTo('email').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
-      const templateLink = actionLink.forkTo('parameters').forkTo('template').check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const emailLink = actionLink.forkTo('parameters')
+        .forkTo('email')
+        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+      const templateLink = actionLink.forkTo('parameters')
+        .forkTo('template')
+        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
       const error = formData.actionEnabled ? (emailLink.error || templateLink.error) : false;
       return { emailLink, templateLink, error };
     });
@@ -447,39 +447,34 @@ export class RuleEditor extends LinkedComponent {
                 onChange={this.onActionToggle} >
                 {formData.actionEnabled ? t('rules.flyouts.ruleEditor.actions.on') : t('rules.flyouts.ruleEditor.actions.off')}
               </ToggleBtn>
-              {
-                formData.actionEnabled && <p>{t('rules.flyouts.ruleEditor.actions.sendEmailOnTrigger')}</p>
-              }
-              {
-                actionLinks.map((action, idx) => (
-                  <div key={formData.actions[idx].key}>
-                    <Section.Content>
-                      {
-                        formData.actionEnabled &&
-                        <div>
-                          <FormGroup>
-                            <FormControl
-                              type="text"
-                              className="long"
-                              onKeyPress={this.onAddEmail(action.emailLink)}
-                              link={this.newEmailLink}
-                              placeholder={t('rules.flyouts.ruleEditor.actions.enterEmail')} />
-                          </FormGroup>
-                          <PillContainer
-                            pills={action.emailLink}
-                            svg={svgs.cancelX}
-                            onSvgClick={this.deletePill(action.emailLink)} />
-                          <FormGroup className="thin-pad-top">
-                            <FormControl
-                              type="textarea"
-                              link={action.templateLink}
-                              placeholder={t('rules.flyouts.ruleEditor.actions.enterEmailComm')} />
-                          </FormGroup>
-                        </div>
-                      }
+              <Section.Content>
+                {
+                  formData.actionEnabled && <p>{t('rules.flyouts.ruleEditor.actions.sendEmailOnTrigger')}</p>
+                }
+                {
+                  formData.actionEnabled && actionLinks.map((action, idx) => (
+                    <Section.Content key={formData.actions[idx].key}>
+                      <FormGroup>
+                        <FormControl
+                          type="text"
+                          className="long"
+                          onKeyPress={this.onAddEmail(action.emailLink)}
+                          link={this.newEmailLink}
+                          placeholder={t('rules.flyouts.ruleEditor.actions.enterEmail')} />
+                      </FormGroup>
+                      <PillFormControl
+                        pills={action.emailLink.value}
+                        svg={svgs.cancelX}
+                        onSvgClick={this.deletePill(action.emailLink)} />
+                      <FormGroup className="thin-pad-top">
+                        <FormControl
+                          type="textarea"
+                          link={action.templateLink}
+                          placeholder={t('rules.flyouts.ruleEditor.actions.enterEmailComm')} />
+                      </FormGroup>
                     </Section.Content>
-                  </div>
-                ))}
+                  ))}
+              </Section.Content>
             </Section.Container>
             <Section.Container collapsable={false}>
               <Section.Content>

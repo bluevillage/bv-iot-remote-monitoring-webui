@@ -6,12 +6,11 @@ import { joinClasses } from 'utilities';
 
 import './styles/pill.css';
 
-export const Pill = (props) => {
-  const { svg, label, onSvgClick} = props;
+export const Pill = ({ svg, label, onSvgClick}) => {
   return (
     <div className={joinClasses('pill', 'pill-primary')} onClick={onSvgClick}>
-      <p>{label}</p>
-      <div>{ svg && <Svg path={props.svg} className="pill-icon" /> }</div>
+      { label }
+      { svg && <Svg path={svg} className="pill-icon" /> }
     </div>
   );
 };
