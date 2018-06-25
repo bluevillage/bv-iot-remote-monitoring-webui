@@ -53,7 +53,10 @@ export class DeviceDetails extends Component {
     };
 
     this.columnDefs = [
-      rulesColumnDefs.ruleName,
+      {
+        ...rulesColumnDefs.ruleName,
+        cellRendererFramework: undefined // Don't allow soft select from an open flyout
+      },
       rulesColumnDefs.severity,
       rulesColumnDefs.alertStatus,
       rulesColumnDefs.explore
@@ -165,6 +168,7 @@ export class DeviceDetails extends Component {
     const rulesGridProps = {
       rowData: isPending ? undefined : this.applyRuleNames(this.state.alerts || [], this.props.rules || []),
       t: this.props.t,
+      domLayout: 'autoHeight',
       columnDefs: translateColumnDefs(this.props.t, this.columnDefs),
       suppressFlyouts: true
     };
@@ -199,7 +203,10 @@ export class DeviceDetails extends Component {
                 </Row>
               </Grid>
 
-              {(!this.state.isAlertsPending && this.state.alerts && (this.state.alerts.length > 0)) && <RulesGrid {...rulesGridProps} />}
+              {
+                (!this.state.isAlertsPending && this.state.alerts && (this.state.alerts.length > 0))
+                && <RulesGrid {...rulesGridProps} />
+              }
 
               <Section.Container>
                 <Section.Header>{t('devices.flyouts.details.telemetry.title')}</Section.Header>
@@ -283,8 +290,8 @@ export class DeviceDetails extends Component {
                             properties.map(([propertyName, propertyValue], idx) => {
                               const desiredPropertyValue = device.desiredProperties[propertyName];
                               const displayValue = !desiredPropertyValue || propertyValue === desiredPropertyValue
-                                ? propertyValue
-                                : t('devices.flyouts.details.properties.syncing', { reportedPropertyValue: propertyValue, desiredPropertyValue });
+                                ? propertyValue.toString()
+                                : t('devices.flyouts.details.properties.syncing', { reportedPropertyValue: propertyValue.toString(), desiredPropertyValue: desiredPropertyValue.toString() });
                               return (
                                 <Row key={idx}>
                                   <Cell className="col-3">{propertyName}</Cell>

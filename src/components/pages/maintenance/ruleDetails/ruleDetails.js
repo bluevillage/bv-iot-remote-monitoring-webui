@@ -6,13 +6,17 @@ import { Observable, Subject } from 'rxjs';
 
 import Config from 'app.config';
 import { RulesGrid } from 'components/pages/rules/rulesGrid';
-import { AjaxError, Btn, PageContent, ContextMenu, RefreshBar } from 'components/shared';
+import { AjaxError, Btn, PageContent, ContextMenu, RefreshBar, Indicator } from 'components/shared';
 import { svgs, joinClasses, renderUndefined } from 'utilities';
 import { DevicesGrid } from 'components/pages/devices/devicesGrid';
+import { DeviceGroupDropdownContainer as DeviceGroupDropdown } from 'components/app/deviceGroupDropdown';
+import { ManageDeviceGroupsBtnContainer as ManageDeviceGroupsBtn } from 'components/app/manageDeviceGroupsBtn';
+import { TimeIntervalDropdown } from 'components/app/timeIntervalDropdown';
 import { TelemetryChart, transformTelemetryResponse, chartColorObjects } from 'components/pages/dashboard/panels/telemetry';
 import { TelemetryService } from 'services';
 import { TimeRenderer, SeverityRenderer } from 'components/shared/cellRenderers';
 import { AlertOccurrencesGrid } from 'components/pages/maintenance/grids';
+import { ROW_HEIGHT } from 'components/shared/pcsGrid/pcsGridConfig';
 
 import './ruleDetails.css';
 
@@ -32,6 +36,8 @@ export class RuleDetails extends Component {
     super(props);
 
     this.state = {
+      updatingAlertStatus: false,
+
       selectedAlerts: [],
       selectedRule: undefined,
 
@@ -62,19 +68,23 @@ export class RuleDetails extends Component {
     this.subscriptions.push(
       this.restartTelemetry$
         .distinctUntilChanged()
-        .filter(deviceIds => deviceIds)
-        .map(deviceIds => deviceIds.split(idDelimiter))
+        .map(deviceIds => deviceIds.split(idDelimiter).filter(id => id))
         .do(() => this.setState({ telemetry: {}, telemetryIsPending: false }))
-        .switchMap(deviceIds =>
-          TelemetryService.getTelemetryByDeviceIdP15M(deviceIds)
-            .merge(
-              this.telemetryRefresh$ // Previous request complete
-                .delay(Config.telemetryRefreshInterval) // Wait to refresh
-                .do(onPendingStart)
-                .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M(deviceIds))
-            )
-            .flatMap(transformTelemetryResponse(() => this.state.telemetry))
-            .map(telemetry => ({ telemetry, telemetryIsPending: false }))
+        .switchMap(deviceIds => {
+          if (deviceIds.length > 0) {
+            return TelemetryService.getTelemetryByDeviceIdP15M(deviceIds)
+              .merge(
+                this.telemetryRefresh$ // Previous request complete
+                  .delay(Config.telemetryRefreshInterval) // Wait to refresh
+                  .do(onPendingStart)
+                  .flatMap(_ => TelemetryService.getTelemetryByDeviceIdP1M(deviceIds))
+              )
+              .flatMap(transformTelemetryResponse(() => this.state.telemetry))
+              .map(telemetry => ({ telemetry, telemetryIsPending: false }))
+            } else {
+              return Observable.empty();
+            }
+          }
         )
         .subscribe(
           telemetryState => this.setState(
@@ -132,16 +142,21 @@ export class RuleDetails extends Component {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  // TODO: Handle error and isPending states
   updateAlertStatus = (selectedAlerts, status) =>
     this.subscriptions.push(
-      Observable.from(selectedAlerts)
+      Observable.of(selectedAlerts)
+        .do(() => this.setState({ updatingAlertStatus: true }))
+        .flatMap(alerts => alerts)
         .flatMap(({ id }) => TelemetryService.updateAlertStatus(id, status))
         .toArray() // Use toArray to wait for all calls to succeed
-        .subscribe(() => {
-          this.props.setAlertStatus(selectedAlerts, status);
-          this.onAlertGridHardSelectChange([]);
-        })
+        .subscribe(
+          () => {
+            this.props.setAlertStatus(selectedAlerts, status);
+            this.onAlertGridHardSelectChange([]);
+          },
+          undefined, // TODO: Handle error
+          () => this.setState({ updatingAlertStatus: false })
+        )
     );
 
   // TODO: Move constant values to central location
@@ -206,26 +221,40 @@ export class RuleDetails extends Component {
       lastUpdated,
       match,
       theme,
-      t
+      t,
+      onTimeIntervalChange,
+      timeInterval
     } = this.props;
     const selectedId = match.params.id;
-    const rule = isPending ? undefined : [this.state.selectedRule];
+    const rule = isPending || !this.state.selectedRule ? undefined : [this.state.selectedRule];
     const alertName = (this.state.selectedRule || {}).name || selectedId;
 
     const alertsGridProps = {
+      domLayout: 'autoHeight',
       rowSelection: 'multiple',
+      deltaRowDataMode: true,
+      getRowNodeId: ({ id }) => id,
       rowData: isPending ? undefined : this.state.occurrences,
+      sizeColumnsToFit: true,
       pagination: true,
       paginationPageSize: Config.smallGridPageSize,
       onHardSelectChange: this.onAlertGridHardSelectChange,
       onGridReady: this.onAlertGridReady,
+      onRowClicked: ({ node }) => node.setSelected(!node.isSelected()),
       t
     };
 
     const { selectedTab, selectedAlert = {} } = this.state;
     const { counts = {} } = selectedAlert;
     return [
-      <ContextMenu key="context-menu">
+      <ContextMenu className="rule-details-context-menu-container" key="context-menu">
+        <DeviceGroupDropdown />
+        {
+          this.state.updatingAlertStatus &&
+          <div className="alert-indicator-container">
+            <Indicator />
+          </div>
+        }
         {
           this.state.ruleContextBtns
           || this.state.alertContextBtns
@@ -236,6 +265,11 @@ export class RuleDetails extends Component {
           time={lastUpdated}
           isPending={isPending}
           t={t} />
+        <TimeIntervalDropdown
+          onChange={onTimeIntervalChange}
+          value={timeInterval}
+          t={t} />
+        <ManageDeviceGroupsBtn />
       </ContextMenu>,
       <PageContent className="maintenance-container rule-details-container" key="page-content">
       {
@@ -288,6 +322,7 @@ export class RuleDetails extends Component {
               <h4 className="sub-heading">{ t('maintenance.ruleDetail') }</h4>
               <RulesGrid
                 t={t}
+                style={{ height: 2 * ROW_HEIGHT + 2 }}
                 onGridReady={this.onRuleGridReady}
                 onContextMenuChange={this.onContextMenuChange('ruleContextBtns')}
                 onHardSelectChange={this.onHardSelectChange('rules')}
@@ -312,6 +347,7 @@ export class RuleDetails extends Component {
                   <h4 className="sub-heading" key="header">{t('maintenance.alertedDevices')}</h4>,
                   <DevicesGrid
                     t={t}
+                    domLayout={'autoHeight'}
                     onGridReady={this.onDeviceGridReady}
                     rowData={isPending ? undefined : this.state.devices}
                     onContextMenuChange={this.onContextMenuChange('deviceContextBtns')}

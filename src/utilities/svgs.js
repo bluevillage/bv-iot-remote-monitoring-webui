@@ -33,14 +33,16 @@ import LoadingToggleIconPath from 'assets/icons/loadingToggle.svg';
 import ManageFiltersIconPath from 'assets/icons/manageFilters.svg';
 import PhysicalDeviceIconPath from 'assets/icons/physicalDevice.svg';
 import PlusIconPath from 'assets/icons/plus.svg';
+import QuestionMarkIconPath from 'assets/icons/questionMark.svg';
 import RadioSelectedIconPath from 'assets/icons/radioSelected.svg';
 import RadioUnselectedIconPath from 'assets/icons/radioUnselected.svg';
 import ReconfigureIconPath from 'assets/icons/reconfigure.svg';
 import RefreshIconPath from 'assets/icons/refresh.svg';
 import RuleDisabledIconPath from 'assets/icons/ruleDisabled.svg';
 import RuleEnabledIconPath from 'assets/icons/ruleEnabled.svg';
-import SettingsIconPath from 'assets/icons/settings.svg';
 import SIMManagementIconPath from 'assets/icons/SIMManagement.svg';
+import SearchIconPath from 'assets/icons/searchIcon.svg';
+import SettingsIconPath from 'assets/icons/settings.svg';
 import SimulatedDeviceIconPath from 'assets/icons/simulatedDevice.svg';
 import TabDashboardIconPath from 'assets/icons/tabDashboard.svg';
 import TabDevicesIconPath from 'assets/icons/tabDevices.svg';
@@ -94,12 +96,14 @@ export const svgs = {
   manageFilters: ManageFiltersIconPath,
   physicalDevice: PhysicalDeviceIconPath,
   plus: PlusIconPath,
+  questionMark: QuestionMarkIconPath,
   radioSelected: RadioSelectedIconPath,
   radioUnselected: RadioUnselectedIconPath,
   reconfigure: ReconfigureIconPath,
   refresh: RefreshIconPath,
   ruleDisabled: RuleDisabledIconPath,
   ruleEnabled: RuleEnabledIconPath,
+  search: SearchIconPath,
   settings: SettingsIconPath,
   simmanagement: SIMManagementIconPath,
   simulatedDevice: SimulatedDeviceIconPath,
