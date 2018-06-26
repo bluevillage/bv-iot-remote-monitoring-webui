@@ -2,11 +2,7 @@
   "companyName": "Contoso",
   "header": {
     "appName": "Azure IoT Remote Monitoring",
-    "logout": "Logout",
-    "profile": "Profile",
-    "getStarted": "Get started",
-    "documentation": "Documentation",
-    "sendSuggestion": "Send a suggestion"
+    "logout": "Logout"
   },
   "pageNotFound": {
     "title": "404 - Page not found",
@@ -157,7 +153,6 @@
     "lastRefreshed": "Last refreshed"
   },
   "devices": {
-    "searchPlaceholder": "Search devices...",
     "noneFound": "No devices found.",
     "refresh": "Refresh",
     "grid": {
@@ -222,8 +217,6 @@
         "title": "Delete",
         "header": "Delete device",
         "description": "This action will delete the devices permanently from the platform.",
-        "confirmNo": "No, do not delete the selected physical devices.",
-        "confirmYes": "Yes, please delete the selected physical devices.",
         "simulatedNotSupported": "Deleting simulated devices is not currently supported, this action will only be taken on the physical devices.",
         "summaryHeader": "Summary",
         "affected": "Affected devices",
@@ -296,7 +289,6 @@
         "apply": "Apply",
         "pending": "Provisioning devices... ",
         "applySuccess": "Devices provisioned successfully",
-        "simulatedRefreshMessage": "Simulated devices are created in the background on the server. Therefore, they may take a while to show up when the device list is refreshed.",
         "close": "Close",
         "validation": {
           "required": "Is required",
@@ -360,7 +352,6 @@
     }
   },
   "rules": {
-    "searchPlaceholder": "Search rules...",
     "severity": {
       "info": "Info",
       "warning": "Warning",
@@ -415,18 +406,18 @@
         "actions":{
           "actions": "Actions",
           "action": "Action",
+          "emailActionLabel": "Send email",
+          "emailActionVal": "Email",
+          "noActionLabel": "No action",
+          "noActionVal": "none",
           "addAction": "Add action",
           "select": "Choose an action",
           "selectionPlaceholder": "Select action",
           "emailAddresses": "Email addresses",
-          "phoneNumbers": "Phone numbers",
           "enterEmail": "Enter email of notification recipients",
-          "enterPhoneNumber": "Enter phone number of notification recipients",
           "emailComments": "Email comments",
-          "smsComments": "Message comments",
           "enterEmailComm": "Enter comments for the email recipient",
-          "enterSMSComm": "Enter comments for the text recipient",
-          "syntaxError": "Invalid syntax",
+          "syntaxError": "Not a valid email address",
           "on": "On",
           "off": "Off",
           "sendEmailOnTrigger": "Send an email when alert is triggered"

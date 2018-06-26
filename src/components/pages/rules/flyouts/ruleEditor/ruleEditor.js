@@ -59,7 +59,7 @@ let actionKey = 0;
 // Creates a state object for a condition
 const newCondition = () => ({
   field: '',
-  operator: operatorOptions[1].value,
+  operator: operatorOptions[0].value,
   value: '',
   key: conditionKey++ // Used by react to track the rendered elements
 });
