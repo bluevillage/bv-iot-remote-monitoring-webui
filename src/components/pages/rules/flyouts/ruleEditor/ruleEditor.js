@@ -105,7 +105,7 @@ export class RuleEditor extends LinkedComponent {
 
     this.formDataLink = this.linkTo('formData');
     this.newEmailLink = this.linkTo('newEmail') // Matches email address pattern
-      .check(val => val.match(/^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@(([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/), props.t('rules.flyouts.ruleEditor.actions.syntaxError'));
+      .check(val => val.match(/^$|^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@(([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/), props.t('rules.flyouts.ruleEditor.actions.syntaxError'));
   }
 
   componentDidMount() {
@@ -217,7 +217,7 @@ export class RuleEditor extends LinkedComponent {
   onAddEmail = (link) => (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (!this.newEmailLink.error) {
+      if (!this.newEmailLink.error && this.newEmailLink.value !== "") {
         const newState = update(
           this.state,
           {
