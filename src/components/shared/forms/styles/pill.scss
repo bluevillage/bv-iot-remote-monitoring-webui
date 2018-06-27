@@ -10,8 +10,7 @@ $pillIconSize: 14px;
   display: flex;
   flex-shrink: 0;
   justify-content: space-between;
-  border-radius: 3px;
-  border: 0;
+  background-color: transparent;
   align-items: center;
   text-align: left;
   float: right;
@@ -32,14 +31,10 @@ $pillIconSize: 14px;
     + .pill-text { @include rem-fallback(padding-left, 5px); }
   }
 
-  .pill-text {
-    @include rem-fallback(padding-right, $pillHeight - $pillIconSize);
-    @include rem-font-size(14px);
-  }
-
   @include themify($themes) {
-    color: themed('colorBtnText');
+    color: themed('colorInputText');
     background-color: themed('colorBtnBackground');
+    border: 1px solid themed('colorInputBorderColor');
 
     .pill-icon svg { fill: themed('colorBtnSvgFill'); }
 
@@ -47,7 +42,7 @@ $pillIconSize: 14px;
 
     &:hover {
       color: themed('colorBtnTextHover');
-      background-color: themed('colorBtnBackgroundHover');
+      border-color: themed('colorInputBorderHoverColor');
 
       .pill-icon svg { fill: themed('colorBtnSvgFillHover'); }
     }
@@ -57,27 +52,6 @@ $pillIconSize: 14px;
       background-color: themed('colorBtnBackgroundActive');
 
       .pill-icon svg { fill: themed('colorBtnSvgFillActive'); }
-    }
-
-    &.pill-primary {
-      color: themed('colorBtnPrimaryText');
-      background-color: themed('colorBtnText');
-
-      .pill-icon svg { fill: themed('colorBtnPrimarySvgFill'); }
-
-      &:hover {
-        color: themed('colorBtnPrimaryTextHover');
-        background-color: themed('colorBtnPrimaryBackgroundHover');
-
-        .pill-icon svg { fill: themed('colorBtnPrimarySvgFillHover'); }
-      }
-
-      &:active {
-        color: themed('colorBtnPrimaryTextActive');
-        background-color: themed('colorBtnPrimaryBackgroundActive');
-
-        .pill-icon svg { fill: themed('colorBtnPrimarySvgFillActive'); }
-      }
     }
   }
 }

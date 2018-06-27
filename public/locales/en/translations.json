@@ -423,7 +423,7 @@
           "select": "Choose an action",
           "selectionPlaceholder": "Select action",
           "emailAddresses": "Email addresses",
-          "enterEmail": "Enter email of notification recipients",
+          "enterEmail": "Press enter to add email recipient",
           "emailComments": "Email comments",
           "enterEmailComm": "Enter comments for the email recipient",
           "syntaxError": "Not a valid email address",
