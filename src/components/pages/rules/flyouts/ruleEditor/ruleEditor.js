@@ -472,11 +472,9 @@ export class RuleEditor extends LinkedComponent {
               </ToggleBtn>
               <Section.Content>
                 {
-                  formData.actionEnabled && <p>{t('rules.flyouts.ruleEditor.actions.sendEmailOnTrigger')}</p>
-                }
-                {
                   formData.actionEnabled && actionLinks.map((action, idx) => (
                     <Section.Content key={formData.actions[idx].key}>
+                      <p className="padded-top">{t('rules.flyouts.ruleEditor.actions.emailAddresses')}</p>
                       <FormGroup>
                         <FormControl
                           type="text"
@@ -489,7 +487,8 @@ export class RuleEditor extends LinkedComponent {
                         pills={action.emailLink.value}
                         svg={svgs.cancelX}
                         onSvgClick={this.deletePill(action.emailLink)} />
-                      <FormGroup className="thin-pad-top">
+                      <p className="padded-top">{t('rules.flyouts.ruleEditor.actions.emailComments')}</p>
+                      <FormGroup>
                         <FormControl
                           type="textarea"
                           link={action.templateLink}

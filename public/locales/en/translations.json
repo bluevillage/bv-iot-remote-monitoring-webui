@@ -427,8 +427,8 @@
           "emailComments": "Email comments",
           "enterEmailComm": "Enter comments for the email recipient",
           "syntaxError": "Not a valid email address",
-          "on": "On",
-          "off": "Off",
+          "on": "Email enabled",
+          "off": "Email disabled",
           "sendEmailOnTrigger": "Send an email when alert is triggered"
         },
         "calculationOptions": {

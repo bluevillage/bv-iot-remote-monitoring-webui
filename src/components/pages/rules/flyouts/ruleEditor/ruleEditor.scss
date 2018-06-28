@@ -16,8 +16,6 @@
     @include rem-fallback(margin-top, 24px);
   }
 
-  .thin-pad-top { @include rem-fallback(margin-top, 10px); }
-
   .rule-editor-error {
     border: 1px transparent solid;
     @include rem-fallback(margin, 12px, 0px);
