@@ -492,7 +492,7 @@ export class RuleEditor extends LinkedComponent {
                         <FormControl
                           type="textarea"
                           link={action.templateLink}
-                          placeholder={t('rules.flyouts.ruleEditor.actions.enterEmailComm')} />
+                          placeholder={t('rules.flyouts.ruleEditor.actions.enterEmailComments')} />
                       </FormGroup>
                     </Section.Content>
                   ))}
