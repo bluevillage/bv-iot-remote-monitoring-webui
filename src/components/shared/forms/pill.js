@@ -5,7 +5,7 @@ import { Svg } from 'components/shared/svg/svg';
 
 import './styles/pill.css';
 
-export const Pill = ({ svg, label, onSvgClick}) => {
+export const Pill = ({ svg, label, onSvgClick }) => {
   return (
     <div className="pill" onClick={onSvgClick}>
       { label }

@@ -24,6 +24,7 @@ import { SeverityRenderer } from 'components/shared/cellRenderers';
 import {
   Validator,
   svgs,
+  isEmail,
   LinkedComponent
 } from 'utilities';
 import Flyout from 'components/shared/flyout';
@@ -105,7 +106,7 @@ export class RuleEditor extends LinkedComponent {
 
     this.formDataLink = this.linkTo('formData');
     this.newEmailLink = this.linkTo('newEmail') // Matches email address pattern
-      .check(val => val.match(/^$|^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@(([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/), props.t('rules.flyouts.ruleEditor.actions.syntaxError'));
+      .check(val => isEmail(val), () => this.props.t('rules.flyouts.ruleEditor.actions.syntaxError'));
   }
 
   componentDidMount() {
@@ -128,11 +129,12 @@ export class RuleEditor extends LinkedComponent {
         ...condition,
         key: conditionKey++
       })),
-      actions: (rule.actions.length === 0 ? [newAction()] : rule.actions).map(action => ({
-        ...action,
-        key: actionKey++
-      })),
-      actionEnabled: (rule.actions || []).length > 0 ? true : false
+      actions:
+        rule.actions.length === 0
+        ? [newAction()]
+        : rule.actions.map(action => ({ ...action, key: actionKey++ })
+      ),
+      actionEnabled: rule.actions === undefined ? false : (rule.actions || []).length > 0 ? true : false
     }
   });
 
@@ -217,7 +219,7 @@ export class RuleEditor extends LinkedComponent {
   onAddEmail = (link) => (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (!this.newEmailLink.error && this.newEmailLink.value !== "") {
+      if (!this.newEmailLink.error && this.newEmailLink.value !== '') {
         const newState = update(
           this.state,
           {
@@ -328,7 +330,7 @@ export class RuleEditor extends LinkedComponent {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
       const operatorLink = conditionLink.forkTo('operator').map(({ value }) => value).withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value')
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'))
+        .check(Validator.notEmpty, this.props.t('deviceGroupsFlyout.errorMsg.isRequired'))
         .check(val => !isNaN(val), t('rules.flyouts.ruleEditor.validation.nan'));
       const error = fieldLink.error || operatorLink.error || valueLink.error;
       return { fieldLink, operatorLink, valueLink, error };
@@ -337,10 +339,10 @@ export class RuleEditor extends LinkedComponent {
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
       const emailLink = actionLink.forkTo('parameters')
         .forkTo('email')
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+        .check(Validator.notEmpty, this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
       const templateLink = actionLink.forkTo('parameters')
         .forkTo('template')
-        .check(Validator.notEmpty, () => this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
+        .check(Validator.notEmpty, this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
       const error = formData.actionEnabled ? (emailLink.error || templateLink.error) : false;
       return { emailLink, templateLink, error };
     });
