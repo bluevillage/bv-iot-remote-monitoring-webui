@@ -5,14 +5,12 @@ import { Svg } from 'components/shared/svg/svg';
 
 import './styles/pill.css';
 
-export const Pill = ({ svg, label, onSvgClick }) => {
-  return (
+export const Pill = ({ svg, label, onSvgClick }) => (
     <div className="pill" onClick={onSvgClick}>
       { label }
       { svg && <Svg path={svg} className="pill-icon" /> }
     </div>
   );
-};
 
 Pill.propTypes = {
   svg: PropTypes.string,

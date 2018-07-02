@@ -13,19 +13,18 @@ $pillIconSize: 14px;
   background-color: transparent;
   align-items: center;
   text-align: left;
-  float: right;
   white-space: nowrap;
-  margin: 7px 7px 0px 0px;
   cursor: pointer;
   font-family: inherit;
+  @include rem-fallback(margin, 7px, 7px, 0px, 0px);
   @include rem-fallback(padding, 0px, $pillHeight/4);
   @include rem-fallback(min-width, $pillMinWidth);
 
   .pill-icon {
-    float: right;
     position: relative;
     @include rem-fallback(height, $pillHeight);
     @include rem-fallback(width, $pillIconSize);
+
     svg { @include square-px-rem($pillIconSize);}
 
     + .pill-text { @include rem-fallback(padding-left, 5px); }

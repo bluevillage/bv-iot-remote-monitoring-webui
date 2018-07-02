@@ -24,7 +24,7 @@ export const toRuleModel = (response = {}) => {
   });
   return update(model, {
     severity: { $set: (model.severity || '').toLowerCase() },
-    actions: { $set: (response.Actions || []).map(toActionModel)}
+    actions: { $set: (response.Actions || []).map(toActionModel) }
   });
 };
 
@@ -35,7 +35,8 @@ export const toActionModel = (response = {}) => {
   });
   const params = response.Parameters || {};
   return update(model, {
-    parameters: { email: { $set: params.Email || [] }, template: { $set: params.Template || ''}}
+    parameters: { email: { $set: params.Email || [] },
+    template: { $set: params.Template || ''}}
   });
 }
 
