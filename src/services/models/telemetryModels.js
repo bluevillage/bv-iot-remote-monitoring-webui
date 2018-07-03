@@ -107,6 +107,8 @@ export const toMessagesModel = (response = {}) => getItems(response)
   }));
 
 export const toNewRuleRequestModel = ({
+  id,
+  eTag,
   name,
   description,
   groupId,
@@ -132,6 +134,8 @@ export const toNewRuleRequestModel = ({
   }));
 
   return {
+    Id: id,
+    ETag: eTag,
     Name: name,
     Description: description,
     GroupId: groupId,
