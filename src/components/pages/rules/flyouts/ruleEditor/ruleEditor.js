@@ -66,7 +66,7 @@ const newCondition = () => ({
 });
 
 const newAction = () => ({
-  type: "Email",
+  type: 'Email',
   parameters: {
     email: [],
     template: ''
@@ -337,11 +337,10 @@ export class RuleEditor extends LinkedComponent {
     });
 
     const actionLinks = this.actionsLink.getLinkedChildren(actionLink => {
-      const emailLink = actionLink.forkTo('parameters')
-        .forkTo('email')
+      const parametersLink = actionLink.forkTo('parameters');
+      const emailLink = parametersLink.forkTo('email')
         .check(Validator.notEmpty, this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
-      const templateLink = actionLink.forkTo('parameters')
-        .forkTo('template')
+      const templateLink = parametersLink.forkTo('template')
         .check(Validator.notEmpty, this.props.t('deviceGroupsFlyout.errorMsg.isRequired'));
       const error = formData.actionEnabled ? (emailLink.error || templateLink.error) : false;
       return { emailLink, templateLink, error };

@@ -20,25 +20,13 @@ export const toRuleModel = (response = {}) => {
     'severity': 'severity',
     'calculation': 'calculation',
     'timePeriod': 'timePeriod',
-    'action.type': 'type'
+    'action.type': 'type',
+    'actions': 'actions'
   });
   return update(model, {
-    severity: { $set: (model.severity || '').toLowerCase() },
-    actions: { $set: (response.Actions || []).map(toActionModel) }
+    severity: { $set: (model.severity || '').toLowerCase() }
   });
 };
-
-export const toActionModel = (response = {}) => {
-  const model = camelCaseReshape(response, {
-    'type': 'type',
-    'parameters': 'parameters'
-  });
-  const params = response.Parameters || {};
-  return update(model, {
-    parameters: { email: { $set: params.Email || [] },
-    template: { $set: params.Template || ''}}
-  });
-}
 
 // TODO: Double check the response from alertsByRule and alerts, might only need one model
 export const toAlertsModel = (response = {}) => getItems(response)
