@@ -93,7 +93,7 @@ const ruleListSchema = new schema.Array(ruleSchema);
 const initialState = { ...errorPendingInitialState, entities: {}, items: [] };
 
 const insertRulesReducer = (state, { payload }) => {
-  const { entities: { rules }, result } = normalize(payload, ruleListSchema);
+  const { entities: { rules = {} }, result } = normalize(payload, ruleListSchema);
   return update(state, {
     entities: { $merge: rules },
     items: { $splice: [[state.items.length, 0, result]] }
@@ -101,14 +101,15 @@ const insertRulesReducer = (state, { payload }) => {
 };
 
 const modifyRulesReducer = (state, { payload }) => {
-  const { entities: { rules } } = normalize(payload, ruleListSchema);
+  const { entities: { rules = {} } } = normalize(payload, ruleListSchema);
   return update(state, {
     entities: { $merge: rules }
   });
 };
 
 const updateRulesReducer = (state, { payload, fromAction }) => {
-  const { entities: { rules }, result } = normalize(payload, ruleListSchema);
+  const { entities: { rules = {} }, result } = normalize(payload, ruleListSchema);
+  console.log('rules', rules);
   return update(state, {
     entities: { $set: rules },
     items: { $set: result },
