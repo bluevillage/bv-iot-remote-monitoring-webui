@@ -6,6 +6,7 @@ import { ConfigService, GitHubService } from 'services';
 import { schema, normalize } from 'normalizr';
 import { createSelector } from 'reselect';
 import update from 'immutability-helper';
+import { permissions } from 'services/models';
 import {
   createAction,
   createReducerScenario,
@@ -121,7 +122,14 @@ const initialState = {
   isDefaultLogo: true,
   azureMapsKey: '',
   deviceGroupFlyoutIsOpen: false,
-  timeInterval: 'PT1H'
+  timeInterval: 'PT1H',
+
+  //TODO: Get this from the server. This is just hardcoded test data for now.
+  userPermissions: [
+    permissions.createDevices,
+    permissions.deleteDevices,
+    permissions.updateDevices
+  ]
 };
 
 const updateDeviceGroupsReducer = (state, { payload, fromAction }) => {
@@ -247,4 +255,6 @@ export const getLogoPendingStatus = state =>
   getPending(getAppReducer(state), epics.actionTypes.fetchLogo);
 
 export const getTimeInterval = state => getAppReducer(state).timeInterval;
+
+export const getUserPermissions = state => getAppReducer(state).userPermissions;
 // ========================= Selectors - END
